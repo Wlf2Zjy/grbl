@@ -38,6 +38,10 @@ void return_tool()
     gc_execute_line("G90G53G0Z-5");
     protocol_buffer_synchronize();
     gc_execute_line("M5");
+    // 向下顶刀
+    gc_execute_line("G91G0X-6");
+    gc_execute_line("G91G1Z-78F2000");
+    gc_execute_line("G90G53G0Z-5");
   }
 }
 
