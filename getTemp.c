@@ -4,7 +4,7 @@ volatile bool tempConversionDone = false;
 volatile uint16_t tempConversionCounter = 0;
 static bool conversionStarted = false;
 volatile uint16_t readSpindleTempNum = 0;
-
+volatile bool readFlag = true;
 // 0主轴，1左风扇，2右风扇
 
 all_temp temp_obj;

@@ -427,11 +427,13 @@ uint8_t system_execute_line(char *line)
       sys.state = STATE_HOMING; // 设置系统状态变量
       if (line[2] == 0)
       {
+        report_realtime_status();
         mc_homing_cycle(HOMING_CYCLE_ALL);
 #ifdef HOMING_SINGLE_AXIS_COMMANDS
       }
       else if (line[3] == 0)
       {
+        report_realtime_status();
         switch (line[2])
         {
         case 'X':
