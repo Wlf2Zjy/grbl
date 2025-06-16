@@ -79,10 +79,23 @@ void control_tool_led()
   TOOL_LED_PORT |= (1 << TOOL_LED_ENABLE_BIT); // 使能
 
   cli(); // 临时关闭中断（发送期间必须）
-  sendColor(255, 0, 0, 1);  // 显示绿色
+  sendColor(0, 0, 0, 1);  // 显示绿色
+  
+  sendColor(255, 0, 0, 1);  // 显示红色
   sendColor(0, 255, 0, 1);  // 显示绿色
-  sendColor(0, 0, 255, 1);  // 显示绿色
+  sendColor(255, 0, 0, 1);  // 显示红色
+  sendColor(0, 255, 0, 1);  // 显示绿色
+  sendColor(255, 0, 0, 1);  // 显示红色
+
+  // sendColor(0, 0, 255, 1);  // 显示绿色
+  // sendColor(0, 255, 0, 1);  // 显示绿色
+  // sendColor(0, 0, 255, 1);  // 显示绿色
+  // sendColor(0, 255, 0, 1);  // 显示绿色
+  // sendColor(0, 0, 255, 1);  // 显示绿色
+
+  // sendColor(255, 0, 0, 1);  // 显示绿色
   sei(); // 恢复中断
+  _delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
 }
 
 void control_status_led()
@@ -96,5 +109,9 @@ void control_status_led()
   sendColor(255, 0, 0, 2);  // 显示绿色
   sendColor(0, 255, 0, 2);  // 显示绿色
   sendColor(0, 0, 255, 2);  // 显示绿色
+  sendColor(255, 0, 0, 2);  // 显示绿色
+  sendColor(0, 255, 0, 2);  // 显示绿色
+  sendColor(0, 0, 255, 2);  // 显示绿色
   sei(); // 恢复中断
+  _delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
 }

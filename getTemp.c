@@ -202,13 +202,12 @@ void timer5_init() {
     TCCR5B |= (1 << CS51) | (1 << CS50);  // 64 分频：CS52=0,CS51=1,CS50=1 (011)
 
     TIMSK5 |= (1 << OCIE5A); // 使能 Timer5 比较匹配 A 中断
-
     sei(); // 开启全局中断
 }
 
 extern volatile bool serial_busy;
 ISR(TIMER5_COMPA_vect) {
-    sei();
+    // sei();
     if (serial_busy) return;  // 当前串口处理中，跳过
     // 500ms延时等待
     if (tempConversionCounter < 5000) {  // 5000ms = 5000 * 1ms

@@ -49,28 +49,81 @@ uint8_t system_control_get_state()
       control_state |= CONTROL_PIN_INDEX_SAFETY_DOOR;
     }
   }
-  return (control_state);
+  // return (control_state);
+  return 0;
 }
 
 // 引脚变化中断，用于引脚输出命令，即循环开始、进给保持和重置。
 // 仅设置实时命令执行变量，以便在主程序准备好时执行这些命令。
 // 这与从输入串行数据流直接提取的字符型实时命令的工作方式相同。
+// ISR(CONTROL_INT_vect)
+// {
+//   // print_uint8_base2_ndigit(CONTROL_PIN, 8);
+//   // printString("111\n");
+//   uint8_t pin = system_control_get_state();
+//   if (pin)
+//   {
+//     // if (bit_istrue(pin, CONTROL_PIN_INDEX_RESET))
+//     // {
+//     //   mc_reset();
+//     // }
+//     if (bit_istrue(pin, CONTROL_PIN_INDEX_SAFETY_DOOR))
+//     {
+//       print_uint8_base2_ndigit(CONTROL_PIN, 8);
+//       printString("\n");
+//       bit_true(sys_rt_exec_state, EXEC_SAFETY_DOOR);
+//     }
+//   }
+// }
+
 ISR(CONTROL_INT_vect)
 {
-  // print_uint8_base2_ndigit(CONTROL_PIN, 8);
-  // uint8_t pin = system_control_get_state();
-  // if (pin)
-  // {
-  //   if (bit_istrue(pin, CONTROL_PIN_INDEX_RESET))
-  //   {
-  //     mc_reset();
-  //   }
-  //   else if (bit_istrue(pin, CONTROL_PIN_INDEX_SAFETY_DOOR))
-  //   {
-  //     bit_true(sys_rt_exec_state, EXEC_SAFETY_DOOR);
-  //   }
-  // }
+  uint8_t pin = (CONTROL_PIN & CONTROL_MASK);
+  pin ^= CONTROL_MASK;
+  if (sys.state != STATE_ALARM) {  // 如果已经处于报警状态则忽略。 
+    if (!(sys_rt_exec_alarm)) {
+      
+      // 检查限位引脚状态。 
+      if(pin & (1 << 3) && sys.state != STATE_HOLD){
+        //虎钳松
+        print_uint8_base2_ndigit(pin, 8);
+        printString("开门\n");
+        system_set_exec_state_flag(EXEC_FEED_HOLD);
+      }else if (pin & (1 | 1 << 4 | 1 << 5 |1 << 6 |1 << 7))
+      {
+        mc_reset(); // 发起系统终止。
+        system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT); // 指示硬限位关键事件
+      }
+      
+      if(~(pin & (1 << 3)) && sys.state == STATE_HOLD){
+        print_uint8_base2_ndigit(pin, 8);
+        printString("关门\n");
+        system_set_exec_state_flag(EXEC_CYCLE_START);
+      }
+    }  
+  }
+
 }
+
+// volatile uint8_t debounce_counter = 0;
+// volatile uint8_t stable_state = 0;
+
+// ISR(CONTROL_INT_vect) {
+//   static uint8_t last_raw = 0;
+//   uint8_t current_raw = (CONTROL_PIN & CONTROL_MASK) ^ CONTROL_MASK;
+  
+//   if(current_raw == last_raw) {
+//     if(debounce_counter < 255) debounce_counter++;
+//   } else {
+//     debounce_counter = 0;
+//     last_raw = current_raw;
+//   }
+  
+//   if(debounce_counter == 10) { // 连续10次检测相同值
+//     stable_state = current_raw;
+//     process_control_signals(stable_state); // 同上方案的处理函数
+//   }
+// }
 
 // 返回安全门是否开启（T）或关闭（F），基于引脚状态。
 uint8_t system_check_safety_door_ajar()
@@ -139,6 +192,9 @@ uint8_t system_execute_line(char *line)
   case 0:
     report_grbl_help();
     break; // 显示 Grbl 帮助
+  case 'V':
+    report_version();
+    break;
   case 'S':
     if (line[4] == 0)
     {

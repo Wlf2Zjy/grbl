@@ -99,10 +99,10 @@
 
 // 定义Grbl内部使用的控制引脚索引。引脚映射可能会改变，但这些值不会。
 #define N_CONTROL_PIN 4
-#define CONTROL_PIN_INDEX_SAFETY_DOOR   bit(0)
-#define CONTROL_PIN_INDEX_RESET         bit(1)
-#define CONTROL_PIN_INDEX_FEED_HOLD     bit(2)
-#define CONTROL_PIN_INDEX_CYCLE_START   bit(3)
+#define CONTROL_PIN_INDEX_SAFETY_DOOR   bit(3)
+// #define CONTROL_PIN_INDEX_RESET         bit(1)
+// #define CONTROL_PIN_INDEX_FEED_HOLD     bit(2)
+// #define CONTROL_PIN_INDEX_CYCLE_START   bit(3)
 
 // 定义主轴停止覆盖控制状态。
 #define SPINDLE_STOP_OVR_DISABLED       0  // 必须为零。

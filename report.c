@@ -305,6 +305,15 @@ void report_probe_parameters()
   report_util_feedback_line_feed();
 }
 
+// 返回软件版本号
+void report_version()
+{
+  // 以机器位置的方式报告。
+  printPgmString(PSTR("[version:"));
+  printPgmString(PSTR("1.0.0"));
+  report_util_feedback_line_feed();
+}
+
 // 打印 Grbl NGC 参数（坐标偏移、探测）
 void report_ngc_parameters()
 {
@@ -731,27 +740,27 @@ void report_realtime_status()
       }
 #endif
     }
-    if (ctrl_pin_state)
-    {
-#ifdef ENABLE_SAFETY_DOOR_INPUT_PIN
-      if (bit_istrue(ctrl_pin_state, CONTROL_PIN_INDEX_SAFETY_DOOR))
-      {
-        serial_write('D');
-      }
-#endif
-      if (bit_istrue(ctrl_pin_state, CONTROL_PIN_INDEX_RESET))
-      {
-        serial_write('R');
-      }
-      if (bit_istrue(ctrl_pin_state, CONTROL_PIN_INDEX_FEED_HOLD))
-      {
-        serial_write('H');
-      }
-      if (bit_istrue(ctrl_pin_state, CONTROL_PIN_INDEX_CYCLE_START))
-      {
-        serial_write('S');
-      }
-    }
+//     if (ctrl_pin_state)
+//     {
+// #ifdef ENABLE_SAFETY_DOOR_INPUT_PIN
+//       if (bit_istrue(ctrl_pin_state, CONTROL_PIN_INDEX_SAFETY_DOOR))
+//       {
+//         serial_write('D');
+//       }
+// #endif
+//       if (bit_istrue(ctrl_pin_state, CONTROL_PIN_INDEX_RESET))
+//       {
+//         serial_write('R');
+//       }
+//       if (bit_istrue(ctrl_pin_state, CONTROL_PIN_INDEX_FEED_HOLD))
+//       {
+//         serial_write('H');
+//       }
+//       if (bit_istrue(ctrl_pin_state, CONTROL_PIN_INDEX_CYCLE_START))
+//       {
+//         serial_write('S');
+//       }
+//     }
   }
 #endif
 

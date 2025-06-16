@@ -32,7 +32,7 @@ int main(void)
   serial2_init();
   settings_init(); // 从 EEPROM 加载 Grbl 设置
   stepper_init();  // 配置步进电机引脚和中断定时器
-  // system_init();   // 配置引脚引脚和引脚变更中断
+  system_init();   // 配置引脚引脚和引脚变更中断
   // memset(sys_position, 0, sizeof(sys_position)); // 清除机器位置。
   sei(); // 启用中断
 
@@ -91,7 +91,8 @@ int main(void)
     // 急停继电器上电
     DDRE |= (1 << 4); // 将其配置为输出引脚。
     PORTE |= (1<<4);  // 设置引脚为高，继电器默认闭合
-
+    control_tool_led();
+    // control_status_led();
     // 将清除的 G-code 和规划器位置同步到当前系统位置。
     plan_sync_position();
     gc_sync_position();

@@ -86,12 +86,10 @@
 #define Y_ALARM_BIT 5 // MEGA2560 Analog Pin 11
 #define Z_ALARM_BIT 6 // MEGA2560 Analog Pin 11
 #define STOP_ALARM_BIT 7 // MEGA2560 Analog Pin 11
-
 #define CONTROL_INT PCIE2         // 引脚更改中断使能引脚
 #define CONTROL_INT_vect PCINT2_vect
 #define CONTROL_PCMSK PCMSK2 // 引脚更改中断寄存器
-// #define CONTROL_MASK ((1 << BRUSH_DETECT_BIT) | (1 << CONTROL_SAFETY_DOOR_BIT) | (1 << X_ALARM_BIT) | (1 << Y_ALARM_BIT) | (1 << Z_ALARM_BIT) | (1 << STOP_ALARM_BIT))
-#define CONTROL_MASK 0
+#define CONTROL_MASK ((1 << BRUSH_DETECT_BIT) | (1 << CONTROL_SAFETY_DOOR_BIT) | (1 << X_ALARM_BIT) | (1 << Y_ALARM_BIT) | (1 << Z_ALARM_BIT) | (1 << STOP_ALARM_BIT))
 
 // 定义探针开关输入引脚。
 #define PROBE_DDR DDRL
