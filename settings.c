@@ -137,10 +137,14 @@ void settings_restore(uint8_t restore_flag)
     {
       settings.tool_data[j][0] = 0x01;
       settings.tool_data[j][1] = 0x00;
-      settings.tool_data[j][2] = 0x40;
-      settings.tool_data[j][3] = 0xC0;
-      settings.tool_data[j][4] = 0x00;
-      settings.tool_data[j][5] = 0x00;
+      // settings.tool_data[j][2] = 0x40;
+      // settings.tool_data[j][3] = 0xC0;
+      // settings.tool_data[j][4] = 0x00;
+      // settings.tool_data[j][5] = 0x00;
+      settings.tool_data[j][2] = 0x00;
+      settings.tool_data[j][3] = 0x00;
+      settings.tool_data[j][4] = 0xC0;
+      settings.tool_data[j][5] = 0x40;
       settings.tool_data[j][6] = 0x00;
       settings.tool_data[j][7] = 0x00;
     }

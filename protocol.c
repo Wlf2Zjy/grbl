@@ -69,10 +69,16 @@ void protocol_main_loop()
   uint8_t line_flags = 0;
   uint8_t char_counter = 0;
   uint8_t c;
+  extern volatile bool readFlag;
   for (;;) {
     // ds18b20_read_temp_timer2(0);
     // 处理一行传入的串行数据，当数据可用时进行处理。
     // 通过删除空格和注释并将所有字母大写来进行初步过滤。
+    if (readFlag){
+      ds18b20_read_temp_timer2(0);
+      readFlag = false;
+    }
+
     while((c = serial_read()) != SERIAL_NO_DATA) {
       // ds18b20_read_temp_timer2(0);
       if ((c == '\n') || (c == '\r')) { // 到达行末

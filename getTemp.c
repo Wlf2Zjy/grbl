@@ -149,25 +149,27 @@ uint8_t onewire_reset(uint8_t flag) {
     return presence;
 }
 
-// // 读取温度
+// // // 读取温度
 // float ds18b20_read_temp(uint8_t flag) {
 //     uint8_t temp_l, temp_h;
 //     int16_t temp;
-    
+//     cli(); // 先关中断，避免配置时被打断
 //     if (!onewire_reset(flag)) return -1;  // 无响应
-
 //     onewire_write_byte(flag, 0xCC);  // Skip ROM
 //     onewire_write_byte(flag, 0x44);  // Convert T
+//     sei(); // 开启全局中断
 //     _delay_ms(750);            // 等待转换
 
-//     onewire_reset();
+//     cli(); // 先关中断，避免配置时被打断
+//     onewire_reset(flag);
 //     onewire_write_byte(flag, 0xCC);  // Skip ROM
 //     onewire_write_byte(flag, 0xBE);  // Read Scratchpad
-
 //     temp_l = onewire_read_byte(flag);
 //     temp_h = onewire_read_byte(flag);
 //     temp = (temp_h << 8) | temp_l;
+//     sei(); // 开启全局中断
 //     // printFloat(temp * 0.0625, 3);
+//     temp_obj.spindle_temp = temp * 0.0625;
 //     return temp * 0.0625;  // 每位代表0.0625℃
 // }
 
@@ -207,61 +209,57 @@ void timer5_init() {
 
 extern volatile bool serial_busy;
 ISR(TIMER5_COMPA_vect) {
-    // sei();
-    if (serial_busy) return;  // 当前串口处理中，跳过
     // 500ms延时等待
     if (tempConversionCounter < 5000) {  // 5000ms = 5000 * 1ms
         tempConversionCounter++;
-        if (tempConversionCounter % 50 == 0) {  // 仅在 5, 10, 15... 时触发
-            switch (tempConversionCounter / 50)
-            {
-            case 1:
-                ds18b20_read_temp_timer2(0);
-                break;
-            case 2:
-                tempConversionDone = true;
-                conversionStarted = false;
-                break;
-            case 3:
-                ds18b20_read_temp_timer2(0);
-                break;
-            case 4:
-                ds18b20_read_temp_timer2(1);
-                break;
-            case 5:
-                tempConversionDone = true;
-                conversionStarted = false;
-                break;
-            case 6:
-                ds18b20_read_temp_timer2(1);
-                break;
-            case 7:
-                ds18b20_read_temp_timer2(2);
-                break;
-            case 8:
-                tempConversionDone = true;
-                conversionStarted = false;
-                break;
-            case 9:
-                ds18b20_read_temp_timer2(2);
-                break;
-            default:
-                break;
-            }
+        if(tempConversionCounter == 2500){
+            tempConversionDone = true;
+            conversionStarted = true;
+            readFlag = true;
         }
-        // if(tempConversionCounter == 500){
-        //     ds18b20_read_temp_timer2(0);
+        // if (tempConversionCounter % 50 == 0) {  // 仅在 5, 10, 15... 时触发
+        //     switch (tempConversionCounter / 50)
+        //     {
+        //     case 1:
+        //         ds18b20_read_temp_timer2(0);
+        //         break;
+        //     case 2:
+        //         tempConversionDone = true;
+        //         conversionStarted = false;
+        //         break;
+        //     case 3:
+        //         ds18b20_read_temp_timer2(0);
+        //         break;
+        //     case 4:
+        //         ds18b20_read_temp_timer2(1);
+        //         break;
+        //     case 5:
+        //         tempConversionDone = true;
+        //         conversionStarted = false;
+        //         break;
+        //     case 6:
+        //         ds18b20_read_temp_timer2(1);
+        //         break;
+        //     case 7:
+        //         ds18b20_read_temp_timer2(2);
+        //         break;
+        //     case 8:
+        //         tempConversionDone = true;
+        //         conversionStarted = false;
+        //         break;
+        //     case 9:
+        //         ds18b20_read_temp_timer2(2);
+        //         break;
+        //     default:
+        //         break;
+        //     }
         // }
-        // if (tempConversionCounter == 1000)
-        // {
-        //     tempConversionDone = true;
-        //     conversionStarted = false;
-        // }
-        // if(tempConversionCounter == 1500){
-        //     ds18b20_read_temp_timer2(0);
-        // }
+
     } else {
         tempConversionCounter = 0;
+        tempConversionDone = false;
+        conversionStarted = false;
+        readFlag = true;
     }
 }
 

@@ -155,41 +155,45 @@ void system_execute_startup(char *line)
   }
 }
 
-void print_tool_info(uint8_t* data, size_t index) {
+void print_tool_info(uint8_t* data) {
   // 提取各字段
   uint8_t tool_type = data[0];
   uint8_t angle     = data[1];
+  
   float diameter;
   memcpy(&diameter, &data[2], 4);
+  // diameter = ((diameter & 0xFF000000) >> 24) |
+  // ((diameter & 0x00FF0000) >> 8)  |
+  // ((diameter & 0x0000FF00) << 8)  |
+  // ((diameter & 0x000000FF) << 24);
   uint16_t reserved = (data[6] << 8) | data[7];
-
   // // 打印解析后的信息
   printString("[");
   switch (tool_type)
   {
   case 1:
-    printString("endmill");
+    printString("endmill,");
     break;
   case 2:
-    printString("ball");
+    printString("ball,");
     break;
   case 3:
-    printString("cone");
+    printString("cone,");
     break;
   case 4:
-    printString("dill");
+    printString("dill,");
     break;
   case 5:
-    printString("thread");
+    printString("thread,");
     break;
   default:
-    printString("空");
-    break;
+    printString("none");
+    return;
   }
-  // printString(" | 类型: %02d", tool_type);
-  // printString(" 角度: %d", angle);
-  // printString(" 直径: %.2f", diameter);
-  // printString(" 保留: %04X\r\n", reserved);
+  print_uint8_base10(angle);
+  printString(",");
+  printFloat(diameter, 3);
+  printString("]");
 }
 
 // 指导并执行来自 protocol_process 的一行格式化输入。虽然主要是
@@ -237,16 +241,18 @@ uint8_t system_execute_line(char *line)
   case 'A':
     if (line[2] == 0)
     {
+      printString("toolData:[");
       for (size_t i = 0; i < 5; i++) {
-        print_tool_info(settings.tool_data[i], i);
-    }
+        print_tool_info(settings.tool_data[i]);
+        if(i < 4){
+          printString(",");
+        }
+      }
+      printString("]\r\n");
       // for (size_t i = 0; i < 5; i++)
       // {
-      //   // printString("[");
-      //   // printString(i+1);
-      //   // printString(":");
       //   serial_write_bytes(settings.tool_data[i], 8);
-      //   // printString("]\r\n");
+      //   printString("\n");
       // }
       break;
     }
