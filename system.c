@@ -208,6 +208,9 @@ uint8_t system_execute_line(char *line)
         case 'P':
           set_probe(index);  // $SP
           break;
+        case 'T':
+          set_flip(index);  // $SP
+          break;
       }
     }
     break;
