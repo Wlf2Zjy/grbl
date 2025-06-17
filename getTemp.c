@@ -1,10 +1,16 @@
 #include "grbl.h"
 
-volatile bool tempConversionDone = false;
 volatile uint16_t tempConversionCounter = 0;
-static bool conversionStarted = false;
 volatile uint16_t readSpindleTempNum = 0;
-volatile bool readFlag = true;
+volatile bool readFlag0 = true;
+volatile bool tempConversionDone0 = false;
+bool conversionStarted0 = false;
+volatile bool readFlag1 = true;
+volatile bool tempConversionDone1 = false;
+bool conversionStarted1 = false;
+volatile bool readFlag2 = true;
+volatile bool tempConversionDone2 = false;
+bool conversionStarted2 = false;
 // 0主轴，1左风扇，2右风扇
 
 all_temp temp_obj;
@@ -212,10 +218,39 @@ ISR(TIMER5_COMPA_vect) {
     // 500ms延时等待
     if (tempConversionCounter < 5000) {  // 5000ms = 5000 * 1ms
         tempConversionCounter++;
-        if(tempConversionCounter == 2500){
-            tempConversionDone = true;
-            conversionStarted = true;
-            readFlag = true;
+        if(tempConversionCounter == 500){
+            tempConversionDone0 = true;
+            conversionStarted0 = true;
+            readFlag0 = true;
+        }else if (tempConversionCounter == 1000)
+        {
+            tempConversionDone0 = false;
+            conversionStarted0 = false;
+            readFlag0 = true;
+        }
+        else if (tempConversionCounter == 1500)
+        {
+            tempConversionDone1 = true;
+            conversionStarted1 = true;
+            readFlag1 = true;
+        }
+        else if (tempConversionCounter == 2000)
+        {
+            tempConversionDone1 = false;
+            conversionStarted1 = false;
+            readFlag1 = true;
+        }
+        else if (tempConversionCounter == 2500)
+        {
+            tempConversionDone2 = true;
+            conversionStarted2 = true;
+            readFlag2 = true;
+        }
+        else if (tempConversionCounter == 3000)
+        {
+            tempConversionDone2 = false;
+            conversionStarted2 = false;
+            readFlag2 = true;
         }
         // if (tempConversionCounter % 50 == 0) {  // 仅在 5, 10, 15... 时触发
         //     switch (tempConversionCounter / 50)
@@ -257,13 +292,10 @@ ISR(TIMER5_COMPA_vect) {
 
     } else {
         tempConversionCounter = 0;
-        tempConversionDone = false;
-        conversionStarted = false;
-        readFlag = true;
     }
 }
 
-float ds18b20_read_temp_timer2(uint8_t flag) {
+float ds18b20_read_temp_timer2(uint8_t flag, bool conversionStarted, bool tempConversionDone) {
     if (!conversionStarted) {
         if (!onewire_reset(flag)) return 0;
         onewire_write_byte(flag, 0xCC);  // Skip ROM

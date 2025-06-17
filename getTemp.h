@@ -25,7 +25,7 @@ typedef struct
 // 声明温度
 extern all_temp temp_obj;
 
-float ds18b20_read_temp_timer2(uint8_t flag);
+float ds18b20_read_temp_timer2(uint8_t flag, bool conversionStarted, bool tempConversionDone);
 
 void timer5_init();
 #endif

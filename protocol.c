@@ -69,14 +69,30 @@ void protocol_main_loop()
   uint8_t line_flags = 0;
   uint8_t char_counter = 0;
   uint8_t c;
-  extern volatile bool readFlag;
+  extern volatile bool readFlag0;
+  extern volatile bool tempConversionDone0;
+  extern bool conversionStarted0;
+  extern volatile bool readFlag1;
+  extern volatile bool tempConversionDone1;
+  extern bool conversionStarted1;
+  extern volatile bool readFlag2;
+  extern volatile bool tempConversionDone2;
+  extern bool conversionStarted2;
   for (;;) {
     // ds18b20_read_temp_timer2(0);
     // 处理一行传入的串行数据，当数据可用时进行处理。
     // 通过删除空格和注释并将所有字母大写来进行初步过滤。
-    if (readFlag){
-      ds18b20_read_temp_timer2(0);
-      readFlag = false;
+    if (readFlag0){
+      ds18b20_read_temp_timer2(0, conversionStarted0, tempConversionDone0);
+      readFlag0 = false;
+    }
+    if (readFlag1){
+      ds18b20_read_temp_timer2(1, conversionStarted1, tempConversionDone1);
+      readFlag1 = false;
+    }
+    if (readFlag2){
+      ds18b20_read_temp_timer2(2, conversionStarted2, tempConversionDone2);
+      readFlag2 = false;
     }
 
     while((c = serial_read()) != SERIAL_NO_DATA) {
