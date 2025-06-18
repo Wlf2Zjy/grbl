@@ -59,6 +59,8 @@
 #include "stepper.h"
 #include "jog.h"
 #include "sleep.h"
+#include "toolFlip_control.h"
+
 
 // ---------------------------------------------------------------------------------------
 // 编译时对定义值进行错误检查：
