@@ -133,7 +133,7 @@ void settings_restore(uint8_t restore_flag)
       settings.tool_y[i] = i * 10;
       settings.tool_z[i] = i * 10;
     }
-    for (size_t j = 0; j < TOOL_NUM; j++)
+    for (size_t j = 0; j < TOOL_NUM-2; j++)
     {
       settings.tool_data[j][0] = 0x01;
       settings.tool_data[j][1] = 0x00;
@@ -147,7 +147,23 @@ void settings_restore(uint8_t restore_flag)
       settings.tool_data[j][5] = 0x40;
       settings.tool_data[j][6] = 0x00;
       settings.tool_data[j][7] = 0x00;
+      settings.tool_data[j][8] = 0xC0;
+      settings.tool_data[j][9] = 0x40;
     }
+    settings.tool_data[4][0] = 0x00;
+    settings.tool_data[4][1] = 0x00;
+    // settings.tool_data[j][2] = 0x40;
+    // settings.tool_data[j][3] = 0xC0;
+    // settings.tool_data[j][4] = 0x00;
+    // settings.tool_data[j][5] = 0x00;
+    settings.tool_data[4][2] = 0x00;
+    settings.tool_data[4][3] = 0x00;
+    settings.tool_data[4][4] = 0x00;
+    settings.tool_data[4][5] = 0x00;
+    settings.tool_data[4][6] = 0x00;
+    settings.tool_data[4][7] = 0x00;
+    settings.tool_data[4][8] = 0x00;
+    settings.tool_data[4][9] = 0x00;
     // memset(settings.tool_data, 0, sizeof(settings.tool_data));
 #ifdef A_AXIS
     settings.steps_per_mm[A_AXIS] = DEFAULT_A_STEPS_PER_MM;

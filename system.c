@@ -162,6 +162,8 @@ void print_tool_info(uint8_t* data) {
   
   float diameter;
   memcpy(&diameter, &data[2], 4);
+  float pitch;
+  memcpy(&pitch, &data[6], 4);
   // diameter = ((diameter & 0xFF000000) >> 24) |
   // ((diameter & 0x00FF0000) >> 8)  |
   // ((diameter & 0x0000FF00) << 8)  |
@@ -172,27 +174,29 @@ void print_tool_info(uint8_t* data) {
   switch (tool_type)
   {
   case 1:
-    printString("endmill,");
+    printString("'endmill',");
     break;
   case 2:
-    printString("ball,");
+    printString("'ball',");
     break;
   case 3:
-    printString("cone,");
+    printString("'cone',");
     break;
   case 4:
-    printString("dill,");
+    printString("'dill',");
     break;
   case 5:
-    printString("thread,");
+    printString("'thread',");
     break;
   default:
-    printString("none");
+    printString("null]");
     return;
   }
   print_uint8_base10(angle);
   printString(",");
-  printFloat(diameter, 3);
+  printFloat(diameter, 2);
+  printString(",");
+  printFloat(pitch, 2);
   printString("]");
 }
 
@@ -241,19 +245,37 @@ uint8_t system_execute_line(char *line)
   case 'A':
     if (line[2] == 0)
     {
-      printString("toolData:[");
-      for (size_t i = 0; i < 5; i++) {
+      printString("{'toolData':[");
+      for (uint8_t i = 0; i < 5; i++) {
         print_tool_info(settings.tool_data[i]);
         if(i < 4){
           printString(",");
         }
       }
-      printString("]\r\n");
-      // for (size_t i = 0; i < 5; i++)
-      // {
-      //   serial_write_bytes(settings.tool_data[i], 8);
-      //   printString("\n");
-      // }
+      printString("]}\r\n");
+      break;
+    }
+    if (line[3] == 0)
+    {
+      switch (line[2])
+      {
+        case 'R':
+          for (uint8_t i = 0; i < 5; i++) {
+            uint8_t rt_exec = sys_rt_exec_state;
+            if(rt_exec & EXEC_RESET){
+              break;
+            }
+            printString("{'tool");
+            print_uint8_base10(i+1);
+            printString("':");
+            print_tool_info(settings.tool_data[i]);
+            printString("}\r\n");
+            delay_ms(3000);
+          }
+          break;
+        default:
+          return (STATUS_INVALID_STATEMENT);
+      }
       break;
     }
     if (line[4] == 0)
@@ -264,11 +286,11 @@ uint8_t system_execute_line(char *line)
       {
         case 'R':
           rfid_read(return_data);
-          memcpy(settings.tool_data[tool_index-1], return_data, 8);
+          memcpy(settings.tool_data[tool_index-1], return_data, 10);
           write_global_settings();
           break;
         case 'G':
-          serial_write_bytes(settings.tool_data[tool_index-1], 8);
+          serial_write_bytes(settings.tool_data[tool_index-1], 10);
           break;
         default:
           return (STATUS_INVALID_STATEMENT);

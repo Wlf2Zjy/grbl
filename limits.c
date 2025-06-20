@@ -232,7 +232,7 @@ void limits_go_home(uint8_t cycle_mask)
     st_prep_buffer(); // 准备并填充段缓冲区，来源于新计划的块。
     st_wake_up(); // 启动运动
     do {
-      protocol_execute_realtime();
+      // protocol_execute_realtime();
       if (approach) {
         // 检查限位状态。当它们发生变化时锁定循环轴。
         limit_state = limits_get_state();
