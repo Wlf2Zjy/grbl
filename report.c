@@ -639,6 +639,8 @@ void report_realtime_status()
   printFloat_RateValue(temp_obj.l_fan_temp);
   printPgmString(PSTR("|RFT:"));
   printFloat_RateValue(temp_obj.r_fan_temp);
+  printPgmString(PSTR("|R:"));
+  printFloat_RateValue(sys.isRunGcode);
   printPgmString(PSTR("|S:"));
   printFloat(gc_state.spindle_speed, N_DECIMAL_RPMVALUE);
   printPgmString(PSTR("|M:"));

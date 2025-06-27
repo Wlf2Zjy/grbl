@@ -105,25 +105,6 @@ ISR(CONTROL_INT_vect)
 
 }
 
-// volatile uint8_t debounce_counter = 0;
-// volatile uint8_t stable_state = 0;
-
-// ISR(CONTROL_INT_vect) {
-//   static uint8_t last_raw = 0;
-//   uint8_t current_raw = (CONTROL_PIN & CONTROL_MASK) ^ CONTROL_MASK;
-  
-//   if(current_raw == last_raw) {
-//     if(debounce_counter < 255) debounce_counter++;
-//   } else {
-//     debounce_counter = 0;
-//     last_raw = current_raw;
-//   }
-  
-//   if(debounce_counter == 10) { // 连续10次检测相同值
-//     stable_state = current_raw;
-//     process_control_signals(stable_state); // 同上方案的处理函数
-//   }
-// }
 
 // 返回安全门是否开启（T）或关闭（F），基于引脚状态。
 uint8_t system_check_safety_door_ajar()
@@ -275,7 +256,7 @@ uint8_t system_execute_line(char *line)
           printString("\r\n");
           print_uint32_base10(nowTime);
           printString("\r\n");
-      
+          rfid_write(1, minutes);
           break;
         default:
           return (STATUS_INVALID_STATEMENT);
@@ -323,7 +304,7 @@ uint8_t system_execute_line(char *line)
       }
     }
     break;
-  case 'R':
+  case 'B':
     if (line[3] == 0)
     {
       switch (line[2])
