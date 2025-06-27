@@ -156,14 +156,44 @@ void set_rfid(uint8_t flag)
 
 void rfid_read(uint8_t* return_data)
 {
-    uint8_t first_data;
     uint8_t read_command[11] = {0xAA, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x55};
     clearSerial1BufferHard();
     for(uint8_t j=0; j < 3; j++){
         for(uint8_t i=0; i < sizeof(read_command); i++){
             serial1_write(read_command[i]);
-            delay_ms(1);
         }
+        delay_ms(100);
+        if(serial1_read() != 0xAA) continue;
+        uint8_t data_len = serial1_read();
+        uint8_t read_data[data_len];
+        serial1_read_bytes(read_data, data_len);
+        if(read_data[data_len-1] == 0x55){
+            // serial_write_bytes(&read_data[6], 8);
+            memcpy(return_data, &read_data[6], 16);
+            return;
+        }
+    }
+}
+
+void rfid_write(uint8_t toolNumber, uint16_t time)
+{
+    uint8_t write_head[7] = {0xAA, 0x1B, 0x25, 0x00, 0x00, 0x00, 0x00};
+    // uint8_t write_command[16];
+    // memcpy(&write_command, &settings.tool_data[toolNumber], 16);
+    clearSerial1BufferHard();
+    for(uint8_t j=0; j < 3; j++){
+        // 帧头
+        for(uint8_t i=0; i < sizeof(write_head); i++){
+            serial1_write(write_head[i]);
+        }
+        // 数据位除时间
+        for(uint8_t j=0; j < 14; j++){
+            serial1_write(settings.tool_data[toolNumber][i]);
+        }
+        //时间
+        
+        //帧尾
+        serial1_write(0x55);
         delay_ms(100);
         if(serial1_read() != 0xAA) continue;
         uint8_t data_len = serial1_read();

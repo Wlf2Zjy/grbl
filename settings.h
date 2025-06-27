@@ -110,7 +110,7 @@ typedef struct
   float tool_x[TOOL_NUM]; // 刀具x坐标
   float tool_y[TOOL_NUM]; // 刀具y坐标
   float tool_z[TOOL_NUM]; // 刀具z坐标
-  uint8_t tool_data[TOOL_NUM][8]; // 刀具z坐标
+  uint8_t tool_data[TOOL_NUM-1][16]; // 刀具z坐标
 } settings_t;
 extern settings_t settings; // 全局设置变量
 

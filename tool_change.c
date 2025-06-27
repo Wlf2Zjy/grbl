@@ -90,14 +90,6 @@ void change_tool(uint8_t tool_number)
     return_tool();
     get_tool(tool_number);
     set_tool_length();
-    // if (beforeTool == 0)
-    // {
-    //   tool_length_zero();
-    // }
-    // else
-    // {
-    //   set_tool_length();
-    // }
   }
   protocol_buffer_synchronize();
   // 将换完刀后刀号保存
@@ -160,6 +152,7 @@ void set_tool_length()
   gc_execute_line("G38.2Z-2F30");
   float print_position[N_AXIS];
   system_convert_array_steps_to_mpos(print_position, sys_position);
+  // 现在z轴位置- 之前刀z轴位置 + 之前刀长
   gc_state.tool_length_offset = print_position[2] - settings.tool_zpos + settings.tool_length;
   settings.tool_length = gc_state.tool_length_offset;
   settings.tool_zpos = print_position[2];

@@ -127,6 +127,8 @@ typedef struct {
   uint8_t report_ovr_counter;  // 跟踪何时将覆盖数据添加到状态报告。
   uint8_t report_wco_counter;  // 跟踪何时将工作坐标偏移数据添加到状态报告。
   float spindle_speed;
+  unsigned long startTime;      // 刀具开始使用
+  bool isRunGcode;
 } system_t;
 extern system_t sys;
 

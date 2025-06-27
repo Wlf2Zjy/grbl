@@ -156,19 +156,22 @@ void system_execute_startup(char *line)
 }
 
 void print_tool_info(uint8_t* data) {
+  float diameter;
+  float pitch;
   // 提取各字段
   uint8_t tool_type = data[0];
   uint8_t angle     = data[1];
-  
-  float diameter;
-  memcpy(&diameter, &data[2], 4);
-  float pitch;
-  memcpy(&pitch, &data[6], 4);
-  // diameter = ((diameter & 0xFF000000) >> 24) |
-  // ((diameter & 0x00FF0000) >> 8)  |
-  // ((diameter & 0x0000FF00) << 8)  |
-  // ((diameter & 0x000000FF) << 24);
-  uint16_t reserved = (data[6] << 8) | data[7];
+  uint8_t bladeNum = data[10];
+  uint8_t bladeLength = data[11];
+  uint8_t handleDiameter = data[12];
+  uint8_t allLength = data[13];
+  uint16_t useTime = (data[14] << 8) | data[15];
+
+  diameter = (data[2] << 24) | (data[3] << 16) | (data[4] << 8) | data[5];
+  // memcpy(&diameter, &data[2], 4);
+  // memcpy(&pitch, &data[6], 4);
+  pitch = (data[6] << 24) | (data[7] << 16) | (data[8] << 8) | data[9];
+
   // // 打印解析后的信息
   printString("[");
   switch (tool_type)
@@ -197,6 +200,16 @@ void print_tool_info(uint8_t* data) {
   printFloat(diameter, 2);
   printString(",");
   printFloat(pitch, 2);
+  printString(",");
+  print_uint8_base10(bladeNum);
+  printString(",");
+  print_uint8_base10(bladeLength);
+  printString(",");
+  print_uint8_base10(handleDiameter);
+  printString(",");
+  print_uint8_base10(allLength);
+  printString(",");
+  print_uint32_base10(useTime);
   printString("]");
 }
 
@@ -220,6 +233,74 @@ uint8_t system_execute_line(char *line)
   case 0:
     report_grbl_help();
     break; // 显示 Grbl 帮助
+    case 'A':    // rfid相关
+    if (line[2] == 0)
+    {
+      printString("{'toolData':[");
+      for (uint8_t i = 0; i < 5; i++) {
+        print_tool_info(settings.tool_data[i]);
+        if(i < 4){
+          printString(",");
+        }
+      }
+      printString("]}\r\n");
+      break;
+    }
+    if (line[3] == 0)
+    {
+      switch (line[2])
+      {
+        unsigned long nowTime, useTime, seconds;
+        uint16_t minutes;
+        case 'R':
+          for (uint8_t i = 0; i < 5; i++) {
+            uint8_t rt_exec = sys_rt_exec_state;
+            if(rt_exec & EXEC_RESET){
+              break;
+            }
+            printString("{'tool");
+            print_uint8_base10(i+1);
+            printString("':");
+            print_tool_info(settings.tool_data[i]);
+            printString("}\r\n");
+            delay_ms(3000);
+          }
+          break;
+        case 'T':
+          nowTime = getTime(); // 记录开始时间
+          useTime = nowTime - sys.startTime;
+          minutes = useTime / 60;
+          sys.startTime = nowTime;
+          print_uint32_base10(minutes);
+          printString("\r\n");
+          print_uint32_base10(nowTime);
+          printString("\r\n");
+      
+          break;
+        default:
+          return (STATUS_INVALID_STATEMENT);
+      }
+      break;
+    }
+    if (line[4] == 0)
+    {
+      uint8_t tool_index = line[3] - '0';
+      if (tool_index >= TOOL_NUM) return STATUS_INVALID_STATEMENT;
+      switch (line[2])
+      {
+        case 'R':
+          rfid_read(return_data);
+          memcpy(settings.tool_data[tool_index-1], return_data, 16);
+          write_global_settings();
+          break;
+        case 'G':
+          serial_write_bytes(settings.tool_data[tool_index-1], 16);
+          break;
+        default:
+          return (STATUS_INVALID_STATEMENT);
+      }
+      break;
+    }
   case 'V':
     report_version();
     break;
@@ -242,62 +323,22 @@ uint8_t system_execute_line(char *line)
       }
     }
     break;
-  case 'A':
-    if (line[2] == 0)
-    {
-      printString("{'toolData':[");
-      for (uint8_t i = 0; i < 5; i++) {
-        print_tool_info(settings.tool_data[i]);
-        if(i < 4){
-          printString(",");
-        }
-      }
-      printString("]}\r\n");
-      break;
-    }
+  case 'R':
     if (line[3] == 0)
     {
       switch (line[2])
       {
-        case 'R':
-          for (uint8_t i = 0; i < 5; i++) {
-            uint8_t rt_exec = sys_rt_exec_state;
-            if(rt_exec & EXEC_RESET){
-              break;
-            }
-            printString("{'tool");
-            print_uint8_base10(i+1);
-            printString("':");
-            print_tool_info(settings.tool_data[i]);
-            printString("}\r\n");
-            delay_ms(3000);
-          }
+        case 'S':
+          sys.isRunGcode = true;
+          // 开始运行gcode
           break;
-        default:
-          return (STATUS_INVALID_STATEMENT);
+        case 'E':
+          sys.isRunGcode = false;
+          // Gcode运行结束
+          break;
       }
-      break;
     }
-    if (line[4] == 0)
-    {
-      uint8_t tool_index = line[3] - '0';
-      if (tool_index >= TOOL_NUM) return STATUS_INVALID_STATEMENT;
-      switch (line[2])
-      {
-        case 'R':
-          rfid_read(return_data);
-          memcpy(settings.tool_data[tool_index-1], return_data, 10);
-          write_global_settings();
-          break;
-        case 'G':
-          serial_write_bytes(settings.tool_data[tool_index-1], 10);
-          break;
-        default:
-          return (STATUS_INVALID_STATEMENT);
-      }
-      break;
-    }
-    
+    break;  
   case 'E':
     tool_length_zero();
     break;

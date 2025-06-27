@@ -33,6 +33,8 @@ int main(void)
   settings_init(); // 从 EEPROM 加载 Grbl 设置
   stepper_init();  // 配置步进电机引脚和中断定时器
   system_init();   // 配置引脚引脚和引脚变更中断
+  time2Init();
+  sys.startTime = getTime(); // 记录开始时间
   // memset(sys_position, 0, sizeof(sys_position)); // 清除机器位置。
   sei(); // 启用中断
 
