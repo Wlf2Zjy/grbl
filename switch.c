@@ -16,6 +16,20 @@ void switch_init()
     RFID_ELE_DDR |= (1 << RFID_ELE_BIT);
 }
 
+void all_switch_stop(){
+    air_fan_control(0);
+    spindle_l_fan_control(0);
+    spindle_r_fan_control(0);
+    blow_fan_control(0);
+    suction_cup_control(0);
+    light_control(0);
+    l_water_control(0);
+    r_water_control(0);
+    outline_control(0);
+    camera_control(0);
+    rfid_ele_control(0);
+}
+
 // 1开0关
 void air_fan_control(uint8_t flag)
 {
@@ -44,6 +58,12 @@ void spindle_r_fan_control(uint8_t flag)
     }else{
         SPINDLE_R_FAN_PORT &= ~(1 << SPINDLE_R_FAN_BIT);
     }
+}
+
+void spindle_fan_close()
+{
+    spindle_r_fan_control(0);
+    spindle_l_fan_control(0);
 }
 
 // 1开0关

@@ -62,6 +62,7 @@ void r_water_control(uint8_t flag);
 void outline_control(uint8_t flag);
 void camera_control(uint8_t flag);
 void rfid_ele_control(uint8_t flag);
-
+void all_switch_stop();
+void spindle_fan_close();
 
 #endif

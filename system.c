@@ -84,21 +84,23 @@ ISR(CONTROL_INT_vect)
     if (!(sys_rt_exec_alarm)) {
       
       // 检查限位引脚状态。 
-      if(pin & (1 << 3) && sys.state != STATE_HOLD){
+      if(pin & (1 << 3)){
         //虎钳松
-        print_uint8_base2_ndigit(pin, 8);
-        printString("开门\n");
-        system_set_exec_state_flag(EXEC_FEED_HOLD);
+        sys.doorStatus = 1;
+        // print_uint8_base2_ndigit(pin, 8);
+        // printString("开门\n");
+        // system_set_exec_state_flag(EXEC_FEED_HOLD);
       }else if (pin & (1 | 1 << 4 | 1 << 5 |1 << 6 |1 << 7))
       {
         mc_reset(); // 发起系统终止。
         system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT); // 指示硬限位关键事件
       }
       
-      if(~(pin & (1 << 3)) && sys.state == STATE_HOLD){
-        print_uint8_base2_ndigit(pin, 8);
-        printString("关门\n");
-        system_set_exec_state_flag(EXEC_CYCLE_START);
+      if(~(pin & (1 << 3))){
+        sys.doorStatus = 0;
+        // print_uint8_base2_ndigit(pin, 8);
+        // printString("关门\n");
+        // system_set_exec_state_flag(EXEC_CYCLE_START);
       }
     }  
   }
@@ -312,9 +314,13 @@ uint8_t system_execute_line(char *line)
         case 'S':
           sys.isRunGcode = true;
           // 开始运行gcode
+          sys.spindleFanStatus = 1;
+          spindle_l_fan_control(1);
           break;
         case 'E':
           sys.isRunGcode = false;
+          sys.spindleFanStatus = 0;
+          spindle_fan_close();
           // Gcode运行结束
           break;
       }
@@ -331,6 +337,7 @@ uint8_t system_execute_line(char *line)
       {
       case 'A':
         air_fan_control(index);
+        sys.airFanStatus = index;
         break;
       case 'B':
         spindle_l_fan_control(index);
@@ -346,6 +353,7 @@ uint8_t system_execute_line(char *line)
         break;
       case 'F':
         light_control(index);
+        sys.ledStatus = index;
         break;
       case 'G':
         spray_control(index);
@@ -364,6 +372,10 @@ uint8_t system_execute_line(char *line)
         break;
       case 'L':
         rfid_ele_control(index);
+        break;
+      case 'N': 
+        set_flip(index);
+        sys.toolDoorStatus = index;
         break;
       default:
         return (STATUS_INVALID_STATEMENT);

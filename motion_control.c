@@ -425,8 +425,9 @@ void mc_reset()
   {
     system_set_exec_state_flag(EXEC_RESET);
 
-    // 停止主轴和冷却液。
+    // 停止主轴和全部外设。
     spindle_stop();
+    all_switch_stop();
 
     // 仅在处于任何运动状态（即循环、主动保持或归零）时终止步进器。
     // 注意：如果通过步进空闲延迟设置保持步进器启用，则这也通过完全避免

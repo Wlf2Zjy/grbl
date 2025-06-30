@@ -1,6 +1,7 @@
 #include "grbl.h"
 
 volatile uint16_t tempConversionCounter = 0;
+volatile uint16_t fanCounter = 0;
 volatile uint16_t readSpindleTempNum = 0;
 volatile bool readFlag0 = true;
 volatile bool tempConversionDone0 = false;
@@ -213,7 +214,6 @@ void timer5_init() {
     sei(); // 开启全局中断
 }
 
-extern volatile bool serial_busy;
 ISR(TIMER5_COMPA_vect) {
     // 500ms延时等待
     if (tempConversionCounter < 5000) {  // 5000ms = 5000 * 1ms
@@ -252,46 +252,24 @@ ISR(TIMER5_COMPA_vect) {
             conversionStarted2 = false;
             readFlag2 = true;
         }
-        // if (tempConversionCounter % 50 == 0) {  // 仅在 5, 10, 15... 时触发
-        //     switch (tempConversionCounter / 50)
-        //     {
-        //     case 1:
-        //         ds18b20_read_temp_timer2(0);
-        //         break;
-        //     case 2:
-        //         tempConversionDone = true;
-        //         conversionStarted = false;
-        //         break;
-        //     case 3:
-        //         ds18b20_read_temp_timer2(0);
-        //         break;
-        //     case 4:
-        //         ds18b20_read_temp_timer2(1);
-        //         break;
-        //     case 5:
-        //         tempConversionDone = true;
-        //         conversionStarted = false;
-        //         break;
-        //     case 6:
-        //         ds18b20_read_temp_timer2(1);
-        //         break;
-        //     case 7:
-        //         ds18b20_read_temp_timer2(2);
-        //         break;
-        //     case 8:
-        //         tempConversionDone = true;
-        //         conversionStarted = false;
-        //         break;
-        //     case 9:
-        //         ds18b20_read_temp_timer2(2);
-        //         break;
-        //     default:
-        //         break;
-        //     }
-        // }
-
     } else {
         tempConversionCounter = 0;
+    }
+    if (sys.isRunGcode){
+        if(fanCounter < 50000){
+            fanCounter++;
+        }else{
+            fanCounter = 0;
+            if(sys.spindleFanStatus == 1){
+                spindle_l_fan_control(0);
+                spindle_r_fan_control(1);
+                sys.spindleFanStatus == 2;
+            }else if(sys.spindleFanStatus == 2){
+                spindle_r_fan_control(0);
+                spindle_l_fan_control(1);
+                sys.spindleFanStatus == 1;
+            }
+        }
     }
 }
 

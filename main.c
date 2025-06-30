@@ -34,7 +34,6 @@ int main(void)
   stepper_init();  // 配置步进电机引脚和中断定时器
   system_init();   // 配置引脚引脚和引脚变更中断
   time2Init();
-  sys.startTime = getTime(); // 记录开始时间
   // memset(sys_position, 0, sizeof(sys_position)); // 清除机器位置。
   sei(); // 启用中断
 
@@ -71,6 +70,7 @@ int main(void)
     sys.f_override = DEFAULT_FEED_OVERRIDE;                 // 设置为 100%
     sys.r_override = DEFAULT_RAPID_OVERRIDE;                // 设置为 100%
     sys.spindle_speed_ovr = DEFAULT_SPINDLE_SPEED_OVERRIDE; // 设置为 100%
+    sys.startTime = getTime(); // 记录开始时间
     // memset(sys_probe_position, 0, sizeof(sys_probe_position)); // 清除探测位置。
     sys_probe_state = 0;
     sys_rt_exec_state = 0;
@@ -89,6 +89,7 @@ int main(void)
     toolFlip_control_init();
     probe_init();
     sleep_init();
+    switch_init();
     plan_reset(); // 清除块缓冲区和规划器变量
     st_reset();   // 清除步进电机子系统变量。
     // 急停继电器上电
