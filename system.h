@@ -135,6 +135,8 @@ typedef struct {
   bool ledStatus;  // 照明灯状态
   bool airFanStatus;  // 空气过滤开关状态
   uint8_t spindleFanStatus;  // 主轴风扇状态
+  bool lWaterStatus;  // 左液位传感器状态
+  bool rWaterStatus;  // 右液位传感器状态
 } system_t;
 extern system_t sys;
 

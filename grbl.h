@@ -59,6 +59,7 @@
 #include "jog.h"
 #include "sleep.h"
 #include "getTemp.h"
+#include "getDepth.h"
 #include "switch.h"
 #include "probe_control.h"
 #include "toolFlip_control.h"

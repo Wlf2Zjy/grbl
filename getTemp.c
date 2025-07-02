@@ -2,6 +2,7 @@
 
 volatile uint16_t tempConversionCounter = 0;
 volatile uint16_t fanCounter = 0;
+volatile uint16_t waterCounter = 0;
 volatile uint16_t readSpindleTempNum = 0;
 volatile bool readFlag0 = true;
 volatile bool tempConversionDone0 = false;
@@ -13,6 +14,11 @@ volatile bool readFlag2 = true;
 volatile bool tempConversionDone2 = false;
 bool conversionStarted2 = false;
 // 0主轴，1左风扇，2右风扇
+
+// 全局变量用于消抖
+volatile uint8_t time_ms = 20;  // 消抖时间
+volatile uint8_t debounce_counter = 0;  // 当前时间
+volatile uint8_t last_pin_state = 0;  // 最后状态
 
 all_temp temp_obj;
 
@@ -256,7 +262,7 @@ ISR(TIMER5_COMPA_vect) {
         tempConversionCounter = 0;
     }
     if (sys.isRunGcode){
-        if(fanCounter < 50000){
+        if(fanCounter < 300000){
             fanCounter++;
         }else{
             fanCounter = 0;
@@ -270,6 +276,17 @@ ISR(TIMER5_COMPA_vect) {
                 sys.spindleFanStatus == 1;
             }
         }
+    }
+    if(waterCounter < 5000){
+        waterCounter++;
+    }else{
+        waterCounter = 0;
+        sys.lWaterStatus = get_L_Depth();
+        sys.rWaterStatus = get_R_Depth();
+    }
+
+    if (debounce_counter > 0) {
+        debounce_counter--;
     }
 }
 

@@ -129,7 +129,7 @@ void report_status_message(uint8_t status_code)
 // 打印警报消息。
 void report_alarm_message(uint8_t alarm_code)
 {
-  printPgmString(PSTR("警报:"));
+  printPgmString(PSTR("Alarm:"));
   print_uint8_base10(alarm_code);
   report_util_line_feed();
   delay_ms(500); // 强制延迟以确保消息清除串行写入缓冲区。
@@ -139,41 +139,41 @@ void report_alarm_message(uint8_t alarm_code)
 // 注意：对于接口，消息总是放在括号内。如果安装了静音模式，消息编号代码小于零。
 void report_feedback_message(uint8_t message_code)
 {
-  printPgmString(PSTR("[消息:"));
+  printPgmString(PSTR("[MSG:"));  // 消息
   switch (message_code)
   {
   case MESSAGE_CRITICAL_EVENT:
-    printPgmString(PSTR("重置以继续"));
+    printPgmString(PSTR("Please Reset"));  // 重置以继续
     break;
   case MESSAGE_ALARM_LOCK:
-    printPgmString(PSTR("'$H'|'$X' 解锁"));
+    printPgmString(PSTR("Please unlock")); // $H'|'$X' 解锁
     break;
   case MESSAGE_ALARM_UNLOCK:
-    printPgmString(PSTR("警告：已解锁"));
+    printPgmString(PSTR("Caution: Unlocked"));  // 警告：已解锁
     break;
   case MESSAGE_ENABLED:
-    printPgmString(PSTR("已启用"));
+    printPgmString(PSTR("Enabled")); // 已启用
     break;
   case MESSAGE_DISABLED:
-    printPgmString(PSTR("已禁用"));
+    printPgmString(PSTR("Disabled"));  // 已禁用
     break;
   case MESSAGE_SAFETY_DOOR_AJAR:
-    printPgmString(PSTR("检查门"));
+    printPgmString(PSTR("Check door"));  // 检查门
     break;
   case MESSAGE_CHECK_LIMITS:
-    printPgmString(PSTR("检查限制"));
+    printPgmString(PSTR("Check limits"));  // 检查限制
     break;
   case MESSAGE_PROGRAM_END:
-    printPgmString(PSTR("程序结束"));
+    printPgmString(PSTR("Program ended"));  // 程序结束
     break;
   case MESSAGE_RESTORE_DEFAULTS:
-    printPgmString(PSTR("正在恢复默认值"));
+    printPgmString(PSTR("Restoring defaults"));  // 正在恢复默认值
     break;
   case MESSAGE_SPINDLE_RESTORE:
-    printPgmString(PSTR("正在恢复主轴"));
+    printPgmString(PSTR("Restoring spindle"));  // 正在恢复主轴
     break;
   case MESSAGE_SLEEP_MODE:
-    printPgmString(PSTR("睡眠中"));
+    printPgmString(PSTR("Sleeping"));
     break;
   }
   report_util_feedback_line_feed();
@@ -182,13 +182,15 @@ void report_feedback_message(uint8_t message_code)
 // 欢迎消息
 void report_init_message()
 {
-  printPgmString(PSTR("\r\nGrbl " GRBL_VERSION " ['$' 获取帮助]\r\n"));
+  // printPgmString(PSTR("\r\nGrbl " GRBL_VERSION " ['$' 获取帮助]\r\n"));
+  return;
 }
 
 // Grbl 帮助消息
 void report_grbl_help()
 {
-  printPgmString(PSTR("[帮助:$$ $# $G $I $N $x=值 $Nx=行 $J=行 $SLP $C $X $H ~ ! ? ctrl-x]\r\n"));
+  // printPgmString(PSTR("[帮助:$$ $# $G $I $N $x=值 $Nx=行 $J=行 $SLP $C $X $H ~ ! ? ctrl-x]\r\n"));
+  return;
 }
 
 // Grbl 全局设置打印。
@@ -635,10 +637,14 @@ void report_realtime_status()
   printFloat_RateValue(gc_state.feed_rate);
   printPgmString(PSTR("|ST:"));
   printFloat_RateValue(temp_obj.spindle_temp);
-  // printPgmString(PSTR("|LFT:"));
-  // printFloat_RateValue(temp_obj.l_fan_temp);
-  // printPgmString(PSTR("|RFT:"));
-  // printFloat_RateValue(temp_obj.r_fan_temp);
+  printPgmString(PSTR("|LFT:"));
+  printFloat_RateValue(temp_obj.l_fan_temp);
+  printPgmString(PSTR("|RFT:"));
+  printFloat_RateValue(temp_obj.r_fan_temp);
+  printPgmString(PSTR("|LW:"));
+  printFloat_RateValue(sys.lWaterStatus);
+  printPgmString(PSTR("|RW:"));
+  printFloat_RateValue(sys.rWaterStatus);
   printPgmString(PSTR("|R:"));
   printFloat_RateValue(sys.isRunGcode);
   printPgmString(PSTR("|TD:"));

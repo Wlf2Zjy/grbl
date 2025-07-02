@@ -448,5 +448,6 @@ void mc_reset()
       }
       st_go_idle(); // 强制终止步进器。位置可能已经丢失。
     }
+    // control_led(1);
   }
 }

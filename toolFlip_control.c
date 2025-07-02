@@ -70,7 +70,7 @@ void set_flip(uint8_t flag)
     sys.homing_axis_lock = axislock;
 
     // 执行回原点循环。计划器缓冲区应为空，以便启动回原点循环。
-    pl_data->feed_rate = 100;          // 设置当前回原点速率。
+    pl_data->feed_rate = 50;          // 设置当前回原点速率。
     plan_buffer_line(target, pl_data); // 绕过 mc_line()。直接计划回原点运动。
 
     sys.step_control = STEP_CONTROL_EXECUTE_SYS_MOTION; // 设置为执行回原点运动并清除现有标志。

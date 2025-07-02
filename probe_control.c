@@ -57,11 +57,11 @@ void set_probe(uint8_t flag)
         // 注意：这样编译出来的代码比尝试过的任何其他实现都要小。
         if (flag)
         {
-            target[idx] = -max_travel;
+            target[idx] = max_travel;
         }
         else
         {
-            target[idx] = max_travel;
+            target[idx] = -100;
         }
         // 将轴锁应用于本循环中活动的步进端口引脚。
         axislock |= step_pin[idx];
@@ -70,7 +70,7 @@ void set_probe(uint8_t flag)
     sys.homing_axis_lock = axislock;
 
     // 执行回原点循环。计划器缓冲区应为空，以便启动回原点循环。
-    pl_data->feed_rate = 100;          // 设置当前回原点速率。
+    pl_data->feed_rate = 2000;          // 设置当前回原点速率。
     plan_buffer_line(target, pl_data); // 绕过 mc_line()。直接计划回原点运动。
 
     sys.step_control = STEP_CONTROL_EXECUTE_SYS_MOTION; // 设置为执行回原点运动并清除现有标志。
@@ -81,11 +81,11 @@ void set_probe(uint8_t flag)
         // 检查限位状态。当它们发生变化时锁定循环轴。
         if (flag)
         {
-            limit_state = ~PINL & 1;
+            limit_state = ~PINL & (1<<1);
         }
         else
         {
-            limit_state = ~PINL & (1 << 1);
+            limit_state = 0;
         }
         if (axislock & step_pin[idx])
         {

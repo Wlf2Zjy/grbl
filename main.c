@@ -67,6 +67,7 @@ int main(void)
     uint8_t prior_state = sys.state;
     memset(&sys, 0, sizeof(system_t)); // 清除系统结构变量。
     sys.state = prior_state;
+    // sys.state = STATE_ALARM;
     sys.f_override = DEFAULT_FEED_OVERRIDE;                 // 设置为 100%
     sys.r_override = DEFAULT_RAPID_OVERRIDE;                // 设置为 100%
     sys.spindle_speed_ovr = DEFAULT_SPINDLE_SPEED_OVERRIDE; // 设置为 100%
@@ -95,8 +96,8 @@ int main(void)
     // 急停继电器上电
     DDRE |= (1 << 4); // 将其配置为输出引脚。
     PORTE |= (1<<4);  // 设置引脚为高，继电器默认闭合
-    control_tool_led();
-    // control_status_led();
+    // led_init();
+    // control_led(1);
     // 将清除的 G-code 和规划器位置同步到当前系统位置。
     plan_sync_position();
     gc_sync_position();

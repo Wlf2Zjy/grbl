@@ -15,12 +15,13 @@ void tool_control_init()
 
 void return_tool()
 {
-  printPgmString(PSTR("前刀号:"));
+  printPgmString(PSTR("beforeTool:"));
   printInteger(settings.tool);
   printPgmString(PSTR("\r\n"));
   // 抬刀
   gc_execute_line("G90G53G0Z-5");
   gc_execute_line("M4S2400");
+  set_flip(1);
   protocol_buffer_synchronize();
   if (settings.tool != 0)
   {
@@ -39,9 +40,9 @@ void return_tool()
     protocol_buffer_synchronize();
     gc_execute_line("M5");
     // 向下压刀
-    gc_execute_line("G91G0X-6");
-    gc_execute_line("G91G1Z-78F2000");
-    gc_execute_line("G90G53G0Z-5");
+    // gc_execute_line("G91G0X-6");
+    // gc_execute_line("G91G1Z-78F2000");
+    // gc_execute_line("G90G53G0Z-5");
   }
 
   // if(sys.isRunGcode){
@@ -55,10 +56,10 @@ void return_tool()
 }
 
 void getToolStatus(){
-  printPgmString(PSTR("[换刀状态: "));
+  printPgmString(PSTR("[toolStatus: "));
   // uint8_t status = PINF & (1 << 6);
   print_uint8_base10((PINF & (1 << 6)) ? 1 : 0);
-  printPgmString(PSTR("]//"));
+  printPgmString(PSTR("]"));
   printPgmString(PSTR("\r\n"));
   return 0;
 }
@@ -105,10 +106,11 @@ void change_tool(uint8_t tool_number)
     set_tool_length();
   }
   protocol_buffer_synchronize();
+  set_flip(0);
   // 将换完刀后刀号保存
   settings.tool = tool_number;
   write_global_settings(); // 将更新后的刀号写入eeprom
-  printPgmString(PSTR("后刀号:"));
+  printPgmString(PSTR("nowTool:"));
   printInteger(tool_number);
   printPgmString(PSTR("\r\n"));
 }
@@ -117,14 +119,14 @@ void change_tool(uint8_t tool_number)
 // 校准刀具长度
 void tool_length_zero()
 {
-  printPgmString(PSTR("开始对刀"));
+  printPgmString(PSTR("Start tool setting"));
   printPgmString(PSTR("\r\n"));
   // 抬刀
   gc_execute_line("G90G53G01Z-5F1000");
   // 移动到对刀的xy位置
   float2string(settings.tool_x[TOOL_NUM - 1], x_char, 3);
   float2string(settings.tool_y[TOOL_NUM - 1], y_char, 3);
-  sprintf(command, "G90G53G01X%sY%sF1000", x_char, y_char);
+  sprintf(command, "G90G53G0X%sY%s", x_char, y_char);
   gc_execute_line(command);
   // 下降到对刀z位置
   float2string(settings.tool_z[TOOL_NUM - 1], z_char, 3);
@@ -141,13 +143,13 @@ void tool_length_zero()
   gc_state.tool_length_offset = 0;
   write_global_settings(); // 将更新后的刀长写入eeprom
   // report_probe_parameters();
-  gc_execute_line("G90G53G01Z-5F1000");
+  gc_execute_line("G90G53G0Z-5"); // 抬刀
 }
 
 // 设置刀补
 void set_tool_length()
 {
-  printPgmString(PSTR("开始对刀"));
+  printPgmString(PSTR("Start tool setting"));
   printPgmString(PSTR("\r\n"));
   // 抬刀
   gc_execute_line("G90G53G01Z-5F1000");
@@ -169,7 +171,7 @@ void set_tool_length()
   gc_state.tool_length_offset = print_position[2] - settings.tool_zpos + settings.tool_length;
   settings.tool_length = gc_state.tool_length_offset;
   settings.tool_zpos = print_position[2];
-  write_global_settings(); // 将更新后的刀长写入eeprom
+  // write_global_settings(); // 将更新后的刀长写入eeprom
   // report_probe_parameters();
   // 抬刀
   gc_execute_line("G90G53G01Z-5F1000");

@@ -31,7 +31,8 @@
 
 
 // 设置从 G-code 解析器接收到的有效移动命令，检查软限位，并执行移动。
-void ws2812b_init_once();
+void led_init();
 void control_status_led();
 void control_tool_led();
+void control_led(uint8_t color);
 #endif

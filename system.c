@@ -76,37 +76,40 @@ uint8_t system_control_get_state()
 //   }
 // }
 
-ISR(CONTROL_INT_vect)
-{
+extern volatile uint8_t time_ms;  
+extern volatile uint8_t debounce_counter;
+extern volatile uint8_t last_pin_state;
+volatile bool pin_state = false;
+
+// 控制中断服务
+ISR(CONTROL_INT_vect) {
   uint8_t pin = (CONTROL_PIN & CONTROL_MASK);
   pin ^= CONTROL_MASK;
-  if (sys.state != STATE_ALARM) {  // 如果已经处于报警状态则忽略。 
-    if (!(sys_rt_exec_alarm)) {
-      
-      // 检查限位引脚状态。 
-      if(pin & (1 << 3)){
-        //虎钳松
-        sys.doorStatus = 1;
-        // print_uint8_base2_ndigit(pin, 8);
-        // printString("开门\n");
-        // system_set_exec_state_flag(EXEC_FEED_HOLD);
-      }else if (pin & (1 | 1 << 4 | 1 << 5 |1 << 6 |1 << 7))
-      {
-        mc_reset(); // 发起系统终止。
-        system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT); // 指示硬限位关键事件
-      }
-      
-      if(~(pin & (1 << 3))){
-        sys.doorStatus = 0;
-        // print_uint8_base2_ndigit(pin, 8);
-        // printString("关门\n");
-        // system_set_exec_state_flag(EXEC_CYCLE_START);
-      }
-    }  
+  sys.doorStatus = pin & (1 << 3);
+  if (pin != last_pin_state) {
+      last_pin_state = pin;
+      debounce_counter = time_ms;  // 重置消抖计数器
+      pin_state = true;
   }
-
+  // 只有当消抖计数器为0时才处理稳定输入
+  if (debounce_counter == 0 && sys.state != STATE_ALARM && pin_state) {
+      pin_state = false;
+      handle_stable_input(pin);
+  }
 }
 
+// 处理稳定输入的函数
+void handle_stable_input(uint8_t pin) {
+  if (!(sys_rt_exec_alarm)) {
+    // uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7));
+    uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
+    // 检查限位引脚状态
+    if (stopStatus) {
+        mc_reset();
+        system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT);
+    }
+  }
+}
 
 // 返回安全门是否开启（T）或关闭（F），基于引脚状态。
 uint8_t system_check_safety_door_ajar()
@@ -156,44 +159,52 @@ void print_tool_info(uint8_t* data) {
   pitch = (data[6] << 24) | (data[7] << 16) | (data[8] << 8) | data[9];
 
   // // 打印解析后的信息
-  printString("[");
+  printPgmString(PSTR("["));
+  // printString("[");
   switch (tool_type)
   {
   case 1:
-    printString("'endmill',");
+    printPgmString(PSTR("'endmill',"));
+    // printString("'endmill',");
     break;
   case 2:
-    printString("'ball',");
+    printPgmString(PSTR("'ball',"));
+    // printString("'ball',");
     break;
   case 3:
-    printString("'cone',");
+    // printString("'cone',");
+    printPgmString(PSTR("'cone',"));
     break;
   case 4:
-    printString("'dill',");
+    // printString("'dill',");
+    printPgmString(PSTR("'dill',"));
     break;
   case 5:
-    printString("'thread',");
+    // printString("'thread',");
+    printPgmString(PSTR("'thread',"));
     break;
   default:
-    printString("null]");
+    // printString("null]");
+    printPgmString(PSTR("null]"));
     return;
   }
   print_uint8_base10(angle);
-  printString(",");
+  printPgmString(PSTR(","));
   printFloat(diameter, 2);
-  printString(",");
+  printPgmString(PSTR("["));
+  printPgmString(PSTR(","));
   printFloat(pitch, 2);
-  printString(",");
+  printPgmString(PSTR(","));
   print_uint8_base10(bladeNum);
-  printString(",");
+  printPgmString(PSTR(","));
   print_uint8_base10(bladeLength);
-  printString(",");
+  printPgmString(PSTR(","));
   print_uint8_base10(handleDiameter);
-  printString(",");
+  printPgmString(PSTR(","));
   print_uint8_base10(allLength);
-  printString(",");
+  printPgmString(PSTR(","));
   print_uint32_base10(useTime);
-  printString("]");
+  printPgmString(PSTR("]"));
 }
 
 // 指导并执行来自 protocol_process 的一行格式化输入。虽然主要是
@@ -236,18 +247,19 @@ uint8_t system_execute_line(char *line)
         unsigned long nowTime, useTime, seconds;
         uint16_t minutes;
         case 'R':
-          for (uint8_t i = 0; i < 5; i++) {
-            uint8_t rt_exec = sys_rt_exec_state;
-            if(rt_exec & EXEC_RESET){
-              break;
-            }
-            printString("{'tool");
-            print_uint8_base10(i+1);
-            printString("':");
-            print_tool_info(settings.tool_data[i]);
-            printString("}\r\n");
-            delay_ms(3000);
-          }
+          // for (uint8_t i = 0; i < 5; i++) {
+          //   uint8_t rt_exec = sys_rt_exec_state;
+          //   if(rt_exec & EXEC_RESET){
+          //     break;
+          //   }
+          //   printString("{'tool");
+          //   print_uint8_base10(i+1);
+          //   printString("':");
+          //   print_tool_info(settings.tool_data[i]);
+          //   printString("}\r\n");
+          //   delay_ms(3000);
+          // }
+          read_all_rfid();
           break;
         case 'T':
           nowTime = getTime(); // 记录开始时间
@@ -259,6 +271,9 @@ uint8_t system_execute_line(char *line)
           print_uint32_base10(nowTime);
           printString("\r\n");
           rfid_write(1, minutes);
+          break;
+        case 'A':
+          getToolStatus();
           break;
         default:
           return (STATUS_INVALID_STATEMENT);
@@ -315,11 +330,13 @@ uint8_t system_execute_line(char *line)
           sys.isRunGcode = true;
           // 开始运行gcode
           sys.spindleFanStatus = 1;
+          control_led(3);
           spindle_l_fan_control(1);
           break;
         case 'E':
           sys.isRunGcode = false;
           sys.spindleFanStatus = 0;
+          control_led(2);
           spindle_fan_close();
           // Gcode运行结束
           break;
@@ -448,6 +465,7 @@ uint8_t system_execute_line(char *line)
         }
         report_feedback_message(MESSAGE_ALARM_UNLOCK);
         sys.state = STATE_IDLE;
+        control_led(2);
         // 不运行启动脚本。防止启动中的存储移动造成事故。
       } // 否则无效。
       break;
@@ -481,6 +499,7 @@ uint8_t system_execute_line(char *line)
         return (STATUS_CHECK_DOOR);
       } // 如果安全门未关闭，则阻止。
       sys.state = STATE_HOMING; // 设置系统状态变量
+      report_realtime_status();
       if (line[2] == 0)
       {
         mc_homing_cycle(HOMING_CYCLE_ALL);

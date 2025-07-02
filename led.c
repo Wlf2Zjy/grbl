@@ -54,27 +54,15 @@ void sendColor(uint8_t r, uint8_t g, uint8_t b, uint8_t flag) {
   sendByte(b, flag);
 }
 
-void ws2812b_init_once() {
-  DDRD |= (1 << 0); // 将其配置为输出引脚。
-  PORTD |= (1<<0);  // 设置引脚为高，继电器默认闭合
-  DDRD |= (1 << 2); // 将其配置为输出引脚。
-  PORTD |= (1<<2);  // 设置引脚为高，继电器默认闭合
-
-  // LED_DDR |= (1 << LED_PIN);  // 设置 D6 为输出
-  // LED_PORT |= (1 << LED_PIN);
-  cli(); // 临时关闭中断（发送期间必须）
-  sendColor(255, 0, 0,1);  // 显示绿色
-  sendColor(0, 255, 0,1);  // 显示绿色
-  sendColor(0, 0, 255,1);  // 显示绿色
-  sei(); // 恢复中断
-  _delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
+void led_init(){
+  TOOL_LED_DDR |= (1 << TOOL_LED_ENABLE_BIT); // 将其配置为输出引脚。
+  TOOL_LED_DDR |= (1 << TOOL_LED_BIT); // 将其配置为输出引脚。
+  STATUS_LED_DDR |= (1 << STATUS_LED_ENABLE_BIT); // 将其配置为输出引脚。
+  STATUS_LED_DDR |= (1 << STATUS_LED_BIT); // 将其配置为输出引脚。
 }
-
 
 void control_tool_led()
 {
-  TOOL_LED_DDR |= (1 << TOOL_LED_ENABLE_BIT); // 将其配置为输出引脚。
-  TOOL_LED_DDR |= (1 << TOOL_LED_BIT); // 将其配置为输出引脚。
   TOOL_LED_PORT &= ~(1 << TOOL_LED_ENABLE_BIT); // 失能
   TOOL_LED_PORT |= (1 << TOOL_LED_ENABLE_BIT); // 使能
 
@@ -100,18 +88,37 @@ void control_tool_led()
 
 void control_status_led()
 {
-  STATUS_LED_DDR |= (1 << STATUS_LED_ENABLE_BIT); // 将其配置为输出引脚。
-  STATUS_LED_DDR |= (1 << STATUS_LED_BIT); // 将其配置为输出引脚。
   STATUS_LED_PORT &= ~(1 << STATUS_LED_ENABLE_BIT); // 失能
   STATUS_LED_PORT |= (1 << STATUS_LED_ENABLE_BIT); // 使能
 
   cli(); // 临时关闭中断（发送期间必须）
-  sendColor(255, 0, 0, 2);  // 显示绿色
-  sendColor(0, 255, 0, 2);  // 显示绿色
-  sendColor(0, 0, 255, 2);  // 显示绿色
-  sendColor(255, 0, 0, 2);  // 显示绿色
-  sendColor(0, 255, 0, 2);  // 显示绿色
-  sendColor(0, 0, 255, 2);  // 显示绿色
+  for (size_t i = 0; i < 15; i++)
+  {
+    // sendColor(222, 49, 99, 2);  // 显示绿色
+    sendColor(0, 255, 0, 2);  // 显示绿色
+  }
+  sei(); // 恢复中断
+  _delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
+}
+
+void control_led(uint8_t color)
+{
+  STATUS_LED_PORT &= ~(1 << STATUS_LED_ENABLE_BIT); // 失能
+  STATUS_LED_PORT |= (1 << STATUS_LED_ENABLE_BIT); // 使能
+
+  cli(); // 临时关闭中断（发送期间必须）
+  for (size_t i = 0; i < 15; i++)
+  {
+    if(color==1){
+      sendColor(255, 0, 0, 2);  // 显示红色
+    }else if (color == 2)
+    {
+      sendColor(0, 255, 0, 2);  // 显示绿色
+    }else if (color == 3)
+    {
+      sendColor(0, 0, 255, 2);  // 显示蓝色
+    }
+  }
   sei(); // 恢复中断
   _delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
 }
