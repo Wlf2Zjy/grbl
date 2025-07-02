@@ -133,7 +133,7 @@ void settings_restore(uint8_t restore_flag)
       settings.tool_y[i] = -20 - i * 30;
       settings.tool_z[i] = -50;
     }
-    for (size_t j = 0; j < TOOL_NUM-2; j++)
+    for (uint8_t j = 0; j < TOOL_NUM-2; j++)
     {
       settings.tool_data[j][0] = 0x01;
       settings.tool_data[j][1] = 0x00;

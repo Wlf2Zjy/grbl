@@ -92,7 +92,7 @@ void control_status_led()
   STATUS_LED_PORT |= (1 << STATUS_LED_ENABLE_BIT); // 使能
 
   cli(); // 临时关闭中断（发送期间必须）
-  for (size_t i = 0; i < 15; i++)
+  for (uint8_t i = 0; i < 15; i++)
   {
     // sendColor(222, 49, 99, 2);  // 显示绿色
     sendColor(0, 255, 0, 2);  // 显示绿色
@@ -107,7 +107,7 @@ void control_led(uint8_t color)
   STATUS_LED_PORT |= (1 << STATUS_LED_ENABLE_BIT); // 使能
 
   cli(); // 临时关闭中断（发送期间必须）
-  for (size_t i = 0; i < 15; i++)
+  for (uint8_t i = 0; i < 15; i++)
   {
     if(color==1){
       sendColor(255, 0, 0, 2);  // 显示红色

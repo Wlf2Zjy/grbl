@@ -197,4 +197,5 @@ void system_set_exec_accessory_override_flag(uint8_t mask);
 void system_clear_exec_motion_overrides();
 void system_clear_exec_accessory_overrides();
 
+void handle_stable_input(uint8_t pin);
 #endif

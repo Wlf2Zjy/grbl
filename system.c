@@ -79,7 +79,7 @@ uint8_t system_control_get_state()
 extern volatile uint8_t time_ms;  
 extern volatile uint8_t debounce_counter;
 extern volatile uint8_t last_pin_state;
-volatile bool pin_state = false;
+extern volatile bool pin_state;
 
 // 控制中断服务
 ISR(CONTROL_INT_vect) {
@@ -92,17 +92,21 @@ ISR(CONTROL_INT_vect) {
       pin_state = true;
   }
   // 只有当消抖计数器为0时才处理稳定输入
-  if (debounce_counter == 0 && sys.state != STATE_ALARM && pin_state) {
-      pin_state = false;
-      handle_stable_input(pin);
-  }
+  // print_uint8_base2_ndigit(pin, 8);
+  // printString("A\r\n");
+  // if (debounce_counter == 0 && sys.state != STATE_ALARM && pin_state) {
+  //     pin_state = false;
+  //     handle_stable_input(pin);
+  // }
 }
 
 // 处理稳定输入的函数
 void handle_stable_input(uint8_t pin) {
   if (!(sys_rt_exec_alarm)) {
-    // uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7));
-    uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
+    uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7));
+    // uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
+    // print_uint8_base2_ndigit(stopStatus, 8);
+    // printString("S\r\n");
     // 检查限位引脚状态
     if (stopStatus) {
         mc_reset();
@@ -331,13 +335,13 @@ uint8_t system_execute_line(char *line)
           // 开始运行gcode
           sys.spindleFanStatus = 1;
           control_led(3);
-          spindle_l_fan_control(1);
+          // spindle_l_fan_control(1);
           break;
         case 'E':
           sys.isRunGcode = false;
           sys.spindleFanStatus = 0;
           control_led(2);
-          spindle_fan_close();
+          // spindle_fan_close();
           // Gcode运行结束
           break;
       }

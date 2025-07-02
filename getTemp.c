@@ -19,6 +19,7 @@ bool conversionStarted2 = false;
 volatile uint8_t time_ms = 20;  // 消抖时间
 volatile uint8_t debounce_counter = 0;  // 当前时间
 volatile uint8_t last_pin_state = 0;  // 最后状态
+volatile bool pin_state = false;
 
 all_temp temp_obj;
 
@@ -261,22 +262,26 @@ ISR(TIMER5_COMPA_vect) {
     } else {
         tempConversionCounter = 0;
     }
-    if (sys.isRunGcode){
-        if(fanCounter < 300000){
-            fanCounter++;
-        }else{
-            fanCounter = 0;
-            if(sys.spindleFanStatus == 1){
-                spindle_l_fan_control(0);
-                spindle_r_fan_control(1);
-                sys.spindleFanStatus == 2;
-            }else if(sys.spindleFanStatus == 2){
-                spindle_r_fan_control(0);
-                spindle_l_fan_control(1);
-                sys.spindleFanStatus == 1;
-            }
-        }
-    }
+
+    // 风扇循环
+    // if (sys.isRunGcode){
+    //     if(fanCounter < 300000){
+    //         fanCounter++;
+    //     }else{
+    //         fanCounter = 0;
+    //         if(sys.spindleFanStatus == 1){
+    //             spindle_l_fan_control(0);
+    //             spindle_r_fan_control(1);
+    //             sys.spindleFanStatus == 2;
+    //         }else if(sys.spindleFanStatus == 2){
+    //             spindle_r_fan_control(0);
+    //             spindle_l_fan_control(1);
+    //             sys.spindleFanStatus == 1;
+    //         }
+    //     }
+    // }
+
+    //读液位
     if(waterCounter < 5000){
         waterCounter++;
     }else{
@@ -284,9 +289,15 @@ ISR(TIMER5_COMPA_vect) {
         sys.lWaterStatus = get_L_Depth();
         sys.rWaterStatus = get_R_Depth();
     }
-
-    if (debounce_counter > 0) {
+    // 消抖
+    if(pin_state){
         debounce_counter--;
+        if (debounce_counter == 0) {
+            uint8_t pin = (CONTROL_PIN & CONTROL_MASK);
+            pin ^= CONTROL_MASK;
+            handle_stable_input(pin);
+            pin_state = false;
+        }
     }
 }
 

@@ -186,7 +186,7 @@
 // 该选项强制 Grbl 始终初始化为警报状态，无论是否启用归位。
 // 此选项主要用于希望此电源循环行为的 OEM 和 LinuxCNC 用户。
 
-// #define FORCE_INITIALIZATION_ALARM // 默认禁用。
+#define FORCE_INITIALIZATION_ALARM // 默认禁用。
 
 // 在上电或重置时，Grbl 将检查限位开关状态，以确保它们未处于活动状态
 // 然后再初始化。如果检测到问题并且启用了硬限位设置，Grbl 将
