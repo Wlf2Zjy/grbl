@@ -227,10 +227,10 @@ void read_all_rfid(){
         rfid_read(return_data);
         memcpy(settings.tool_data[i], return_data, 16);
         printPgmString(PSTR("{'tool"));
-        print_uint8_base10(i);
-        printPgmString(PSTR("':["));
+        print_uint8_base10(i + 1);
+        printPgmString(PSTR("':"));
         print_tool_info(settings.tool_data[i]);
-        printPgmString(PSTR("]}\r\n"));
+        printPgmString(PSTR("}\r\n"));
     }
     set_rfid(1);
     set_flip(0);
