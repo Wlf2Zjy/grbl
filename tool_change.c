@@ -21,7 +21,6 @@ void return_tool()
   // 抬刀
   gc_execute_line("G90G53G0Z-5");
   gc_execute_line("M4S2400");
-  set_flip(1);
   protocol_buffer_synchronize();
   if (settings.tool != 0)
   {
@@ -43,16 +42,28 @@ void return_tool()
     // gc_execute_line("G91G0X-6");
     // gc_execute_line("G91G1Z-78F2000");
     // gc_execute_line("G90G53G0Z-5");
+
+    if(sys.isRunGcode){
+      // RFID运动到刀旁边
+      unsigned long nowTime = getTime(); // 记录开始时间
+      unsigned long useTime = nowTime - sys.startTime;
+      uint16_t minutes = useTime / 60;
+
+      char y_char[20], command[80];
+      uint8_t return_data[8];
+      gc_execute_line("G90G53G0Z-5");
+      protocol_buffer_synchronize();
+      set_rfid(0);
+      memset(return_data, 0, 8);
+      // 移动刀位置
+      float2string(settings.tool_y[settings.tool - 1] - 30, y_char, 3);
+      sprintf(command, "G90G53G0Y%s", y_char);
+      gc_execute_line(command);
+      protocol_buffer_synchronize();
+      rfid_write(settings.tool, minutes);
+      set_rfid(1);
+    }
   }
-
-  // if(sys.isRunGcode){
-  //   // RFID运动到刀旁边
-  //   unsigned long nowTime = getTime(); // 记录开始时间
-  //   unsigned long useTime = nowTime - sys.startTime;
-  //   uint16_t minutes = useTime / 60;
-  //   rfid_write(settings.tool, minutes);
-  // }
-
 }
 
 void getToolStatus(){
@@ -87,14 +98,15 @@ void get_tool(uint8_t tool_number)
   protocol_buffer_synchronize();
   gc_execute_line("M5");
 
-  //   if(sys.isRunGcode){
-  //   sys.startTime = getTime(); // 记录开始时间
-  // }
+  if(sys.isRunGcode){
+    sys.startTime = getTime(); // 记录开始时间
+  }
 }
 
 void change_tool(uint8_t tool_number)
 {
   uint8_t beforeTool = settings.tool;
+  set_flip(1);
   if (tool_number == 0)
   {
     return_tool();

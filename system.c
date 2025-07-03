@@ -164,38 +164,30 @@ void print_tool_info(uint8_t* data) {
 
   // // 打印解析后的信息
   printPgmString(PSTR("["));
-  // printString("[");
   switch (tool_type)
   {
   case 1:
     printPgmString(PSTR("'endmill',"));
-    // printString("'endmill',");
     break;
   case 2:
     printPgmString(PSTR("'ball',"));
-    // printString("'ball',");
     break;
   case 3:
-    // printString("'cone',");
     printPgmString(PSTR("'cone',"));
     break;
   case 4:
-    // printString("'dill',");
     printPgmString(PSTR("'dill',"));
     break;
   case 5:
-    // printString("'thread',");
     printPgmString(PSTR("'thread',"));
     break;
   default:
-    // printString("null]");
     printPgmString(PSTR("null]"));
     return;
   }
   print_uint8_base10(angle);
   printPgmString(PSTR(","));
   printFloat(diameter, 2);
-  printPgmString(PSTR("["));
   printPgmString(PSTR(","));
   printFloat(pitch, 2);
   printPgmString(PSTR(","));
@@ -234,14 +226,14 @@ uint8_t system_execute_line(char *line)
     case 'A':    // rfid相关
     if (line[2] == 0)
     {
-      printString("{'toolData':[");
+      printPgmString(PSTR("{'toolData':["));
       for (uint8_t i = 0; i < 5; i++) {
         print_tool_info(settings.tool_data[i]);
         if(i < 4){
-          printString(",");
+          printPgmString(PSTR(","));
         }
       }
-      printString("]}\r\n");
+      printPgmString(PSTR("]}\r\n"));
       break;
     }
     if (line[3] == 0)
@@ -335,6 +327,7 @@ uint8_t system_execute_line(char *line)
           // 开始运行gcode
           sys.spindleFanStatus = 1;
           control_led(3);
+          sys.startTime = getTime();
           // spindle_l_fan_control(1);
           break;
         case 'E':

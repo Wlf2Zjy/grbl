@@ -289,6 +289,7 @@ ISR(TIMER5_COMPA_vect) {
         sys.lWaterStatus = get_L_Depth();
         sys.rWaterStatus = get_R_Depth();
     }
+    
     // 消抖
     if(pin_state){
         debounce_counter--;
@@ -297,6 +298,7 @@ ISR(TIMER5_COMPA_vect) {
             pin ^= CONTROL_MASK;
             handle_stable_input(pin);
             pin_state = false;
+            debounce_counter = time_ms;
         }
     }
 }

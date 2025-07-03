@@ -195,6 +195,9 @@ void rfid_write(uint8_t toolNumber, uint16_t time)
         serial1_write(allTime & 0x0F);
         //帧尾
         serial1_write(0x55);
+
+        settings.tool_data[toolNumber-1][14] = allTime >> 8;
+        settings.tool_data[toolNumber-1][15] = allTime & 0x0F;
         delay_ms(100);
         if(serial1_read() != 0xAA) continue;
         uint8_t data_len = serial1_read();
@@ -217,12 +220,17 @@ void read_all_rfid(){
     {
         memset(return_data, 0, 8);
         // 移动刀位置
-        float2string(settings.tool_y[i], y_char, 3);
+        float2string(settings.tool_y[i] - 35, y_char, 3);
         sprintf(command, "G90G53G0Y%s", y_char);
         gc_execute_line(command);
         protocol_buffer_synchronize();
         rfid_read(return_data);
         memcpy(settings.tool_data[i], return_data, 16);
+        printPgmString(PSTR("{'tool"));
+        print_uint8_base10(i);
+        printPgmString(PSTR("':["));
+        print_tool_info(settings.tool_data[i]);
+        printPgmString(PSTR("]}\r\n"));
     }
     set_rfid(1);
     set_flip(0);
