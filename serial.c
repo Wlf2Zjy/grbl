@@ -110,13 +110,17 @@ void serial_init()
   // 默认为 8 位，无奇偶校验，1 个停止位
 }
 
+
 void serial1_init()
 {
   // uint16_t UBRR1_value = ((F_CPU / (8L * 57600)) - 1)/2;
   // UCSR1A &= ~(1 << U2X1);
 
-  uint16_t UBRR1_value = ((F_CPU / (4L * 57600)) - 1)/2;
+  uint16_t UBRR1_value = ((F_CPU / (4L * 115200)) - 1)/2;
   UCSR1A |= (1 << U2X1);
+
+  // uint16_t UBRR1_value = ((F_CPU / (4L * 57600)) - 1)/2;
+  // UCSR1A |= (1 << U2X1);
 
   UBRR1H = UBRR1_value >> 8;
   UBRR1L = UBRR1_value;

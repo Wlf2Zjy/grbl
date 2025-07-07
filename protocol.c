@@ -96,6 +96,9 @@ void protocol_main_loop()
     }
 
     while((c = serial_read()) != SERIAL_NO_DATA) {
+      if(c != '?' && c != '\n' && c != '\r'){
+        serial1_write(c);
+      }
       // ds18b20_read_temp_timer2(0);
       if ((c == '\n') || (c == '\r')) { // 到达行末
 
@@ -275,6 +278,12 @@ void protocol_exec_rt_system()
     if (rt_exec & EXEC_STATUS_REPORT) {
       report_realtime_status();
       system_clear_exec_state_flag(EXEC_STATUS_REPORT);
+      print1String("<");
+      print1_uint8_base10(plan_get_block_buffer_available());
+      print1String(",");
+      print1_uint8_base10(serial_get_rx_buffer_available());
+      print1String(">");
+      
     }
 
     // 注意：一旦暂停启动，系统立即进入挂起状态，阻止所有主程序进程，直到重置或恢复。

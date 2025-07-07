@@ -21,6 +21,29 @@ void printString(const char *s)
     serial_write(*s++);
 }
 
+void print1String(const char *s)
+{
+  while (*s)
+    serial1_write(*s++);
+}
+
+// 以十进制打印 uint8 变量。
+void print1_uint8_base10(uint8_t n)
+{
+  uint8_t digit_a = 0;
+  uint8_t digit_b = 0;
+  if (n >= 100) { // 100-255
+    digit_a = '0' + n % 10;
+    n /= 10;
+  }
+  if (n >= 10) { // 10-99
+    digit_b = '0' + n % 10;
+    n /= 10;
+  }
+  serial1_write('0' + n);
+  if (digit_b) { serial1_write(digit_b); }
+  if (digit_a) { serial1_write(digit_a); }
+}
 
 // 打印存储在 PGM 内存中的字符串
 void printPgmString(const char *s)
