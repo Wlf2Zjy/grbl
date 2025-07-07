@@ -280,7 +280,7 @@
 // 警告：禁用上拉电阻后，需要额外的接线和下拉电阻！
 // #define DISABLE_LIMIT_PIN_PULL_UP
 // #define DISABLE_PROBE_PIN_PULL_UP
-// #define DISABLE_CONTROL_PIN_PULL_UP
+#define DISABLE_CONTROL_PIN_PULL_UP
 
 // 设置工具长度偏移应用于哪个轴。假设主轴始终与所选轴平行，
 // 工具朝向负方向。换句话说，正的工具长度偏移值将从当前位置减去。

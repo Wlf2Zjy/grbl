@@ -14,6 +14,7 @@ void switch_init()
     OUTLINE_DDR |= (1 << OUTLINE_BIT);
     CAMERA_DDR |= (1 << CAMERA_BIT);
     RFID_ELE_DDR |= (1 << RFID_ELE_BIT);
+    all_switch_stop();
 }
 
 void all_switch_stop(){
@@ -34,9 +35,9 @@ void all_switch_stop(){
 void air_fan_control(uint8_t flag)
 {
     if(flag){
-        AIR_FAN_PORT |= (1 << AIR_FAN_BIT);
+        AIR_FAN_PORT |= (1 << AIR_FAN_BIT);  // 高电平
     }else{
-        AIR_FAN_PORT &= ~(1 << AIR_FAN_BIT);
+        AIR_FAN_PORT &= ~(1 << AIR_FAN_BIT); // 低电平
     }
 }
 

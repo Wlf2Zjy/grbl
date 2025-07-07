@@ -3,6 +3,7 @@
 
 // void tool_loose();        // 松刀
 // void tool_tight();        // 紧刀
+extern uint8_t toolLed[];
 void change_tool(uint8_t tool_number);
 void return_tool();
 void get_tool(uint8_t tool_number);

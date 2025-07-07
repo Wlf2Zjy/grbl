@@ -29,10 +29,30 @@
 #define STATUS_LED_BIT  0
 #define STATUS_LED_ENABLE_BIT  1
 
+// #define TOOL_LED_PORT PORTG
+// #define TOOL_LED_DDR  DDRG
+// #define TOOL_LED_BIT  0
+// #define TOOL_LED_ENABLE_BIT  1
+
+// #define STATUS_LED_PORT PORTL
+// #define STATUS_LED_DDR  DDRL
+// #define STATUS_LED_BIT  6
+// #define STATUS_LED_ENABLE_BIT  7
+
+typedef enum {
+  LED_OFF = 0,    // 关闭
+  LED_WHITE,      // 白色
+  LED_RED,        // 红色
+  LED_GREEN,      // 绿色
+  LED_BLUE        // 蓝色
+} LedColor;
+
 
 // 设置从 G-code 解析器接收到的有效移动命令，检查软限位，并执行移动。
 void led_init();
 void control_status_led();
 void control_tool_led();
 void control_led(uint8_t color);
+void set_tool_leds(LedColor color1, LedColor color2, LedColor color3, 
+  LedColor color4, LedColor color5);
 #endif

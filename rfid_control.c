@@ -231,6 +231,12 @@ void read_all_rfid(){
         printPgmString(PSTR("':"));
         print_tool_info(settings.tool_data[i]);
         printPgmString(PSTR("}\r\n"));
+        if (settings.tool_data[i][0] == 0){
+            toolLed[i] = LED_OFF;
+        }else{
+            toolLed[i] = LED_GREEN;
+        }
+        set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]); 
     }
     set_rfid(1);
     set_flip(0);

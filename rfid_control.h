@@ -6,6 +6,7 @@
 #define RFID_LIMIT_PIN PINF
 #define RFID_LIMIT_BIT 5
 
+extern uint8_t toolLed[];
 void rfid_control_init();
 void set_rfid(uint8_t flag);
 void rfid_read(uint8_t* return_data);

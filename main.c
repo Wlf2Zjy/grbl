@@ -26,7 +26,7 @@ int main(void)
   // 在上电时初始化系统。
   switch_init();
   timer5_init();
-  // getDepth_init();
+  getDepth_init();
   serial_init();   // 设置串行波特率和中断
   serial1_init();
   serial2_init();
@@ -97,6 +97,8 @@ int main(void)
     DDRE |= (1 << 4); // 将其配置为输出引脚。
     PORTE |= (1<<4);  // 设置引脚为高，继电器默认闭合
     led_init();
+
+    set_tool_leds(LED_WHITE, LED_WHITE, LED_WHITE, LED_WHITE, LED_WHITE);
     control_led(1);
     // 将清除的 G-code 和规划器位置同步到当前系统位置。
     plan_sync_position();
