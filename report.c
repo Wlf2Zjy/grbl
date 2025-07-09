@@ -682,9 +682,16 @@ void report_realtime_status()
   if (bit_istrue(settings.status_report_mask, BITFLAG_RT_STATUS_BUFFER_STATE))
   {
     printPgmString(PSTR("|Bf:"));
-    print_uint8_base10(plan_get_block_buffer_available());
+    uint8_t a = plan_get_block_buffer_available();
+    uint8_t b = serial_get_rx_buffer_available();
+    print_uint8_base10(a);
     serial_write(',');
-    print_uint8_base10(serial_get_rx_buffer_available());
+    print_uint8_base10(b);
+    print1String("<");
+    print1_uint8_base10(a);
+    print1String(",");
+    print1_uint8_base10(b);
+    print1String(">");
   }
 #endif
 
