@@ -624,6 +624,8 @@ void report_realtime_status()
   print_uint8_base10(settings.tool);
   printPgmString(PSTR("|F:"));
   printFloat_RateValue(gc_state.feed_rate);
+  printPgmString(PSTR("|R:"));
+  printFloat_RateValue(0);
   // printPgmString(PSTR("|ST:"));
   // printFloat_RateValue(temp_obj.spindle_temp);
   // printPgmString(PSTR("|LFT:"));
