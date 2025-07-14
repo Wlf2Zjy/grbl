@@ -653,12 +653,18 @@ void report_realtime_status()
   printFloat_RateValue(sys.toolDoorStatus);
   printPgmString(PSTR("|D:"));
   printFloat_RateValue(sys.doorStatus);
+  printPgmString(PSTR("|DR:"));
+  printFloat_RateValue(sys.drawerStatus);
   printPgmString(PSTR("|C:"));
   printFloat_RateValue(sys.coolingStatus);
   printPgmString(PSTR("|L:"));
   printFloat_RateValue(sys.ledStatus);
   printPgmString(PSTR("|AF:"));
   printFloat_RateValue(sys.airFanStatus);
+  printPgmString(PSTR("|SF:"));
+  printFloat_RateValue(sys.spindleFanStatus);
+  printPgmString(PSTR("|BF:"));
+  printFloat_RateValue(sys.blowFanStatus);
   printPgmString(PSTR("|S:"));
   printFloat(gc_state.spindle_speed, N_DECIMAL_RPMVALUE);
   printPgmString(PSTR("|M:"));

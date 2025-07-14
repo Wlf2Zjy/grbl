@@ -134,9 +134,12 @@ typedef struct {
   uint8_t coolingStatus;  // 喷洒状态
   bool ledStatus;  // 照明灯状态
   bool airFanStatus;  // 空气过滤开关状态
+  bool blowFanStatus;  // 吹渣风扇开关状态
   uint8_t spindleFanStatus;  // 主轴风扇状态
   bool lWaterStatus;  // 左液位传感器状态
   bool rWaterStatus;  // 右液位传感器状态
+  bool drawerStatus;  // 是否拉出抽屉
+  bool probeStatus;  // 探针状态0下1上
 } system_t;
 extern system_t sys;
 

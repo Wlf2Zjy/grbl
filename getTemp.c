@@ -1,7 +1,8 @@
 #include "grbl.h"
 
 volatile uint16_t tempConversionCounter = 0;
-volatile uint16_t fanCounter = 0;
+volatile uint32_t blowFanCounter = 0;
+volatile uint32_t SpineFanCounter = 0;
 volatile uint16_t waterCounter = 0;
 volatile uint16_t readSpindleTempNum = 0;
 volatile bool readFlag0 = true;
@@ -264,22 +265,33 @@ ISR(TIMER5_COMPA_vect) {
     }
 
     // 风扇循环
-    // if (sys.isRunGcode){
-    //     if(fanCounter < 300000){
-    //         fanCounter++;
-    //     }else{
-    //         fanCounter = 0;
-    //         if(sys.spindleFanStatus == 1){
-    //             spindle_l_fan_control(0);
-    //             spindle_r_fan_control(1);
-    //             sys.spindleFanStatus == 2;
-    //         }else if(sys.spindleFanStatus == 2){
-    //             spindle_r_fan_control(0);
-    //             spindle_l_fan_control(1);
-    //             sys.spindleFanStatus == 1;
-    //         }
-    //     }
-    // }
+    if (sys.isRunGcode){
+        if (blowFanCounter >= (uint32_t)1000*60*15) {  // 确保一定会进入清零逻辑
+            blowFanCounter = 0;
+            blow_fan_control(0);
+        } else {
+            blowFanCounter++;
+            if (blowFanCounter == (uint32_t)1000*60*14) {
+                blow_fan_control(1);
+            }
+        }
+        if(sys.spindleFanStatus != 0){
+            if (SpineFanCounter < (uint32_t)1000*60*5) {
+                SpineFanCounter++;
+            } else {
+                if(sys.spindleFanStatus == 1){
+                    spindle_l_fan_control(0);
+                    spindle_r_fan_control(1);
+                    sys.spindleFanStatus == 2;
+                }else if(sys.spindleFanStatus == 2){
+                    spindle_r_fan_control(0);
+                    spindle_l_fan_control(1);
+                    sys.spindleFanStatus == 1;
+                }
+                SpineFanCounter = 0;
+            }
+        }
+    }
 
     //读液位
     if(waterCounter < 5000){

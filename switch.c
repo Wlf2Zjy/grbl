@@ -29,6 +29,7 @@ void all_switch_stop(){
     outline_control(0);
     camera_control(0);
     rfid_ele_control(0);
+    spray_control(0);
 }
 
 // 1开0关
@@ -65,6 +66,12 @@ void spindle_fan_close()
 {
     spindle_r_fan_control(0);
     spindle_l_fan_control(0);
+}
+
+void coolant_close()
+{
+    l_water_control(0);
+    r_water_control(0);
 }
 
 // 1开0关

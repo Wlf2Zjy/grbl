@@ -7,7 +7,7 @@ void probe_control_init()
     PORTL |= ((1 << 1) | 1); // 启用内部上拉电阻。正常高操作。
 }
 
-//  0上V 1下P
+//  1上 0下
 void set_probe(uint8_t flag)
 {
     protocol_buffer_synchronize();

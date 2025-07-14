@@ -64,5 +64,6 @@ void camera_control(uint8_t flag);
 void rfid_ele_control(uint8_t flag);
 void all_switch_stop();
 void spindle_fan_close();
+void coolant_close();
 
 #endif

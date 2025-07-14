@@ -87,15 +87,14 @@ extern volatile bool pin_state;
 ISR(CONTROL_INT_vect) {
   uint8_t pin = (CONTROL_PIN & CONTROL_MASK);
   pin ^= CONTROL_MASK;
-  sys.doorStatus = pin & (1 << 3);
   if (pin != last_pin_state) {
       last_pin_state = pin;
       debounce_counter = time_ms;  // 重置消抖计数器
       pin_state = true;
   }
   // 只有当消抖计数器为0时才处理稳定输入
-  print_uint8_base2_ndigit(pin, 8);
-  printString("A\r\n");
+  // print_uint8_base2_ndigit(pin, 8);
+  // printString("A\r\n");
   // if (debounce_counter == 0 && sys.state != STATE_ALARM && pin_state) {
   //     pin_state = false;
   //     handle_stable_input(pin);
@@ -104,6 +103,8 @@ ISR(CONTROL_INT_vect) {
 
 // 处理稳定输入的函数
 void handle_stable_input(uint8_t pin) {
+  sys.doorStatus = pin & (1 << CONTROL_SAFETY_DOOR_BIT);
+  sys.drawerStatus = pin & (1 << DRAWER_DETECT_BIT);
   if (!(sys_rt_exec_alarm)) {
     // uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7));
     // uint8_t stopStatus = (~pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
@@ -312,7 +313,11 @@ uint8_t system_execute_line(char *line)
           set_rfid(index);  // $SR
           break;
         case 'P':
-          set_probe(index);  // $SP
+          if (sys.probeStatus != index)
+          {
+            set_probe(index);  // $SP
+            sys.probeStatus = index;
+          }
           break;
         case 'T':
           set_flip(index);  // $SP
@@ -331,13 +336,13 @@ uint8_t system_execute_line(char *line)
           sys.spindleFanStatus = 1;
           control_led(3);
           sys.startTime = getTime();
-          // spindle_l_fan_control(1);
+          spindle_l_fan_control(1);
           break;
         case 'E':
           sys.isRunGcode = false;
           sys.spindleFanStatus = 0;
           control_led(2);
-          // spindle_fan_close();
+          spindle_fan_close();
           // Gcode运行结束
           break;
       }
@@ -358,12 +363,15 @@ uint8_t system_execute_line(char *line)
         break;
       case 'B':
         spindle_l_fan_control(index);
+        sys.spindleFanStatus = 1;
         break;
       case 'C':
         spindle_r_fan_control(index);
+        sys.spindleFanStatus = 2;
         break;
       case 'D':
         blow_fan_control(index);
+        sys.blowFanStatus = index;
         break;
       case 'E':
         suction_cup_control(index);
@@ -393,6 +401,10 @@ uint8_t system_execute_line(char *line)
       case 'N': 
         set_flip(index);
         sys.toolDoorStatus = index;
+        break;
+      case 'M': 
+        spindle_fan_close();
+        sys.spindleFanStatus = 0;
         break;
       default:
         return (STATUS_INVALID_STATEMENT);
@@ -502,6 +514,8 @@ uint8_t system_execute_line(char *line)
       report_realtime_status();
       if (line[2] == 0)
       {
+        set_probe(1);
+        sys.probeStatus = 1;
         mc_homing_cycle(HOMING_CYCLE_ALL);
 #ifdef HOMING_SINGLE_AXIS_COMMANDS
       }
