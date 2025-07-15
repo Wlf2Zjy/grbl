@@ -13,6 +13,37 @@ void tool_control_init()
   // PORTF &= ~(1 << 6); // 正常低操作。需要外部下拉。
 }
 
+void blowToolSlag(){
+  gc_execute_line("G90G53G0Z-5");
+  protocol_buffer_synchronize();
+  spindle_r_fan_control(1);
+  gc_execute_line("G90G53G0X-5Y-5");
+  gc_execute_line("G90G53G0X-5Y-200");
+  protocol_buffer_synchronize();
+  spindle_r_fan_control(0);
+}
+
+void blowAllSlag(){
+  gc_execute_line("G90G53G0Z-5");
+  protocol_buffer_synchronize();
+  spindle_r_fan_control(1);
+  gc_execute_line("G90G53G0X-5Y-5");
+  gc_execute_line("G90G53G0X-5Y-200");
+  gc_execute_line("G90G53G0X-50Y-200");
+  gc_execute_line("G90G53G0X-50Y-5");
+  
+  gc_execute_line("G90G53G0X-100Y-5");
+  gc_execute_line("G90G53G0X-100Y-200");
+  gc_execute_line("G90G53G0X-150Y-200");
+  gc_execute_line("G90G53G0X-150Y-5");
+
+  gc_execute_line("G90G53G0X-200Y-5");
+  gc_execute_line("G90G53G0X-200Y-200");
+  gc_execute_line("G90G53G0X-10Y-10");
+  protocol_buffer_synchronize();
+  spindle_r_fan_control(0);
+}
+
 void return_tool()
 {
   for (uint8_t i = 0; i < TOOL_NUM - 1; i++)
@@ -126,6 +157,8 @@ void get_tool(uint8_t tool_number)
 void change_tool(uint8_t tool_number)
 {
   uint8_t beforeTool = settings.tool;
+  blowToolSlag();
+  // 开门
   set_flip(1);
   if (tool_number == 0)
   {
@@ -154,7 +187,7 @@ void tool_length_zero()
   printPgmString(PSTR("Start tool setting"));
   printPgmString(PSTR("\r\n"));
   // 抬刀
-  gc_execute_line("G90G53G01Z-5F1000");
+  gc_execute_line("G90G53G0Z-5");
   // 移动到对刀的xy位置
   float2string(settings.tool_x[TOOL_NUM - 1], x_char, 3);
   float2string(settings.tool_y[TOOL_NUM - 1], y_char, 3);
@@ -162,7 +195,7 @@ void tool_length_zero()
   gc_execute_line(command);
   // 下降到对刀z位置
   float2string(settings.tool_z[TOOL_NUM - 1], z_char, 3);
-  sprintf(command, "G90G53G01Z%sF1000", z_char);
+  sprintf(command, "G90G53G0Z%s", z_char);
   gc_execute_line(command);
   gc_execute_line("G21G91G38.2Z-100F200");
   gc_execute_line("G0Z1");
@@ -184,15 +217,15 @@ void set_tool_length()
   printPgmString(PSTR("Start tool setting"));
   printPgmString(PSTR("\r\n"));
   // 抬刀
-  gc_execute_line("G90G53G01Z-5F1000");
+  gc_execute_line("G90G53G0Z-5");
   // 移动到对刀的xy位置
   float2string(settings.tool_x[TOOL_NUM - 1], x_char, 3);
   float2string(settings.tool_y[TOOL_NUM - 1], y_char, 3);
-  sprintf(command, "G90G53G01X%sY%sF1000", x_char, y_char);
+  sprintf(command, "G90G53G0X%sY%s", x_char, y_char);
   gc_execute_line(command);
   // 下降到对刀z位置
   float2string(settings.tool_z[TOOL_NUM - 1], z_char, 3);
-  sprintf(command, "G90G53G01Z%sF1000", z_char);
+  sprintf(command, "G90G53G0Z%s", z_char);
   gc_execute_line(command);
   gc_execute_line("G21G91G38.2Z-100F200");
   gc_execute_line("G0Z1");
@@ -206,5 +239,5 @@ void set_tool_length()
   // write_global_settings(); // 将更新后的刀长写入eeprom
   // report_probe_parameters();
   // 抬刀
-  gc_execute_line("G90G53G01Z-5F1000");
+  gc_execute_line("G90G53G0Z-5");
 }

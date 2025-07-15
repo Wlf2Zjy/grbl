@@ -339,10 +339,11 @@ uint8_t system_execute_line(char *line)
           spindle_l_fan_control(1);
           break;
         case 'E':
-          sys.isRunGcode = false;
           sys.spindleFanStatus = 0;
           control_led(2);
           spindle_fan_close();
+          blowAllSlag();
+          sys.isRunGcode = false;
           // Gcode运行结束
           break;
       }
@@ -515,6 +516,7 @@ uint8_t system_execute_line(char *line)
       if (line[2] == 0)
       {
         set_probe(1);
+        set_flip(0);
         sys.probeStatus = 1;
         mc_homing_cycle(HOMING_CYCLE_ALL);
 #ifdef HOMING_SINGLE_AXIS_COMMANDS
