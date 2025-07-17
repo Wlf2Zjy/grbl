@@ -515,10 +515,10 @@ uint8_t system_execute_line(char *line)
       report_realtime_status();
       if (line[2] == 0)
       {
-        // set_probe(1);
-        // set_flip(0);
-        // sys.probeStatus = 1;
+        set_probe(1);
         mc_homing_cycle(HOMING_CYCLE_ALL);
+        set_flip(0);
+        sys.probeStatus = 1;
 #ifdef HOMING_SINGLE_AXIS_COMMANDS
       }
       else if (line[3] == 0)
