@@ -156,7 +156,6 @@ void get_tool(uint8_t tool_number)
 
 void change_tool(uint8_t tool_number)
 {
-  uint8_t beforeTool = settings.tool;
   blowToolSlag();
   // 开门
   set_flip(1);
@@ -172,12 +171,14 @@ void change_tool(uint8_t tool_number)
   }
   protocol_buffer_synchronize();
   set_flip(0);
-  // 将换完刀后刀号保存
-  settings.tool = tool_number;
-  write_global_settings(); // 将更新后的刀号写入eeprom
-  printPgmString(PSTR("nowTool:"));
-  printInteger(tool_number);
-  printPgmString(PSTR("\r\n"));
+  if (sys.state != STATE_ALARM){
+    // 将换完刀后刀号保存
+    settings.tool = tool_number;
+    write_global_settings(); // 将更新后的刀号写入eeprom
+    printPgmString(PSTR("nowTool:"));
+    printInteger(tool_number);
+    printPgmString(PSTR("\r\n"));
+  }
 }
 
 
