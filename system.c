@@ -151,6 +151,7 @@ void system_execute_startup(char *line)
 
 void print_tool_info(uint8_t* data) {
   float diameter;
+  uint32_t int_rep;
   float pitch;
   // 提取各字段
   uint8_t tool_type = data[0];
@@ -161,11 +162,9 @@ void print_tool_info(uint8_t* data) {
   uint8_t allLength = data[13];
   uint16_t useTime = (data[14] << 8) | data[15];
 
-  diameter = (data[2] << 24) | (data[3] << 16) | (data[4] << 8) | data[5];
-  // memcpy(&diameter, &data[2], 4);
-  // memcpy(&pitch, &data[6], 4);
-  pitch = (data[6] << 24) | (data[7] << 16) | (data[8] << 8) | data[9];
-
+  memcpy(&diameter, &data[2], 4);
+  memcpy(&pitch, &data[6], 4);
+  // pitch = (data[9] << 24) | (data[8] << 16) | (data[7] << 8) | data[6];
   // // 打印解析后的信息
   printPgmString(PSTR("["));
   switch (tool_type)
@@ -350,7 +349,12 @@ uint8_t system_execute_line(char *line)
     }
     break;  
   case 'E':
-    tool_length_zero();
+    // tool_length_zero();
+      // 开门
+    set_flip(1);
+    set_tool_length();
+      // 开门
+    set_flip(0);
     break;
   case 'F':
     if (line[4] == 0)
@@ -515,6 +519,7 @@ uint8_t system_execute_line(char *line)
       report_realtime_status();
       if (line[2] == 0)
       {
+        // 回零
         set_probe(1);
         mc_homing_cycle(HOMING_CYCLE_ALL);
         set_flip(0);
