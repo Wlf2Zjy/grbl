@@ -21,14 +21,14 @@
 
 void system_init()
 {
-  CONTROL_DDR &= ~(CONTROL_MASK); // 配置为输入引脚
-// #ifdef DISABLE_CONTROL_PIN_PULL_UP
+  CONTROL_DDR &= ~(CONTROL_MASK);  // 配置为输入引脚
+                                   // #ifdef DISABLE_CONTROL_PIN_PULL_UP
   CONTROL_PORT &= ~(CONTROL_MASK); // 常规低操作。需要外部下拉。
   // CONTROL_PORT &= ~((1 << X_ALARM_BIT) | (1 << Y_ALARM_BIT) | (1 << Z_ALARM_BIT));
-//   CONTROL_PORT |= ((1 << CONTROL_SAFETY_DOOR_BIT) | (1 << STOP_ALARM_BIT));
-// #else
-//   CONTROL_PORT |= CONTROL_MASK; // 启用内部上拉电阻。常规高操作。
-// #endif
+  //   CONTROL_PORT |= ((1 << CONTROL_SAFETY_DOOR_BIT) | (1 << STOP_ALARM_BIT));
+  // #else
+  //   CONTROL_PORT |= CONTROL_MASK; // 启用内部上拉电阻。常规高操作。
+  // #endif
   CONTROL_PCMSK |= CONTROL_MASK; // 启用引脚变化中断的特定引脚
   PCICR |= (1 << CONTROL_INT);   // 启用引脚变化中断
 }
@@ -78,19 +78,21 @@ uint8_t system_control_get_state()
 //   }
 // }
 
-extern volatile uint8_t time_ms;  
+extern volatile uint8_t time_ms;
 extern volatile uint8_t debounce_counter;
 extern volatile uint8_t last_pin_state;
 extern volatile bool pin_state;
 
 // 控制中断服务
-ISR(CONTROL_INT_vect) {
+ISR(CONTROL_INT_vect)
+{
   uint8_t pin = (CONTROL_PIN & CONTROL_MASK);
   pin ^= CONTROL_MASK;
-  if (pin != last_pin_state) {
-      last_pin_state = pin;
-      debounce_counter = time_ms;  // 重置消抖计数器
-      pin_state = true;
+  if (pin != last_pin_state)
+  {
+    last_pin_state = pin;
+    debounce_counter = time_ms; // 重置消抖计数器
+    pin_state = true;
   }
   // 只有当消抖计数器为0时才处理稳定输入
   // print_uint8_base2_ndigit(pin, 8);
@@ -102,19 +104,22 @@ ISR(CONTROL_INT_vect) {
 }
 
 // 处理稳定输入的函数
-void handle_stable_input(uint8_t pin) {
+void handle_stable_input(uint8_t pin)
+{
   sys.doorStatus = pin & (1 << CONTROL_SAFETY_DOOR_BIT);
   sys.drawerStatus = pin & (1 << DRAWER_DETECT_BIT);
-  if (!(sys_rt_exec_alarm)) {
+  if (!(sys_rt_exec_alarm))
+  {
     // uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7));
     // uint8_t stopStatus = (~pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
-    uint8_t stopStatus = (~pin &  1 << 7);
+    uint8_t stopStatus = (~pin & 1 << 7);
     // print_uint8_base2_ndigit(stopStatus, 8);
     // printString("S\r\n");
     // 检查限位引脚状态
-    if (stopStatus) {
-        mc_reset();
-        system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT);
+    if (stopStatus)
+    {
+      mc_reset();
+      system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT);
     }
   }
 }
@@ -149,13 +154,14 @@ void system_execute_startup(char *line)
   }
 }
 
-void print_tool_info(uint8_t* data) {
+void print_tool_info(uint8_t *data)
+{
   float diameter;
   uint32_t int_rep;
   float pitch;
   // 提取各字段
   uint8_t tool_type = data[0];
-  uint8_t angle     = data[1];
+  uint8_t angle = data[1];
   uint8_t bladeNum = data[10];
   uint8_t bladeLength = data[11];
   uint8_t handleDiameter = data[12];
@@ -225,14 +231,16 @@ uint8_t system_execute_line(char *line)
   {
   case 0:
     report_grbl_help();
-    break; // 显示 Grbl 帮助
-    case 'A':    // rfid相关
+    break;  // 显示 Grbl 帮助
+  case 'A': // rfid相关
     if (line[2] == 0)
     {
       printPgmString(PSTR("{'toolData':["));
-      for (uint8_t i = 0; i < 5; i++) {
+      for (uint8_t i = 0; i < 5; i++)
+      {
         print_tool_info(settings.tool_data[i]);
-        if(i < 4){
+        if (i < 4)
+        {
           printPgmString(PSTR(","));
         }
       }
@@ -245,56 +253,57 @@ uint8_t system_execute_line(char *line)
       {
         unsigned long nowTime, useTime, seconds;
         uint16_t minutes;
-        case 'R':
-          // for (uint8_t i = 0; i < 5; i++) {
-          //   uint8_t rt_exec = sys_rt_exec_state;
-          //   if(rt_exec & EXEC_RESET){
-          //     break;
-          //   }
-          //   printString("{'tool");
-          //   print_uint8_base10(i+1);
-          //   printString("':");
-          //   print_tool_info(settings.tool_data[i]);
-          //   printString("}\r\n");
-          //   delay_ms(3000);
-          // }
-          read_all_rfid();
-          break;
-        case 'T':
-          nowTime = getTime(); // 记录开始时间
-          useTime = nowTime - sys.startTime;
-          minutes = useTime / 60;
-          sys.startTime = nowTime;
-          print_uint32_base10(minutes);
-          printString("\r\n");
-          print_uint32_base10(nowTime);
-          printString("\r\n");
-          rfid_write(1, minutes);
-          break;
-        case 'A':
-          getToolStatus();
-          break;
-        default:
-          return (STATUS_INVALID_STATEMENT);
+      case 'R':
+        // for (uint8_t i = 0; i < 5; i++) {
+        //   uint8_t rt_exec = sys_rt_exec_state;
+        //   if(rt_exec & EXEC_RESET){
+        //     break;
+        //   }
+        //   printString("{'tool");
+        //   print_uint8_base10(i+1);
+        //   printString("':");
+        //   print_tool_info(settings.tool_data[i]);
+        //   printString("}\r\n");
+        //   delay_ms(3000);
+        // }
+        read_all_rfid();
+        break;
+      case 'T':
+        nowTime = getTime(); // 记录开始时间
+        useTime = nowTime - sys.startTime;
+        minutes = useTime / 60;
+        sys.startTime = nowTime;
+        print_uint32_base10(minutes);
+        printString("\r\n");
+        print_uint32_base10(nowTime);
+        printString("\r\n");
+        // rfid_write(1, minutes);
+        break;
+      case 'A':
+        getToolStatus();
+        break;
+      default:
+        return (STATUS_INVALID_STATEMENT);
       }
       break;
     }
     if (line[4] == 0)
     {
       uint8_t tool_index = line[3] - '0';
-      if (tool_index >= TOOL_NUM) return STATUS_INVALID_STATEMENT;
+      if (tool_index >= TOOL_NUM)
+        return STATUS_INVALID_STATEMENT;
       switch (line[2])
       {
-        case 'R':
-          rfid_read(return_data);
-          memcpy(settings.tool_data[tool_index-1], return_data, 16);
-          write_global_settings();
-          break;
-        case 'G':
-          serial_write_bytes(settings.tool_data[tool_index-1], 16);
-          break;
-        default:
-          return (STATUS_INVALID_STATEMENT);
+      case 'R':
+        rfid_read(return_data);
+        memcpy(settings.tool_data[tool_index - 1], return_data, 16);
+        write_global_settings();
+        break;
+      case 'G':
+        serial_write_bytes(settings.tool_data[tool_index - 1], 16);
+        break;
+      default:
+        return (STATUS_INVALID_STATEMENT);
       }
       break;
     }
@@ -308,19 +317,19 @@ uint8_t system_execute_line(char *line)
       uint8_t index = line[3] - '0';
       switch (line[2])
       {
-        case 'R':
-          set_rfid(index);  // $SR
-          break;
-        case 'P':
-          if (sys.probeStatus != index)
-          {
-            set_probe(index);  // $SP
-            sys.probeStatus = index;
-          }
-          break;
-        case 'T':
-          set_flip(index);  // $SP
-          break;
+      case 'R':
+        set_rfid(index); // $SR
+        break;
+      case 'P':
+        if (sys.probeStatus != index)
+        {
+          set_probe(index); // $SP
+          sys.probeStatus = index;
+        }
+        break;
+      case 'T':
+        set_flip(index); // $SP
+        break;
       }
     }
     break;
@@ -329,31 +338,31 @@ uint8_t system_execute_line(char *line)
     {
       switch (line[2])
       {
-        case 'S':
-          sys.isRunGcode = true;
-          // 开始运行gcode
-          sys.spindleFanStatus = 1;
-          control_led(3);
-          sys.startTime = getTime();
-          spindle_l_fan_control(1);
-          break;
-        case 'E':
-          sys.spindleFanStatus = 0;
-          control_led(2);
-          spindle_fan_close();
-          blowAllSlag();
-          sys.isRunGcode = false;
-          // Gcode运行结束
-          break;
+      case 'S':
+        sys.isRunGcode = true;
+        // 开始运行gcode
+        sys.spindleFanStatus = 1;
+        control_led(3);
+        sys.startTime = getTime();
+        spindle_l_fan_control(1);
+        break;
+      case 'E':
+        sys.spindleFanStatus = 0;
+        control_led(2);
+        spindle_fan_close();
+        blowAllSlag();
+        sys.isRunGcode = false;
+        // Gcode运行结束
+        break;
       }
     }
-    break;  
+    break;
   case 'E':
     // tool_length_zero();
-      // 开门
+    // 开门
     set_flip(1);
     set_tool_length();
-      // 开门
+    // 开门
     set_flip(0);
     break;
   case 'F':
@@ -403,11 +412,11 @@ uint8_t system_execute_line(char *line)
       case 'L':
         rfid_ele_control(index);
         break;
-      case 'N': 
+      case 'N':
         set_flip(index);
         sys.toolDoorStatus = index;
         break;
-      case 'M': 
+      case 'M':
         spindle_fan_close();
         sys.spindleFanStatus = 0;
         break;
