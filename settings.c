@@ -137,14 +137,14 @@ void settings_restore(uint8_t restore_flag)
     {
       settings.tool_data[j][0] = 0x01;
       settings.tool_data[j][1] = 0x00;
-      settings.tool_data[j][2] = 0x40;
-      settings.tool_data[j][3] = 0xC0;
-      settings.tool_data[j][4] = 0x00;
-      settings.tool_data[j][5] = 0x00;
-      // settings.tool_data[j][2] = 0x00;
-      // settings.tool_data[j][3] = 0x00;
-      // settings.tool_data[j][4] = 0xC0;
-      // settings.tool_data[j][5] = 0x40;
+      // settings.tool_data[j][2] = 0x40;
+      // settings.tool_data[j][3] = 0xC0;
+      // settings.tool_data[j][4] = 0x00;
+      // settings.tool_data[j][5] = 0x00;
+      settings.tool_data[j][2] = 0x00;
+      settings.tool_data[j][3] = 0x00;
+      settings.tool_data[j][4] = 0xC0;
+      settings.tool_data[j][5] = 0x40;
       settings.tool_data[j][6] = 0x00;
       settings.tool_data[j][7] = 0x00;
       settings.tool_data[j][8] = 0x00;
@@ -153,8 +153,8 @@ void settings_restore(uint8_t restore_flag)
       settings.tool_data[j][11] = 0x0A;
       settings.tool_data[j][12] = 0x06;
       settings.tool_data[j][13] = 0x32;
-      settings.tool_data[j][14] = 0x00;
-      settings.tool_data[j][15] = 0x00;
+      settings.tool_data[j][14] = 0x01;
+      settings.tool_data[j][15] = 0x22;
     }
     settings.tool_data[4][0] = 0x00;
     settings.tool_data[4][1] = 0x00;
@@ -174,8 +174,8 @@ void settings_restore(uint8_t restore_flag)
     settings.tool_data[4][11] = 0x00;
     settings.tool_data[4][12] = 0x00;
     settings.tool_data[4][13] = 0x00;
-    settings.tool_data[4][14] = 0x00;
-    settings.tool_data[4][15] = 0x00;
+    settings.tool_data[4][14] = 0x07;
+    settings.tool_data[4][15] = 0x04;
     // memset(settings.tool_data, 0, sizeof(settings.tool_data));
 #ifdef A_AXIS
     settings.steps_per_mm[A_AXIS] = DEFAULT_A_STEPS_PER_MM;

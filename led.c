@@ -92,7 +92,7 @@ void control_tool_led()
   sendColor(0, 255, 0, 1);  // 显示红色
   
   sei(); // 恢复中断
-  _delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
+  delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
 }
 
 void control_status_led()
@@ -107,7 +107,7 @@ void control_status_led()
     sendColor(0, 255, 0, 2);  // 显示绿色
   }
   sei(); // 恢复中断
-  _delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
+  delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
 }
 
 void control_led(uint8_t color)
@@ -129,7 +129,7 @@ void control_led(uint8_t color)
     }
   }
   sei(); // 恢复中断
-  _delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
+  delay_us(60);  // 至少 50µs 的低电平时间，让 WS2812B 更新
 }
 
 // 设置所有5个刀位的LED颜色
@@ -189,5 +189,5 @@ void set_tool_leds(LedColor color1, LedColor color2, LedColor color3,
   }
   
   sei(); // 恢复中断
-  _delay_us(60);  // WS2812B更新需要的时间
+  delay_us(60);  // WS2812B更新需要的时间
 }

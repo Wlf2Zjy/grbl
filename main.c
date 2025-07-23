@@ -33,7 +33,7 @@ int main(void)
   settings_init(); // 从 EEPROM 加载 Grbl 设置
   stepper_init();  // 配置步进电机引脚和中断定时器
   system_init();   // 配置引脚引脚和引脚变更中断
-  time2Init();
+  // time2Init();
   // memset(sys_position, 0, sizeof(sys_position)); // 清除机器位置。
   sei(); // 启用中断
 
@@ -89,8 +89,8 @@ int main(void)
     tool_control_init();
     toolFlip_control_init();
     probe_init();
-    sleep_init();
-    switch_init();
+    // sleep_init();
+    all_switch_stop();
     plan_reset(); // 清除块缓冲区和规划器变量
     st_reset();   // 清除步进电机子系统变量。
     // 急停继电器上电

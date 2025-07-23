@@ -17,10 +17,11 @@ bool conversionStarted2 = false;
 // 0主轴，1左风扇，2右风扇
 
 // 全局变量用于消抖
-volatile uint8_t time_ms = 20;  // 消抖时间
+volatile uint8_t time_ms = 2;  // 消抖时间
 volatile uint8_t debounce_counter = 0;  // 当前时间
 volatile uint8_t last_pin_state = 0;  // 最后状态
 volatile bool pin_state = false;
+volatile unsigned long seconds_count = 0; // 记录秒数
 
 all_temp temp_obj;
 
@@ -67,9 +68,9 @@ void onewire_write_bit(uint8_t flag, uint8_t bit) {
         {
             R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
         }
-        _delay_us(5);
+        // delay_us(5);
         onewire_input(flag);
-        _delay_us(55);
+        // delay_us(55);
     } else {
         if(flag==0){
             SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
@@ -80,9 +81,9 @@ void onewire_write_bit(uint8_t flag, uint8_t bit) {
         {
             R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
         }
-        _delay_us(65);
+        // delay_us(65);
         onewire_input(flag);
-        _delay_us(5);
+        // delay_us(5);
     }
 }
 
@@ -99,9 +100,9 @@ uint8_t onewire_read_bit(uint8_t flag) {
     {
         R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
     }
-    _delay_us(3);
+    // delay_us(3);
     onewire_input(flag);
-    _delay_us(10);
+    // delay_us(10);
     if(flag==0){
         bit = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 1 : 0;
     }else if (flag==1)
@@ -111,7 +112,7 @@ uint8_t onewire_read_bit(uint8_t flag) {
     {
         bit = (R_FAN_TEMP_PIN & (1 << R_FAN_TEMP_BIT)) ? 1 : 0;
     }
-    _delay_us(50);
+    // delay_us(50);
     return bit;
 }
 
@@ -148,9 +149,9 @@ uint8_t onewire_reset(uint8_t flag) {
     {
         R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
     }
-    _delay_us(480);
+    // delay_us(480);
     onewire_input(flag);
-    _delay_us(70);
+    // delay_us(70);
     if(flag==0){
         presence = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 0 : 1;
     }else if (flag==1)
@@ -160,52 +161,10 @@ uint8_t onewire_reset(uint8_t flag) {
     {
         presence = (R_FAN_TEMP_PIN & (1 << R_FAN_TEMP_BIT)) ? 0 : 1;
     }
-    _delay_us(410);
+    // delay_us(410);
     return presence;
 }
 
-// // // 读取温度
-// float ds18b20_read_temp(uint8_t flag) {
-//     uint8_t temp_l, temp_h;
-//     int16_t temp;
-//     cli(); // 先关中断，避免配置时被打断
-//     if (!onewire_reset(flag)) return -1;  // 无响应
-//     onewire_write_byte(flag, 0xCC);  // Skip ROM
-//     onewire_write_byte(flag, 0x44);  // Convert T
-//     sei(); // 开启全局中断
-//     _delay_ms(750);            // 等待转换
-
-//     cli(); // 先关中断，避免配置时被打断
-//     onewire_reset(flag);
-//     onewire_write_byte(flag, 0xCC);  // Skip ROM
-//     onewire_write_byte(flag, 0xBE);  // Read Scratchpad
-//     temp_l = onewire_read_byte(flag);
-//     temp_h = onewire_read_byte(flag);
-//     temp = (temp_h << 8) | temp_l;
-//     sei(); // 开启全局中断
-//     // printFloat(temp * 0.0625, 3);
-//     temp_obj.spindle_temp = temp * 0.0625;
-//     return temp * 0.0625;  // 每位代表0.0625℃
-// }
-
-
-// void time2_init() {
-//     // 配置 Timer2（8位定时器，CTC模式，64分频）
-//     TCCR2A = (1 << WGM21);  // CTC模式
-//     TCCR2B = (1 << CS22);   // 64分频（16MHz / 64 = 250kHz）
-//     OCR2A = 249;            // 1ms = (250kHz / 250) - 1
-//     TIMSK2 = (1 << OCIE2A); // 启用比较匹配中断
-//     sei();                  // 启用全局中断
-// }
-
-// void time2_init() {
-//     // 配置 Timer2（8位定时器，CTC模式，1024分频）
-//     TCCR2A = (1 << WGM21);   // CTC模式
-//     TCCR2B = (1 << CS22) | (1 << CS21) | (1 << CS20);  // 1024分频（16MHz / 1024 = 15.625kHz）
-//     OCR2A = 1561;            // 100ms = (15.625kHz / 1562) - 1
-//     TIMSK2 = (1 << OCIE2A);  // 启用比较匹配中断
-//     sei();                   // 启用全局中断
-// }
 
 void timer5_init() {
     cli(); // 先关中断，避免配置时被打断
@@ -213,7 +172,7 @@ void timer5_init() {
     TCCR5A = 0;              // 清除控制寄存器 A，设置为普通 CTC 模式
     TCCR5B = 0;
     TCNT5 = 0;               // 清零计数器
-    OCR5A = 249;             // 计数到 249 触发中断（1ms）
+    OCR5A = 2499;             // 计数到 2499 触发中断（10ms）
 
     TCCR5B |= (1 << WGM52);  // CTC 模式，WGM bits: 4=1,5=0,6=0 => WGM52=1
     TCCR5B |= (1 << CS51) | (1 << CS50);  // 64 分频：CS52=0,CS51=1,CS50=1 (011)
@@ -226,11 +185,11 @@ ISR(TIMER5_COMPA_vect) {
     // 500ms延时等待
     if (tempConversionCounter < 5000) {  // 5000ms = 5000 * 1ms
         tempConversionCounter++;
-        if(tempConversionCounter == 500){
+        if(tempConversionCounter == 50){
             tempConversionDone0 = true;
             conversionStarted0 = true;
             readFlag0 = true;
-        }else if (tempConversionCounter == 1000)
+        }else if (tempConversionCounter == 100)
         {
             tempConversionDone0 = false;
             conversionStarted0 = false;
@@ -242,7 +201,7 @@ ISR(TIMER5_COMPA_vect) {
             conversionStarted1 = true;
             readFlag1 = true;
         }
-        else if (tempConversionCounter == 2000)
+        else if (tempConversionCounter == 1550)
         {
             tempConversionDone1 = false;
             conversionStarted1 = false;
@@ -254,7 +213,7 @@ ISR(TIMER5_COMPA_vect) {
             conversionStarted2 = true;
             readFlag2 = true;
         }
-        else if (tempConversionCounter == 3000)
+        else if (tempConversionCounter == 2550)
         {
             tempConversionDone2 = false;
             conversionStarted2 = false;
@@ -266,17 +225,17 @@ ISR(TIMER5_COMPA_vect) {
 
     // 风扇循环
     if (sys.isRunGcode){
-        if (blowFanCounter >= (uint32_t)1000*60*15) {  // 确保一定会进入清零逻辑
+        if (blowFanCounter >= (uint32_t)100*60*15) {  // 确保一定会进入清零逻辑
             blowFanCounter = 0;
             blow_fan_control(0);
         } else {
             blowFanCounter++;
-            if (blowFanCounter == (uint32_t)1000*60*14) {
+            if (blowFanCounter == (uint32_t)100*60*14) {
                 blow_fan_control(1);
             }
         }
         if(sys.spindleFanStatus != 0){
-            if (SpineFanCounter < (uint32_t)1000*60*5) {
+            if (SpineFanCounter < (uint32_t)100*60*5) {
                 SpineFanCounter++;
             } else {
                 if(sys.spindleFanStatus == 1){
@@ -294,7 +253,7 @@ ISR(TIMER5_COMPA_vect) {
     }
 
     //读液位
-    if(waterCounter < 5000){
+    if(waterCounter < 500){
         waterCounter++;
     }else{
         waterCounter = 0;
@@ -313,6 +272,21 @@ ISR(TIMER5_COMPA_vect) {
             debounce_counter = time_ms;
         }
     }
+
+    // 计时
+    static uint8_t overflow_count = 0;
+    overflow_count++;
+    
+    // 计算 1 秒
+    if (overflow_count >= 100) {
+        overflow_count = 0;
+        seconds_count++;        
+    }
+}
+
+unsigned long getTime()
+{
+	return seconds_count;
 }
 
 float ds18b20_read_temp_timer2(uint8_t flag, bool conversionStarted, bool tempConversionDone) {
