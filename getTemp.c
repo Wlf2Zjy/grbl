@@ -68,9 +68,9 @@ void onewire_write_bit(uint8_t flag, uint8_t bit) {
         {
             R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
         }
-        // delay_us(5);
+        delay_us(5);
         onewire_input(flag);
-        // delay_us(55);
+        delay_us(55);
     } else {
         if(flag==0){
             SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
@@ -81,9 +81,9 @@ void onewire_write_bit(uint8_t flag, uint8_t bit) {
         {
             R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
         }
-        // delay_us(65);
+        delay_us(65);
         onewire_input(flag);
-        // delay_us(5);
+        delay_us(5);
     }
 }
 
@@ -100,9 +100,9 @@ uint8_t onewire_read_bit(uint8_t flag) {
     {
         R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
     }
-    // delay_us(3);
+    delay_us(3);
     onewire_input(flag);
-    // delay_us(10);
+    delay_us(10);
     if(flag==0){
         bit = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 1 : 0;
     }else if (flag==1)
@@ -112,7 +112,7 @@ uint8_t onewire_read_bit(uint8_t flag) {
     {
         bit = (R_FAN_TEMP_PIN & (1 << R_FAN_TEMP_BIT)) ? 1 : 0;
     }
-    // delay_us(50);
+    delay_us(50);
     return bit;
 }
 
@@ -183,7 +183,7 @@ void timer5_init() {
 
 ISR(TIMER5_COMPA_vect) {
     // 500ms延时等待
-    if (tempConversionCounter < 5000) {  // 5000ms = 5000 * 1ms
+    if (tempConversionCounter < 500) {  // 5000ms = 5000 * 1ms
         tempConversionCounter++;
         if(tempConversionCounter == 50){
             tempConversionDone0 = true;
@@ -195,25 +195,25 @@ ISR(TIMER5_COMPA_vect) {
             conversionStarted0 = false;
             readFlag0 = true;
         }
-        else if (tempConversionCounter == 1500)
+        else if (tempConversionCounter == 200)
         {
             tempConversionDone1 = true;
             conversionStarted1 = true;
             readFlag1 = true;
         }
-        else if (tempConversionCounter == 1550)
+        else if (tempConversionCounter == 250)
         {
             tempConversionDone1 = false;
             conversionStarted1 = false;
             readFlag1 = true;
         }
-        else if (tempConversionCounter == 2500)
+        else if (tempConversionCounter == 300)
         {
             tempConversionDone2 = true;
             conversionStarted2 = true;
             readFlag2 = true;
         }
-        else if (tempConversionCounter == 2550)
+        else if (tempConversionCounter == 350)
         {
             tempConversionDone2 = false;
             conversionStarted2 = false;
