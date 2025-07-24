@@ -29,4 +29,5 @@ float ds18b20_read_temp_timer2(uint8_t flag, bool conversionStarted, bool tempCo
 
 void timer5_init();
 unsigned long getTime();
+void get_Temp1();
 #endif

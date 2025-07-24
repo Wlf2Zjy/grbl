@@ -68,9 +68,9 @@ void onewire_write_bit(uint8_t flag, uint8_t bit) {
         {
             R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
         }
-        delay_us(5);
+        // delay_us(5);
         onewire_input(flag);
-        delay_us(55);
+        // delay_us(55);
     } else {
         if(flag==0){
             SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
@@ -81,9 +81,9 @@ void onewire_write_bit(uint8_t flag, uint8_t bit) {
         {
             R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
         }
-        delay_us(65);
+        // delay_us(65);
         onewire_input(flag);
-        delay_us(5);
+        // delay_us(5);
     }
 }
 
@@ -100,9 +100,9 @@ uint8_t onewire_read_bit(uint8_t flag) {
     {
         R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
     }
-    delay_us(3);
+    // delay_us(3);
     onewire_input(flag);
-    delay_us(10);
+    // delay_us(10);
     if(flag==0){
         bit = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 1 : 0;
     }else if (flag==1)
@@ -112,7 +112,7 @@ uint8_t onewire_read_bit(uint8_t flag) {
     {
         bit = (R_FAN_TEMP_PIN & (1 << R_FAN_TEMP_BIT)) ? 1 : 0;
     }
-    delay_us(50);
+    // delay_us(50);
     return bit;
 }
 
@@ -321,4 +321,149 @@ float ds18b20_read_temp_timer2(uint8_t flag, bool conversionStarted, bool tempCo
         return temp / 16.0;
     }
     return 0;  // 等待中
+}
+
+// 温度读取全流程使用一个函数
+void get_Temp1(){
+    uint8_t presence = 0;
+    SPINDLE_TEMP_DDR |= (1 << SPINDLE_TEMP_BIT);    // 设置为输出
+    SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+    delay_us(480);
+    SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+    SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+    delay_us(70);
+    presence = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 0 : 1;
+    delay_us(410);
+    if (!presence) return 0;
+
+    uint8_t byte = 0xCC;
+    for (int i = 0; i < 8; i++) {
+        uint8_t bit = byte & 0x01;
+        SPINDLE_TEMP_DDR |= (1 << SPINDLE_TEMP_BIT);    // 设置为输出
+        if (bit) {
+            SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+            delay_us(5);
+            SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+            SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+            delay_us(55);
+        } else {
+            SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+            delay_us(65);
+            SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+            SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+            delay_us(5);
+        }
+        byte >>= 1;
+    }
+
+    uint8_t byte = 0x44;
+    for (int i = 0; i < 8; i++) {
+        uint8_t bit = byte & 0x01;
+        SPINDLE_TEMP_DDR |= (1 << SPINDLE_TEMP_BIT);    // 设置为输出
+        if (bit) {
+            SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+            delay_us(5);
+            SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+            SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+            delay_us(55);
+        } else {
+            SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+            delay_us(65);
+            SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+            SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+            delay_us(5);
+        }
+        byte >>= 1;
+    }
+
+    uint8_t presence = 0;
+    SPINDLE_TEMP_DDR |= (1 << SPINDLE_TEMP_BIT);    // 设置为输出
+    SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+    delay_us(480);
+    SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+    SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+    delay_us(70);
+    presence = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 0 : 1;
+    delay_us(410);
+
+    uint8_t byte = 0xCC;
+    for (int i = 0; i < 8; i++) {
+        uint8_t bit = byte & 0x01;
+        SPINDLE_TEMP_DDR |= (1 << SPINDLE_TEMP_BIT);    // 设置为输出
+        if (bit) {
+            SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+            delay_us(5);
+            SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+            SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+            delay_us(55);
+        } else {
+            SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+            delay_us(65);
+            SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+            SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+            delay_us(5);
+        }
+        byte >>= 1;
+    }
+
+    uint8_t byte = 0xBE;
+    for (int i = 0; i < 8; i++) {
+        uint8_t bit = byte & 0x01;
+        SPINDLE_TEMP_DDR |= (1 << SPINDLE_TEMP_BIT);    // 设置为输出
+        if (bit) {
+            SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+            delay_us(5);
+            SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+            SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+            delay_us(55);
+        } else {
+            SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+            delay_us(65);
+            SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+            SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+            delay_us(5);
+        }
+        byte >>= 1;
+    }
+
+    uint8_t byte = 0;
+    for (int i = 0; i < 8; i++) {
+        byte >>= 1;
+        uint8_t bit = 0;
+        SPINDLE_TEMP_DDR |= (1 << SPINDLE_TEMP_BIT);    // 设置为输出
+        SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+        delay_us(3);
+        SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+        SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+        delay_us(10);
+        bit = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 1 : 0;
+        delay_us(50);
+        
+        if (bit) {
+            byte |= 0x80;
+        }
+    }
+    uint8_t temp_l =  byte;
+    
+    uint8_t byte = 0;
+    for (int i = 0; i < 8; i++) {
+        byte >>= 1;
+        uint8_t bit = 0;
+        SPINDLE_TEMP_DDR |= (1 << SPINDLE_TEMP_BIT);    // 设置为输出
+        SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
+        delay_us(3);
+        SPINDLE_TEMP_DDR &= ~(1 << SPINDLE_TEMP_BIT); // 设置为输入
+        SPINDLE_TEMP_PORT |= (1 << SPINDLE_TEMP_BIT); // 启用内部上拉
+        delay_us(10);
+        bit = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 1 : 0;
+        delay_us(50);
+        
+        if (bit) {
+            byte |= 0x80;
+        }
+    }
+    uint8_t temp_h =  byte;
+
+    int16_t temp = (temp_h << 8) | temp_l;
+    temp_obj.spindle_temp = temp * 0.0625;
 }
