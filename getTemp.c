@@ -68,9 +68,9 @@ void onewire_write_bit(uint8_t flag, uint8_t bit) {
         {
             R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
         }
-        // delay_us(5);
+        delay_us(5);
         onewire_input(flag);
-        // delay_us(55);
+        delay_us(55);
     } else {
         if(flag==0){
             SPINDLE_TEMP_PORT &= ~(1 << SPINDLE_TEMP_BIT);
@@ -81,9 +81,9 @@ void onewire_write_bit(uint8_t flag, uint8_t bit) {
         {
             R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
         }
-        // delay_us(65);
+        delay_us(65);
         onewire_input(flag);
-        // delay_us(5);
+        delay_us(5);
     }
 }
 
@@ -100,9 +100,9 @@ uint8_t onewire_read_bit(uint8_t flag) {
     {
         R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
     }
-    // delay_us(3);
+    delay_us(3);
     onewire_input(flag);
-    // delay_us(10);
+    delay_us(10);
     if(flag==0){
         bit = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 1 : 0;
     }else if (flag==1)
@@ -112,7 +112,7 @@ uint8_t onewire_read_bit(uint8_t flag) {
     {
         bit = (R_FAN_TEMP_PIN & (1 << R_FAN_TEMP_BIT)) ? 1 : 0;
     }
-    // delay_us(50);
+    delay_us(50);
     return bit;
 }
 
@@ -149,9 +149,9 @@ uint8_t onewire_reset(uint8_t flag) {
     {
         R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
     }
-    // delay_us(480);
+    delay_us(480);
     onewire_input(flag);
-    // delay_us(70);
+    delay_us(70);
     if(flag==0){
         presence = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 0 : 1;
     }else if (flag==1)
@@ -161,7 +161,7 @@ uint8_t onewire_reset(uint8_t flag) {
     {
         presence = (R_FAN_TEMP_PIN & (1 << R_FAN_TEMP_BIT)) ? 0 : 1;
     }
-    // delay_us(410);
+    delay_us(410);
     return presence;
 }
 

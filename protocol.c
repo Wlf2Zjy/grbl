@@ -83,17 +83,18 @@ void protocol_main_loop()
     // 处理一行传入的串行数据，当数据可用时进行处理。
     // 通过删除空格和注释并将所有字母大写来进行初步过滤。
     if (readFlag0){
+      // get_Temp1();
       ds18b20_read_temp_timer2(0, conversionStarted0, tempConversionDone0);
       readFlag0 = false;
     }
-    if (readFlag1){
-      ds18b20_read_temp_timer2(1, conversionStarted1, tempConversionDone1);
-      readFlag1 = false;
-    }
-    if (readFlag2){
-      ds18b20_read_temp_timer2(2, conversionStarted2, tempConversionDone2);
-      readFlag2 = false;
-    }
+    // if (readFlag1){
+    //   ds18b20_read_temp_timer2(1, conversionStarted1, tempConversionDone1);
+    //   readFlag1 = false;
+    // }
+    // if (readFlag2){
+    //   ds18b20_read_temp_timer2(2, conversionStarted2, tempConversionDone2);
+    //   readFlag2 = false;
+    // }
 
     while((c = serial_read()) != SERIAL_NO_DATA) {
       // ds18b20_read_temp_timer2(0);
