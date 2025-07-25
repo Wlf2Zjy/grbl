@@ -149,9 +149,9 @@ uint8_t onewire_reset(uint8_t flag) {
     {
         R_FAN_TEMP_PORT &= ~(1 << R_FAN_TEMP_BIT);
     }
-    // delay_us(480);
+    delay_us(480);
     onewire_input(flag);
-    // delay_us(70);
+    delay_us(70);
     if(flag==0){
         presence = (SPINDLE_TEMP_PIN & (1 << SPINDLE_TEMP_BIT)) ? 0 : 1;
     }else if (flag==1)
@@ -161,7 +161,7 @@ uint8_t onewire_reset(uint8_t flag) {
     {
         presence = (R_FAN_TEMP_PIN & (1 << R_FAN_TEMP_BIT)) ? 0 : 1;
     }
-    // delay_us(410);
+    delay_us(410);
     return presence;
 }
 

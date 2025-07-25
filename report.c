@@ -314,7 +314,7 @@ void report_version()
 {
   // 以机器位置的方式报告。
   printPgmString(PSTR("[version:"));
-  printPgmString(PSTR("1.0.2"));
+  printPgmString(PSTR("1.0.3"));
   report_util_feedback_line_feed();
 }
 
@@ -661,6 +661,8 @@ void report_realtime_status()
   printFloat_RateValue(sys.ledStatus);
   printPgmString(PSTR("|AF:"));
   printFloat_RateValue(sys.airFanStatus);
+  printPgmString(PSTR("|H:"));
+  printFloat_RateValue(sys.isHomed);
   printPgmString(PSTR("|SF:"));
   printFloat_RateValue(sys.spindleFanStatus);
   printPgmString(PSTR("|BF:"));

@@ -140,6 +140,7 @@ typedef struct {
   bool rWaterStatus;  // 右液位传感器状态
   bool drawerStatus;  // 是否拉出抽屉
   bool probeStatus;  // 探针状态0下1上
+  bool isHomed;  // 是否回零过
 } system_t;
 extern system_t sys;
 

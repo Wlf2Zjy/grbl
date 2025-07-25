@@ -130,7 +130,7 @@ void get_tool(uint8_t tool_number)
   // 抬刀
   gc_execute_line("G90G53G0Z-5");
   protocol_buffer_synchronize();
-  gc_execute_line("M3S2200");
+  gc_execute_line("M3S2300");
   // 移动取刀位置
   float2string(settings.tool_x[tool_number - 1], x_char, 3);
   float2string(settings.tool_y[tool_number - 1], y_char, 3);

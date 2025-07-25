@@ -149,4 +149,5 @@ void set_probe(uint8_t flag)
     gc_sync_position();
     plan_sync_position();
     limits_init();
+    sys.probeStatus = flag;
 }

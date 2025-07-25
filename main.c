@@ -59,6 +59,7 @@ int main(void)
   }
 #endif
 
+  // uint8_t goHomeFlag = true;
   // Grbl 在上电或系统中止时的初始化循环。对于后者，所有进程
   // 将返回到此循环以进行干净的重新初始化。
   for (;;)
@@ -105,7 +106,14 @@ int main(void)
     gc_sync_position();
     // 打印欢迎消息。指示在上电或重置时发生了初始化。
     // report_init_message();  
-   
+
+    // if(goHomeFlag){
+    //   goHomeFlag = false;
+    //   sys.state = STATE_HOMING; // 设置系统状态变量
+    //   report_realtime_status();
+    //   mc_homing_cycle(HOMING_CYCLE_ALL);
+    // }
+
     // 启动 Grbl 主循环。处理程序输入并执行它们。
     protocol_main_loop();
   }
