@@ -220,7 +220,7 @@ void read_all_rfid(){
     {
         memset(return_data, 0, 8);
         // 移动刀位置
-        float2string(settings.tool_y[i] - 35, y_char, 3);
+        float2string(settings.tool_y[i] - 32, y_char, 3);
         sprintf(command, "G90G53G0Y%s", y_char);
         gc_execute_line(command);
         protocol_buffer_synchronize();

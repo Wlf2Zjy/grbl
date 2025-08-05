@@ -102,6 +102,7 @@ void light_control(uint8_t flag)
     }else{
         LIGHT_PORT &= ~(1 << LIGHT_BIT);
     }
+    sys.ledStatus = flag;
 }
 
 // 1开0关

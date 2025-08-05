@@ -107,6 +107,9 @@ ISR(CONTROL_INT_vect)
 void handle_stable_input(uint8_t pin)
 {
   sys.doorStatus = pin & (1 << CONTROL_SAFETY_DOOR_BIT);
+  if(!sys.doorStatus){
+    light_control(1);
+  }
   sys.drawerStatus = pin & (1 << DRAWER_DETECT_BIT);
   if (!(sys_rt_exec_alarm))
   {
@@ -346,11 +349,14 @@ uint8_t system_execute_line(char *line)
         spindle_l_fan_control(1);
         break;
       case 'E':
+        // 运行gcode结束
         sys.spindleFanStatus = 0;
         control_led(2);
         spindle_fan_close();
         blowAllSlag();
+        change_tool(0);
         sys.isRunGcode = false;
+        report_realtime_status();
         // Gcode运行结束
         break;
       }
@@ -391,7 +397,6 @@ uint8_t system_execute_line(char *line)
         break;
       case 'F':
         light_control(index);
-        sys.ledStatus = index;
         break;
       case 'G':
         spray_control(index);
