@@ -253,7 +253,7 @@ ISR(TIMER5_COMPA_vect) {
     }
 
     //读液位
-    if(waterCounter < 500){
+    if(waterCounter < 50){
         waterCounter++;
     }else{
         waterCounter = 0;

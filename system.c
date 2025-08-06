@@ -188,7 +188,7 @@ void print_tool_info(uint8_t *data)
     printPgmString(PSTR("'cone',"));
     break;
   case 4:
-    printPgmString(PSTR("'dill',"));
+    printPgmString(PSTR("'drill',"));
     break;
   case 5:
     printPgmString(PSTR("'thread',"));
