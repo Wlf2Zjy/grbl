@@ -665,7 +665,7 @@ void report_realtime_status()
   printFloat_RateValue(sys.isHomed);
   printPgmString(PSTR("|SF:"));
   printFloat_RateValue(sys.spindleFanStatus);
-  printPgmString(PSTR("|BF:"));
+  printPgmString(PSTR("|FB:"));
   printFloat_RateValue(sys.blowFanStatus);
   printPgmString(PSTR("|S:"));
   printFloat(gc_state.spindle_speed, N_DECIMAL_RPMVALUE);
