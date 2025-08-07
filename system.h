@@ -44,6 +44,7 @@
 #define EXEC_ALARM_HOMING_FAIL_DOOR     7
 #define EXEC_ALARM_HOMING_FAIL_PULLOFF  8
 #define EXEC_ALARM_HOMING_FAIL_APPROACH 9
+#define EXEC_TOOL_MAGAZINE_ERROR 10
 
 // 覆盖位图。实时位标志控制进给、快速、主轴和冷却液覆盖。
 // 主轴/冷却液和进给/快速被分为两个控制标志变量。

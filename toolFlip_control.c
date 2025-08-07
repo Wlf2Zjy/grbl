@@ -156,78 +156,75 @@ void set_flip(uint8_t flag){
     uint8_t open_command[7] = {0xfe, 0xfe, 0x04, 0x01, 0x08, 0x00, 0xfa};   // 2048
     uint8_t close_command[7] = {0xfe, 0xfe, 0x04, 0x01, 0x0A, 0x28, 0xfa};  // 2600
     uint8_t read_command[5] = {0xfe, 0xfe, 0x02, 0x02, 0xfa}; 
-
+    uint8_t c;
+    uint8_t pos_high;
+    uint8_t pos_low;
+    uint16_t pos;
     if(flag){
         for(uint8_t i=0; i < sizeof(open_command); i++){
             serial2_write(open_command[i]);
         }
         delay_ms(100);
-        for(uint8_t j=0; j < 3; j++){
-            
+        for(uint8_t j=0; j < 50; j++){
             for(uint8_t i=0; i < sizeof(read_command); i++){
                 serial2_write(read_command[i]);
             }
             delay_ms(100);
-            uint8_t head1 = serial2_read();
-            uint8_t head2 = serial2_read();
-            if(head1 != 0xfe) continue;
-            if(head2 != 0xfe) continue;
-            uint8_t data_len = serial2_read();
-            uint8_t data1 = serial2_read();
-            uint8_t data2 = serial2_read();
-            uint8_t data3 = serial2_read();
-            uint8_t data4 = serial2_read();
-
-            serial_write(head1);
-            serial_write(head2);
-            serial_write(data_len);
-            serial_write(data1);
-            serial_write(data2);
-            serial_write(data3);
-            serial_write(data4);
-            // uint8_t read_data[data_len];
-            // serial1_read_bytes(read_data, data_len);
-            // if(read_data[data_len-1] == 0xfa){
-            //     serial_write_bytes(&read_data, sizeof(read_data));
-            //     // memcpy(return_data, &read_data[6], 16);
-            // }
+            while((c = serial2_read()) != SERIAL_NO_DATA) {
+                if(c != 0xfe) continue;
+                if(serial2_read() != 0xfe) continue;
+                if(serial2_read() != 0x04) continue;
+                if(serial2_read() != 0x02) continue;
+                pos_high = serial2_read();
+                pos_low = serial2_read();
+                if(serial2_read() != 0xfa) continue;
+                pos = (pos_high << 8) | pos_low;
+            }
+            if(pos > 2048){
+                if((pos - 2048) < 50){
+                    return 1;
+                }
+            }else{
+                if((2048 - pos) < 50){
+                    return 1;
+                }
+            }
         }
+        sys.state = STATE_ALARM; // 确保设置警报状态。
+        report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
+        return 0;
     }else{
-        for(uint8_t i=0; i < sizeof(open_command); i++){
+        for(uint8_t i=0; i < sizeof(close_command); i++){
             serial2_write(close_command[i]);
         }
         delay_ms(100);
-        for(uint8_t j=0; j < 3; j++){
-            
+        for(uint8_t j=0; j < 50; j++){
             for(uint8_t i=0; i < sizeof(read_command); i++){
                 serial2_write(read_command[i]);
             }
             delay_ms(100);
-            uint8_t head1 = serial2_read();
-            uint8_t head2 = serial2_read();
-            if(head1 != 0xfe) continue;
-            if(head2 != 0xfe) continue;
-            uint8_t data_len = serial2_read();
-            uint8_t data1 = serial2_read();
-            uint8_t data2 = serial2_read();
-            uint8_t data3 = serial2_read();
-            uint8_t data4 = serial2_read();
-
-            serial_write(head1);
-            serial_write(head2);
-            serial_write(data_len);
-            serial_write(data1);
-            serial_write(data2);
-            serial_write(data3);
-            serial_write(data4);
-            // uint8_t read_data[data_len];
-            // serial1_read_bytes(read_data, data_len);
-            // if(read_data[data_len-1] == 0xfa){
-            //     serial_write_bytes(&read_data, sizeof(read_data));
-            //     // memcpy(return_data, &read_data[6], 16);
-            // }
+            while((c = serial2_read()) != SERIAL_NO_DATA) {
+                if(c != 0xfe) continue;
+                if(serial2_read() != 0xfe) continue;
+                if(serial2_read() != 0x04) continue;
+                if(serial2_read() != 0x02) continue;
+                pos_high = serial2_read();
+                pos_low = serial2_read();
+                if(serial2_read() != 0xfa) continue;
+                pos = pos_high << 8 | pos_low;
+            }
+            if(pos > 2600){
+                if((pos - 2600) < 50){
+                    return 1;
+                }
+            }else{
+                if((2600 - pos) < 50){
+                    return 1;
+                }
+            }
         }
-
+        sys.state = STATE_ALARM; // 确保设置警报状态。
+        report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
+        return 0;
     }
-
 }
