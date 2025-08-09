@@ -57,11 +57,11 @@ void set_rfid(uint8_t flag)
         // 注意：这样编译出来的代码比尝试过的任何其他实现都要小。
         if (flag)
         {
-            target[idx] = -max_travel;
+            target[idx] = max_travel;
         }
         else
         {
-            target[idx] = 1.5;
+            target[idx] = -1.3;
         }
         // 将轴锁应用于本循环中活动的步进端口引脚。
         axislock |= step_pin[idx];

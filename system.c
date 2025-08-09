@@ -324,10 +324,7 @@ uint8_t system_execute_line(char *line)
         set_rfid(index); // $SR
         break;
       case 'P':
-        if (sys.probeStatus != index)
-        {
-          set_probe(index); // $SP
-        }
+        set_probe(index); // $SP
         break;
       case 'T':
         set_flip(index); // $SP
