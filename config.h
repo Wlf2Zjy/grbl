@@ -71,6 +71,20 @@
 #define CMD_COOLANT_FLOOD_OVR_TOGGLE 0xA0
 #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA1
 
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA2
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA3
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA4
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA5
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA6
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA7
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA8
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xA9
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xAA
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xAB
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xAC
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xAD
+// #define CMD_COOLANT_MIST_OVR_TOGGLE 0xAE
+
 // 如果启用了归位，归位初始化锁会在开机时将Grbl置于报警状态。这迫使用户在执行其他任何操作之前进行归位循环（或覆盖锁）。
 // 这主要是一个安全特性，用于提醒用户进行归位，因为Grbl的位置信息是未知的。
 
