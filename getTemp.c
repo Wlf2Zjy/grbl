@@ -239,13 +239,9 @@ ISR(TIMER5_COMPA_vect) {
                 SpineFanCounter++;
             } else {
                 if(sys.spindleFanStatus == 1){
-                    spindle_l_fan_control(0);
-                    spindle_r_fan_control(1);
-                    sys.spindleFanStatus = 2;
+                    spindle_fan_control(2);
                 }else if(sys.spindleFanStatus == 2){
-                    spindle_r_fan_control(0);
-                    spindle_l_fan_control(1);
-                    sys.spindleFanStatus = 1;
+                    spindle_fan_control(1);
                 }
                 SpineFanCounter = 0;
             }
@@ -257,8 +253,8 @@ ISR(TIMER5_COMPA_vect) {
         waterCounter++;
     }else{
         waterCounter = 0;
-        sys.lWaterStatus = get_L_Depth();
-        sys.rWaterStatus = get_R_Depth();
+        get_L_Depth();
+        get_R_Depth();
     }
     
     // 消抖

@@ -17,7 +17,8 @@ void switch_init()
     all_switch_stop();
 }
 
-void all_switch_stop(){
+void all_switch_stop()
+{
     air_fan_control(0);
     spindle_l_fan_control(0);
     spindle_r_fan_control(0);
@@ -35,19 +36,45 @@ void all_switch_stop(){
 // 1开0关
 void air_fan_control(uint8_t flag)
 {
-    if(flag){
-        AIR_FAN_PORT |= (1 << AIR_FAN_BIT);  // 高电平
-    }else{
+    if (flag)
+    {
+        AIR_FAN_PORT |= (1 << AIR_FAN_BIT); // 高电平
+    }
+    else
+    {
         AIR_FAN_PORT &= ~(1 << AIR_FAN_BIT); // 低电平
     }
+    sys.airFanStatus = index;
+}
+
+// 1左开， 2右开， 0关
+void spindle_fan_control(uint8_t flag)
+{
+    if (flag == 1)
+    {
+        SPINDLE_L_FAN_PORT |= (1 << SPINDLE_L_FAN_BIT);
+        SPINDLE_R_FAN_PORT &= ~(1 << SPINDLE_R_FAN_BIT);
+    }
+    else if(flag == 2)
+    {
+        SPINDLE_L_FAN_PORT &= ~(1 << SPINDLE_L_FAN_BIT);
+        SPINDLE_R_FAN_PORT |= (1 << SPINDLE_R_FAN_BIT);
+    }else{
+        SPINDLE_L_FAN_PORT &= ~(1 << SPINDLE_L_FAN_BIT);
+        SPINDLE_R_FAN_PORT &= ~(1 << SPINDLE_R_FAN_BIT);
+    }
+    sys.spindleFanStatus = flag;
 }
 
 // 1开0关
 void spindle_l_fan_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         SPINDLE_L_FAN_PORT |= (1 << SPINDLE_L_FAN_BIT);
-    }else{
+    }
+    else
+    {
         SPINDLE_L_FAN_PORT &= ~(1 << SPINDLE_L_FAN_BIT);
     }
 }
@@ -55,9 +82,12 @@ void spindle_l_fan_control(uint8_t flag)
 // 1开0关
 void spindle_r_fan_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         SPINDLE_R_FAN_PORT |= (1 << SPINDLE_R_FAN_BIT);
-    }else{
+    }
+    else
+    {
         SPINDLE_R_FAN_PORT &= ~(1 << SPINDLE_R_FAN_BIT);
     }
 }
@@ -77,19 +107,26 @@ void coolant_close()
 // 1开0关
 void blow_fan_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         BLOW_FAN_PORT |= (1 << BLOW_FAN_BIT);
-    }else{
+    }
+    else
+    {
         BLOW_FAN_PORT &= ~(1 << BLOW_FAN_BIT);
     }
+    sys.blowFanStatus = index;
 }
 
 // 1开0关
 void suction_cup_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         SUCTION_CUP_PORT |= (1 << SUCTION_CUP_BIT);
-    }else{
+    }
+    else
+    {
         SUCTION_CUP_PORT &= ~(1 << SUCTION_CUP_BIT);
     }
 }
@@ -97,9 +134,12 @@ void suction_cup_control(uint8_t flag)
 // 1开0关
 void light_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         LIGHT_PORT |= (1 << LIGHT_BIT);
-    }else{
+    }
+    else
+    {
         LIGHT_PORT &= ~(1 << LIGHT_BIT);
     }
     sys.ledStatus = flag;
@@ -108,9 +148,12 @@ void light_control(uint8_t flag)
 // 1开0关
 void spray_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         SPRAY_PORT |= (1 << SPRAY_BIT);
-    }else{
+    }
+    else
+    {
         SPRAY_PORT &= ~(1 << SPRAY_BIT);
     }
 }
@@ -118,9 +161,12 @@ void spray_control(uint8_t flag)
 // 1开0关
 void l_water_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         L_WATER_PORT |= (1 << L_WATER_BIT);
-    }else{
+    }
+    else
+    {
         L_WATER_PORT &= ~(1 << L_WATER_BIT);
     }
 }
@@ -128,9 +174,12 @@ void l_water_control(uint8_t flag)
 // 1开0关
 void r_water_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         R_WATER_PORT |= (1 << R_WATER_BIT);
-    }else{
+    }
+    else
+    {
         R_WATER_PORT &= ~(1 << R_WATER_BIT);
     }
 }
@@ -138,9 +187,12 @@ void r_water_control(uint8_t flag)
 // 1开0关
 void outline_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         OUTLINE_PORT |= (1 << OUTLINE_BIT);
-    }else{
+    }
+    else
+    {
         OUTLINE_PORT &= ~(1 << OUTLINE_BIT);
     }
 }
@@ -148,9 +200,12 @@ void outline_control(uint8_t flag)
 // 1开0关
 void camera_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         CAMERA_PORT |= (1 << CAMERA_BIT);
-    }else{
+    }
+    else
+    {
         CAMERA_PORT &= ~(1 << CAMERA_BIT);
     }
 }
@@ -158,9 +213,12 @@ void camera_control(uint8_t flag)
 // 1开0关
 void rfid_ele_control(uint8_t flag)
 {
-    if(flag){
+    if (flag)
+    {
         RFID_ELE_PORT |= (1 << RFID_ELE_BIT);
-    }else{
+    }
+    else
+    {
         RFID_ELE_PORT &= ~(1 << RFID_ELE_BIT);
     }
 }
