@@ -104,7 +104,10 @@ void protocol_main_loop()
 
         line[char_counter] = 0; // 设置字符串结束字符。
         #ifdef REPORT_ECHO_LINE_RECEIVED
-          report_echo_line_received(line);
+          if(line[0] != 0){
+            report_echo_line_received(line);
+          }
+
         #endif
 
         // 直接执行一行格式化输入，并报告执行状态。
