@@ -182,46 +182,46 @@ void timer5_init() {
 }
 
 ISR(TIMER5_COMPA_vect) {
-    // 500ms延时等待
-    if (tempConversionCounter < 500) {  // 5000ms = 5000 * 1ms
-        tempConversionCounter++;
-        if(tempConversionCounter == 50){
-            tempConversionDone0 = true;
-            conversionStarted0 = true;
-            readFlag0 = true;
-        }else if (tempConversionCounter == 100)
-        {
-            tempConversionDone0 = false;
-            conversionStarted0 = false;
-            readFlag0 = true;
-        }
-        else if (tempConversionCounter == 200)
-        {
-            tempConversionDone1 = true;
-            conversionStarted1 = true;
-            readFlag1 = true;
-        }
-        else if (tempConversionCounter == 250)
-        {
-            tempConversionDone1 = false;
-            conversionStarted1 = false;
-            readFlag1 = true;
-        }
-        else if (tempConversionCounter == 300)
-        {
-            tempConversionDone2 = true;
-            conversionStarted2 = true;
-            readFlag2 = true;
-        }
-        else if (tempConversionCounter == 350)
-        {
-            tempConversionDone2 = false;
-            conversionStarted2 = false;
-            readFlag2 = true;
-        }
-    } else {
-        tempConversionCounter = 0;
-    }
+    // // 500ms延时等待
+    // if (tempConversionCounter < 500) {  // 5000ms = 5000 * 1ms
+    //     tempConversionCounter++;
+    //     if(tempConversionCounter == 50){
+    //         tempConversionDone0 = true;
+    //         conversionStarted0 = true;
+    //         readFlag0 = true;
+    //     }else if (tempConversionCounter == 100)
+    //     {
+    //         tempConversionDone0 = false;
+    //         conversionStarted0 = false;
+    //         readFlag0 = true;
+    //     }
+    //     else if (tempConversionCounter == 200)
+    //     {
+    //         tempConversionDone1 = true;
+    //         conversionStarted1 = true;
+    //         readFlag1 = true;
+    //     }
+    //     else if (tempConversionCounter == 250)
+    //     {
+    //         tempConversionDone1 = false;
+    //         conversionStarted1 = false;
+    //         readFlag1 = true;
+    //     }
+    //     else if (tempConversionCounter == 300)
+    //     {
+    //         tempConversionDone2 = true;
+    //         conversionStarted2 = true;
+    //         readFlag2 = true;
+    //     }
+    //     else if (tempConversionCounter == 350)
+    //     {
+    //         tempConversionDone2 = false;
+    //         conversionStarted2 = false;
+    //         readFlag2 = true;
+    //     }
+    // } else {
+    //     tempConversionCounter = 0;
+    // }
 
     // 风扇循环
     if (sys.isRunGcode){
@@ -239,13 +239,9 @@ ISR(TIMER5_COMPA_vect) {
                 SpineFanCounter++;
             } else {
                 if(sys.spindleFanStatus == 1){
-                    spindle_l_fan_control(0);
-                    spindle_r_fan_control(1);
-                    sys.spindleFanStatus = 2;
+                    spindle_fan_control(2);
                 }else if(sys.spindleFanStatus == 2){
-                    spindle_r_fan_control(0);
-                    spindle_l_fan_control(1);
-                    sys.spindleFanStatus = 1;
+                    spindle_fan_control(1);
                 }
                 SpineFanCounter = 0;
             }
@@ -257,8 +253,8 @@ ISR(TIMER5_COMPA_vect) {
         waterCounter++;
     }else{
         waterCounter = 0;
-        sys.lWaterStatus = get_L_Depth();
-        sys.rWaterStatus = get_R_Depth();
+        get_L_Depth();
+        get_R_Depth();
     }
     
     // 消抖

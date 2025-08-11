@@ -107,7 +107,8 @@ ISR(CONTROL_INT_vect)
 void handle_stable_input(uint8_t pin)
 {
   sys.doorStatus = pin & (1 << CONTROL_SAFETY_DOOR_BIT);
-  if(!sys.doorStatus){
+  if (!sys.doorStatus)
+  {
     light_control(1);
   }
   sys.drawerStatus = pin & (1 << DRAWER_DETECT_BIT);
@@ -340,16 +341,14 @@ uint8_t system_execute_line(char *line)
       case 'S':
         sys.isRunGcode = true;
         // 开始运行gcode
-        sys.spindleFanStatus = 1;
         control_led(3);
         sys.startTime = getTime();
-        spindle_l_fan_control(1);
+        spindle_fan_control(1);
         break;
       case 'E':
         // 运行gcode结束
-        sys.spindleFanStatus = 0;
         control_led(2);
-        spindle_fan_close();
+        spindle_fan_control(0);
         blowAllSlag();
         change_tool(0);
         sys.isRunGcode = false;
@@ -375,7 +374,6 @@ uint8_t system_execute_line(char *line)
       {
       case 'A':
         air_fan_control(index);
-        sys.airFanStatus = index;
         break;
       case 'B':
         spindle_l_fan_control(index);
@@ -387,7 +385,6 @@ uint8_t system_execute_line(char *line)
         break;
       case 'D':
         blow_fan_control(index);
-        sys.blowFanStatus = index;
         break;
       case 'E':
         suction_cup_control(index);
@@ -415,11 +412,9 @@ uint8_t system_execute_line(char *line)
         break;
       case 'N':
         set_flip(index);
-        sys.toolDoorStatus = index;
         break;
       case 'M':
-        spindle_fan_close();
-        sys.spindleFanStatus = 0;
+        spindle_fan_control(0);
         break;
       default:
         return (STATUS_INVALID_STATEMENT);

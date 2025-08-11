@@ -3,6 +3,6 @@
 #include "grbl.h"
 
 void getDepth_init();
-uint8_t get_R_Depth();
-uint8_t get_L_Depth();
+void get_R_Depth();
+void get_L_Depth();
 #endif

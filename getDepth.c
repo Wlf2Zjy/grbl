@@ -18,10 +18,10 @@ void getDepth_init() {
   R_WATER_PORT |= ((1 << R_WATER_BIT)); // 启用内部上拉电阻。正常高操作。
 }
 
-uint8_t get_L_Depth() {
-  return L_WATER_PIN & (1 << L_WATER_BIT);
+void get_L_Depth() {
+  sys.lWaterStatus = L_WATER_PIN & (1 << L_WATER_BIT);
 }
 
-uint8_t get_R_Depth() {
-  return R_WATER_PIN & (1 << R_WATER_BIT);
+void get_R_Depth() {
+  sys.lWaterStatus = R_WATER_PIN & (1 << R_WATER_BIT);
 }
