@@ -44,7 +44,7 @@ void air_fan_control(uint8_t flag)
     {
         AIR_FAN_PORT &= ~(1 << AIR_FAN_BIT); // 低电平
     }
-    sys.airFanStatus = index;
+    sys.airFanStatus = flag;
 }
 
 // 1左开， 2右开， 0关
@@ -115,7 +115,7 @@ void blow_fan_control(uint8_t flag)
     {
         BLOW_FAN_PORT &= ~(1 << BLOW_FAN_BIT);
     }
-    sys.blowFanStatus = index;
+    sys.blowFanStatus = flag;
 }
 
 // 1开0关

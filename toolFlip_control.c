@@ -149,5 +149,5 @@ void set_flip(uint8_t flag)
     gc_sync_position();
     plan_sync_position();
     limits_init();
-    sys.toolDoorStatus = index;
+    sys.toolDoorStatus = flag;
 }
