@@ -353,6 +353,27 @@ ISR(SERIAL_RX)
           case CMD_SPINDLE_OVR_STOP: system_set_exec_accessory_override_flag(EXEC_SPINDLE_OVR_STOP); break;
           case CMD_COOLANT_FLOOD_OVR_TOGGLE: system_set_exec_accessory_override_flag(EXEC_COOLANT_FLOOD_OVR_TOGGLE); break;
           case CMD_COOLANT_MIST_OVR_TOGGLE: system_set_exec_accessory_override_flag(EXEC_COOLANT_MIST_OVR_TOGGLE); break;
+          case CMD_OPEN_AIR_FAN: air_fan_control(1); break;
+          case CMD_CLOSE_AIR_FAN: air_fan_control(0); break;
+          case CMD_OPEN_LIGHT: light_control(1); break;
+          case CMD_CLOSE_LIGHT: light_control(0); break;
+          case CMD_OPEN_CAMERA: camera_control(1); break;
+          case CMD_CLOSE_CAMERA: camera_control(0); break;
+          case CMD_OPEN_LEFT_FAN: spindle_fan_control(1); break;
+          case CMD_OPEN_RIGHT_FAN: spindle_fan_control(2); break;
+          case CMD_CLOSE_SPINDLE_FAN: spindle_fan_control(0); break;
+          case CMD_OPEN_SUCTION_CUP: suction_cup_control(1); break;
+          case CMD_CLOSE_SUCTION_CUP: suction_cup_control(0); break;
+          case CMD_OPEN_SPRAY: spray_control(1); break;
+          case CMD_CLOSE_SPRAY: spray_control(0); break;
+          case CMD_OPEN_LEFT_WATER: l_water_control(1); break;
+          case CMD_CLOSE_LEFT_WATER: l_water_control(0); break;
+          case CMD_OPEN_RIGHT_WATER: r_water_control(1); break;
+          case CMD_CLOSE_RIGHT_WATER: r_water_control(0); break;
+          case CMD_OPEN_OUTLINE: outline_control(1); break;
+          case CMD_CLOSE_OUTLINE: outline_control(0); break;
+          case CMD_OPEN_RFID_ELE: rfid_ele_control(1); break;
+          case CMD_CLOSE_RFID_ELE: rfid_ele_control(0); break;
         }
         // 丢弃任何未找到的扩展 ASCII 字符，不将其传递到串口缓冲区。
       } else { // 将字符写入缓冲区

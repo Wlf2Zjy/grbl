@@ -158,7 +158,7 @@ void rfid_read(uint8_t* return_data)
 {
     uint8_t read_command[11] = {0xAA, 0x09, 0x20, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x55};
     clearSerial1BufferHard();
-    for(uint8_t j=0; j < 3; j++){
+    for(uint8_t j=0; j < 15; j++){
         for(uint8_t i=0; i < sizeof(read_command); i++){
             serial1_write(read_command[i]);
         }
@@ -219,6 +219,19 @@ void read_all_rfid(){
     for (uint8_t i = 0; i < TOOL_NUM-1; i++)
     {
         memset(return_data, 0, 8);
+        // // 移动刀位置
+        // float2string(settings.tool_y[i] - 32, y_char, 3);
+        // sprintf(command, "G90G53G0Y%s", y_char);
+        // gc_execute_line(command);
+        // protocol_buffer_synchronize();
+        // rfid_read(return_data);
+        // memcpy(settings.tool_data[i], return_data, 16);
+        // printPgmString(PSTR("{'tool"));
+        // print_uint8_base10(i + 1);
+        // printPgmString(PSTR("':"));
+        // print_tool_info(settings.tool_data[i]);
+        // printPgmString(PSTR("}\r\n"));
+        
         // 移动刀位置
         float2string(settings.tool_y[i] - 32, y_char, 3);
         sprintf(command, "G90G53G0Y%s", y_char);
@@ -231,6 +244,36 @@ void read_all_rfid(){
         printPgmString(PSTR("':"));
         print_tool_info(settings.tool_data[i]);
         printPgmString(PSTR("}\r\n"));
+        
+        if (settings.tool_data[i][0] == 0){
+                    // 移动刀位置
+            float2string(settings.tool_y[i] - 30.5, y_char, 3);
+            sprintf(command, "G90G53G0Y%s", y_char);
+            gc_execute_line(command);
+            protocol_buffer_synchronize();
+            rfid_read(return_data);
+            memcpy(settings.tool_data[i], return_data, 16);
+            printPgmString(PSTR("{'tool"));
+            print_uint8_base10(i + 1);
+            printPgmString(PSTR("':"));
+            print_tool_info(settings.tool_data[i]);
+            printPgmString(PSTR("}\r\n"));
+        }
+        if (settings.tool_data[i][0] == 0){
+            // 移动刀位置
+            float2string(settings.tool_y[i] - 33.5, y_char, 3);
+            sprintf(command, "G90G53G0Y%s", y_char);
+            gc_execute_line(command);
+            protocol_buffer_synchronize();
+            rfid_read(return_data);
+            memcpy(settings.tool_data[i], return_data, 16);
+            printPgmString(PSTR("{'tool"));
+            print_uint8_base10(i + 1);
+            printPgmString(PSTR("':"));
+            print_tool_info(settings.tool_data[i]);
+            printPgmString(PSTR("}\r\n"));
+        }
+
         if (settings.tool_data[i][0] == 0){
             toolLed[i] = LED_OFF;
         }else{
