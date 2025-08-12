@@ -153,9 +153,9 @@ void set_flip1(uint8_t flag)
 
 
 void set_flip(uint8_t flag){
-    uint8_t open_command[7] = {0xfe, 0xfe, 0x04, 0x01, 0x08, 0x00, 0xfa};   // 2048
-    uint8_t close_command[7] = {0xfe, 0xfe, 0x04, 0x01, 0x0A, 0x28, 0xfa};  // 2600
-    uint8_t read_command[5] = {0xfe, 0xfe, 0x02, 0x02, 0xfa}; 
+    uint8_t open_command[8] = {0xfe, 0xfe, 0x05, 0x01, 0x01, 0x08, 0x00, 0xfa};   // 2048
+    uint8_t close_command[8] = {0xfe, 0xfe, 0x05, 0x01, 0x01, 0x0A, 0x28, 0xfa};  // 2600
+    uint8_t read_command[6] = {0xfe, 0xfe, 0x03, 0x01, 0x02, 0xfa}; 
     uint8_t c;
     uint8_t pos_high;
     uint8_t pos_low;
@@ -165,6 +165,7 @@ void set_flip(uint8_t flag){
             serial2_write(open_command[i]);
         }
         delay_ms(100);
+        while((c = serial2_read()) != SERIAL_NO_DATA) {}
         for(uint8_t j=0; j < 50; j++){
             for(uint8_t i=0; i < sizeof(read_command); i++){
                 serial2_write(read_command[i]);
@@ -173,12 +174,14 @@ void set_flip(uint8_t flag){
             while((c = serial2_read()) != SERIAL_NO_DATA) {
                 if(c != 0xfe) continue;
                 if(serial2_read() != 0xfe) continue;
-                if(serial2_read() != 0x04) continue;
+                if(serial2_read() != 0x05) continue;
+                if(serial2_read() != 0x01) continue;
                 if(serial2_read() != 0x02) continue;
                 pos_high = serial2_read();
                 pos_low = serial2_read();
                 if(serial2_read() != 0xfa) continue;
                 pos = (pos_high << 8) | pos_low;
+                print_uint32_base10(pos);
             }
             if(pos > 2048){
                 if((pos - 2048) < 50){
@@ -190,14 +193,15 @@ void set_flip(uint8_t flag){
                 }
             }
         }
-        sys.state = STATE_ALARM; // 确保设置警报状态。
-        report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
+        // sys.state = STATE_ALARM; // 确保设置警报状态。
+        // report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
         return 0;
     }else{
         for(uint8_t i=0; i < sizeof(close_command); i++){
             serial2_write(close_command[i]);
         }
         delay_ms(100);
+        while((c = serial2_read()) != SERIAL_NO_DATA) {}
         for(uint8_t j=0; j < 50; j++){
             for(uint8_t i=0; i < sizeof(read_command); i++){
                 serial2_write(read_command[i]);
@@ -206,12 +210,14 @@ void set_flip(uint8_t flag){
             while((c = serial2_read()) != SERIAL_NO_DATA) {
                 if(c != 0xfe) continue;
                 if(serial2_read() != 0xfe) continue;
-                if(serial2_read() != 0x04) continue;
+                if(serial2_read() != 0x05) continue;
+                if(serial2_read() != 0x01) continue;
                 if(serial2_read() != 0x02) continue;
                 pos_high = serial2_read();
                 pos_low = serial2_read();
                 if(serial2_read() != 0xfa) continue;
                 pos = pos_high << 8 | pos_low;
+                print_uint32_base10(pos);
             }
             if(pos > 2600){
                 if((pos - 2600) < 50){
@@ -223,8 +229,9 @@ void set_flip(uint8_t flag){
                 }
             }
         }
-        sys.state = STATE_ALARM; // 确保设置警报状态。
-        report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
+        // sys.state = STATE_ALARM; // 确保设置警报状态。
+        // report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
         return 0;
     }
+    sys.toolDoorStatus = flag;
 }
