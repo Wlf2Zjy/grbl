@@ -181,20 +181,21 @@ void set_flip(uint8_t flag){
                 pos_low = serial2_read();
                 if(serial2_read() != 0xfa) continue;
                 pos = (pos_high << 8) | pos_low;
-                print_uint32_base10(pos);
             }
             if(pos > 2048){
                 if((pos - 2048) < 50){
+                    sys.toolDoorStatus = flag;
                     return 1;
                 }
             }else{
                 if((2048 - pos) < 50){
+                    sys.toolDoorStatus = flag;
                     return 1;
                 }
             }
         }
-        // sys.state = STATE_ALARM; // 确保设置警报状态。
-        // report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
+        sys.state = STATE_ALARM; // 确保设置警报状态。
+        report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
         return 0;
     }else{
         for(uint8_t i=0; i < sizeof(close_command); i++){
@@ -217,21 +218,21 @@ void set_flip(uint8_t flag){
                 pos_low = serial2_read();
                 if(serial2_read() != 0xfa) continue;
                 pos = pos_high << 8 | pos_low;
-                print_uint32_base10(pos);
             }
             if(pos > 2600){
                 if((pos - 2600) < 50){
+                    sys.toolDoorStatus = flag;
                     return 1;
                 }
             }else{
                 if((2600 - pos) < 50){
+                    sys.toolDoorStatus = flag;
                     return 1;
                 }
             }
         }
-        // sys.state = STATE_ALARM; // 确保设置警报状态。
-        // report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
+        sys.state = STATE_ALARM; // 确保设置警报状态。
+        report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
         return 0;
     }
-    sys.toolDoorStatus = flag;
 }
