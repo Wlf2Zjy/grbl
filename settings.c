@@ -539,6 +539,15 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value)
         settings.flags &= ~BITFLAG_LASER_MODE;
       }
       break;
+    case 33:
+      settings.probe_offset[0] = value;
+      break;
+    case 34:
+      settings.probe_offset[1] = value;
+      break;
+    case 35:
+      settings.probe_offset[2] = value;
+      break;
     default:
       return (STATUS_INVALID_STATEMENT);
     }
