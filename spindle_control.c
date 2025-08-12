@@ -140,15 +140,15 @@ void spindle_set_state(uint8_t state, float rpm)
     if (state == SPINDLE_ENABLE_CW) {
         // 激光模式
       if (!(settings.flags & BITFLAG_LASER_MODE)) { 
-        // 发送485顺时针反转指令
-        uint8_t sendData[] = {0x01, 0x06, 0x20, 0x00, 0x00, 0x02};
+        // 发送485顺时针正转指令
+        uint8_t sendData[] = {0x01, 0x06, 0x20, 0x00, 0x00, 0x01};
         control485(sendData);
       }
     } else {
         // 激光模式
         if (!(settings.flags & BITFLAG_LASER_MODE)) { 
-          // 发送485逆时针正转指令
-          uint8_t sendData[] = {0x01, 0x06, 0x20, 0x00, 0x00, 0x01};
+          // 发送485逆时针反转指令
+          uint8_t sendData[] = {0x01, 0x06, 0x20, 0x00, 0x00, 0x02};
           control485(sendData);
         }
     }
