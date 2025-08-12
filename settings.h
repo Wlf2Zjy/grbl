@@ -107,6 +107,7 @@ typedef struct
   uint8_t tool;                   // 刀号
   float tool_length;
   float tool_zpos;
+  float probe_offset[3];
   float tool_x[TOOL_NUM]; // 刀具x坐标
   float tool_y[TOOL_NUM]; // 刀具y坐标
   float tool_z[TOOL_NUM]; // 刀具z坐标
