@@ -19,15 +19,19 @@
 
 // 根据用户设置和探测循环模式反转探针引脚状态。
 uint8_t probe_invert_mask;
+uint8_t probe_invert_mask_test;
 
 // 探针引脚初始化例程。
 void probe_init()
 {
   PROBE_DDR &= ~(PROBE_MASK); // 配置为输入引脚
+  TEST_PROBE_DDR &= ~(TEST_PROBE_MASK); // 配置为输入引脚
 #ifdef DISABLE_PROBE_PIN_PULL_UP
   PROBE_PORT &= ~(PROBE_MASK); // 正常低操作。需要外部下拉电阻。
+  TEST_PROBE_PORT &= TEST_PROBE_MASK; // 启用内部上拉电阻。正常高操作。
 #else
   PROBE_PORT |= PROBE_MASK; // 启用内部上拉电阻。正常高操作。
+  TEST_PROBE_PORT |= TEST_PROBE_MASK; // 启用内部上拉电阻。正常高操作。
 #endif
   probe_configure_invert_mask(false); // 初始化反转掩码。
 }
@@ -38,18 +42,22 @@ void probe_init()
 void probe_configure_invert_mask(uint8_t is_probe_away)
 {
   probe_invert_mask = 0; // 初始化为零。
+  probe_invert_mask_test = 0;
   if (bit_isfalse(settings.flags, BITFLAG_INVERT_PROBE_PIN))
   {
     probe_invert_mask ^= PROBE_MASK;
+    probe_invert_mask_test ^= TEST_PROBE_MASK;
   }
   if (is_probe_away)
   {
     probe_invert_mask ^= PROBE_MASK;
+    probe_invert_mask_test ^= TEST_PROBE_MASK;
   }
 }
 
 // 返回探针引脚状态。触发 = 真。由G代码解析器和探针状态监视器调用。
-uint8_t probe_get_state() { return ((PROBE_PIN & PROBE_MASK) ^ probe_invert_mask); }
+// uint8_t probe_get_state() { return ((PROBE_PIN & PROBE_MASK) ^ probe_invert_mask); }
+uint8_t probe_get_state() { return (((PROBE_PIN & PROBE_MASK) ^ probe_invert_mask) || (TEST_PROBE_PIN & TEST_PROBE_MASK) ^ probe_invert_mask_test); }
 
 // 监视探针引脚状态并在检测到时记录系统位置。由步进电机ISR每个ISR滴答调用。
 // 注意：此函数必须非常高效，以免拖慢步进电机ISR。
