@@ -220,6 +220,9 @@ void report_grbl_settings()
   report_util_float_setting(30, settings.rpm_max, N_DECIMAL_RPMVALUE);
   report_util_float_setting(31, settings.rpm_min, N_DECIMAL_RPMVALUE);
   report_util_uint8_setting(32, bit_istrue(settings.flags, BITFLAG_LASER_MODE));
+  report_util_float_setting(33, settings.probe_offset[0], N_DECIMAL_SETTINGVALUE);
+  report_util_float_setting(34, settings.probe_offset[1], N_DECIMAL_SETTINGVALUE);
+  report_util_float_setting(35, settings.probe_offset[2], N_DECIMAL_SETTINGVALUE);
   // 打印轴设置
   uint8_t idx, set_idx, tool_number;
   uint8_t val = AXIS_SETTINGS_START_VAL;

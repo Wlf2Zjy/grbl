@@ -103,6 +103,12 @@
 #define PROBE_BIT0 3 // MEGA2560 Digital Pin 15
 #define PROBE_MASK ((1 << PROBE_BIT0) | (1 << PROBE_BIT1))
 
+#define TEST_PROBE_DDR DDRF
+#define TEST_PROBE_PIN PINF
+#define TEST_PROBE_PORT PORTF
+#define TEST_PROBE_BIT 4 // MEGA2560 Digital Pin 14
+#define TEST_PROBE_MASK (1 << TEST_PROBE_BIT)
+
 // 高级配置（下面的变量一般不需要修改）
 // 设置定时器以使用TIMER4B，连接到数字引脚7
 #define SPINDLE_PWM_MAX_VALUE 1024.0 // 在1/8预分频下，约转换为1.9 kHz的PWM频率

@@ -104,7 +104,10 @@ void protocol_main_loop()
 
         line[char_counter] = 0; // 设置字符串结束字符。
         #ifdef REPORT_ECHO_LINE_RECEIVED
-          report_echo_line_received(line);
+          if(line[0] != 0){
+            report_echo_line_received(line);
+          }
+
         #endif
 
         // 直接执行一行格式化输入，并报告执行状态。
@@ -251,14 +254,15 @@ void protocol_exec_rt_system()
     sys.state = STATE_ALARM; // 设置系统报警状态
     report_alarm_message(rt_exec);
     // 在发生严重事件标志时暂停所有内容。目前硬限位和软限位标记此项。
-    // if ((rt_exec == EXEC_ALARM_HARD_LIMIT) || (rt_exec == EXEC_ALARM_SOFT_LIMIT)) {
+    if ((rt_exec == EXEC_ALARM_HARD_LIMIT) || (rt_exec == EXEC_ALARM_SOFT_LIMIT)) {
+      mc_reset(); // 发出系统重置，确保主轴和冷却关闭。
       // report_feedback_message(MESSAGE_CRITICAL_EVENT);
       // system_clear_exec_state_flag(EXEC_RESET); // 禁用现有的重置
       // do {
       //   // 阻止所有操作，除非重置或状态报告，直到用户发出重置或断电。
       //   // 硬限位通常在无人监控或未注意时发生，给予用户和 GUI 时间执行必要的操作。
       // } while (bit_isfalse(sys_rt_exec_state,EXEC_RESET));
-    // }
+    }
     system_clear_exec_alarm(); // 清除报警
   }
 

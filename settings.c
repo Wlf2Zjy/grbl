@@ -124,6 +124,9 @@ void settings_restore(uint8_t restore_flag)
     settings.max_travel[X_AXIS] = (-DEFAULT_X_MAX_TRAVEL);
     settings.max_travel[Y_AXIS] = (-DEFAULT_Y_MAX_TRAVEL);
     settings.max_travel[Z_AXIS] = (-DEFAULT_Z_MAX_TRAVEL);
+    settings.probe_offset[X_AXIS] = 10;
+    settings.probe_offset[Y_AXIS] = 20;
+    settings.probe_offset[Z_AXIS] = 30;
     settings.tool = 1;
     settings.tool_length = 0;
     settings.tool_zpos = 0;
@@ -535,6 +538,15 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value)
       {
         settings.flags &= ~BITFLAG_LASER_MODE;
       }
+      break;
+    case 33:
+      settings.probe_offset[0] = value;
+      break;
+    case 34:
+      settings.probe_offset[1] = value;
+      break;
+    case 35:
+      settings.probe_offset[2] = value;
       break;
     default:
       return (STATUS_INVALID_STATEMENT);
