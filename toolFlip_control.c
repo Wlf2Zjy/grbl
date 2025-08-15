@@ -196,6 +196,8 @@ void set_flip(uint8_t flag){
         }
         sys.state = STATE_ALARM; // 确保设置警报状态。
         report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
+        mc_reset(); // 停止电机（如果正在运行）。
+        protocol_execute_realtime();
         return 0;
     }else{
         for(uint8_t i=0; i < sizeof(close_command); i++){
@@ -233,6 +235,8 @@ void set_flip(uint8_t flag){
         }
         sys.state = STATE_ALARM; // 确保设置警报状态。
         report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
+        mc_reset(); // 停止电机（如果正在运行）。
+        protocol_execute_realtime();
         return 0;
     }
 }
