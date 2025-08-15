@@ -552,7 +552,6 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value)
       return (STATUS_INVALID_STATEMENT);
     }
   }
-  write_global_settings();
   return (STATUS_OK);
 }
 

@@ -685,15 +685,22 @@ uint8_t system_execute_line(char *line)
       }
       else
       { // 存储全局设置。
-        if (!read_float(line, &char_counter, &value))
-        {
-          return (STATUS_BAD_NUMBER_FORMAT);
+         // 第一次调用strtok，传入原始字符串
+        char *token;
+        token = strtok(line, "$");
+        // 后续调用strtok，传入NULL继续分割
+        while (token != NULL) {
+            char_counter = 0;
+            read_float(token, &char_counter, &parameter);
+            char_counter++;
+            if (!read_float(token, &char_counter, &value))
+            {
+              return (STATUS_BAD_NUMBER_FORMAT);
+            }
+            settings_store_global_setting((uint8_t)parameter, value);
+            token = strtok(NULL, "$");
         }
-        if ((line[char_counter] != 0) || (parameter > 255))
-        {
-          return (STATUS_INVALID_STATEMENT);
-        }
-        return (settings_store_global_setting((uint8_t)parameter, value));
+        write_global_settings();
       }
     }
   }
