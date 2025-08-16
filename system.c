@@ -314,6 +314,9 @@ uint8_t system_execute_line(char *line)
   case 'V':
     report_version();
     break;
+  case 'P':
+    report_probe_offset();
+    break;
   case 'S':
     if (line[4] == 0)
     {

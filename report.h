@@ -96,6 +96,9 @@ void report_init_message();
 // 打印 Grbl 帮助和当前全局设置
 void report_grbl_help();
 
+// 打印探针偏移
+void report_probe_offset();
+
 // 打印 Grbl 全局设置
 void report_grbl_settings();
 

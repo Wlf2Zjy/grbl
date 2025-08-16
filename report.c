@@ -193,6 +193,15 @@ void report_grbl_help()
   return;
 }
 
+// 打印探针偏移
+void report_probe_offset()
+{
+  report_util_float_setting(33, settings.probe_offset[0], N_DECIMAL_SETTINGVALUE);
+  report_util_float_setting(34, settings.probe_offset[1], N_DECIMAL_SETTINGVALUE);
+  report_util_float_setting(35, settings.probe_offset[2], N_DECIMAL_SETTINGVALUE);
+}
+
+
 // Grbl 全局设置打印。
 // 注意：这里的编号方案必须与 settings.c 中的存储相关。
 void report_grbl_settings()
