@@ -20,8 +20,7 @@ void switch_init()
 void all_switch_stop()
 {
     air_fan_control(0);
-    spindle_l_fan_control(0);
-    spindle_r_fan_control(0);
+    spindle_fan_control(0);
     blow_fan_control(0);
     suction_cup_control(0);
     light_control(0);
@@ -66,37 +65,6 @@ void spindle_fan_control(uint8_t flag)
     sys.spindleFanStatus = flag;
 }
 
-// 1开0关
-void spindle_l_fan_control(uint8_t flag)
-{
-    if (flag)
-    {
-        SPINDLE_L_FAN_PORT |= (1 << SPINDLE_L_FAN_BIT);
-    }
-    else
-    {
-        SPINDLE_L_FAN_PORT &= ~(1 << SPINDLE_L_FAN_BIT);
-    }
-}
-
-// 1开0关
-void spindle_r_fan_control(uint8_t flag)
-{
-    if (flag)
-    {
-        SPINDLE_R_FAN_PORT |= (1 << SPINDLE_R_FAN_BIT);
-    }
-    else
-    {
-        SPINDLE_R_FAN_PORT &= ~(1 << SPINDLE_R_FAN_BIT);
-    }
-}
-
-void spindle_fan_close()
-{
-    spindle_r_fan_control(0);
-    spindle_l_fan_control(0);
-}
 
 void coolant_close()
 {

@@ -376,12 +376,10 @@ uint8_t system_execute_line(char *line)
         air_fan_control(index);
         break;
       case 'B':
-        spindle_l_fan_control(index);
-        sys.spindleFanStatus = 1;
+        spindle_fan_control(1);
         break;
       case 'C':
-        spindle_r_fan_control(index);
-        sys.spindleFanStatus = 2;
+        spindle_fan_control(2);
         break;
       case 'D':
         blow_fan_control(index);

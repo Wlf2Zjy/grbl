@@ -16,17 +16,17 @@ void tool_control_init()
 void blowToolSlag(){
   gc_execute_line("G90G53G0Z-5");
   protocol_buffer_synchronize();
-  spindle_r_fan_control(1);
+  spindle_fan_control(1);
   gc_execute_line("G90G53G0X-5Y-5");
   gc_execute_line("G90G53G0X-5Y-200");
   protocol_buffer_synchronize();
-  spindle_r_fan_control(0);
+  spindle_fan_control(0);
 }
 
 void blowAllSlag(){
   gc_execute_line("G90G53G0Z-5");
   protocol_buffer_synchronize();
-  spindle_r_fan_control(1);
+  spindle_fan_control(1);
   gc_execute_line("G90G53G0X-5Y-5");
   gc_execute_line("G90G53G0X-5Y-200");
   gc_execute_line("G90G53G0X-50Y-200");
@@ -41,7 +41,7 @@ void blowAllSlag(){
   gc_execute_line("G90G53G0X-200Y-200");
   gc_execute_line("G90G53G0X-10Y-10");
   protocol_buffer_synchronize();
-  spindle_r_fan_control(0);
+  spindle_fan_control(0);
 }
 
 void return_tool()

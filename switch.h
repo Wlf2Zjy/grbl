@@ -51,8 +51,6 @@
 
 void switch_init();
 void air_fan_control(uint8_t flag);
-void spindle_l_fan_control(uint8_t flag);
-void spindle_r_fan_control(uint8_t flag);
 void spindle_fan_control(uint8_t flag);
 void blow_fan_control(uint8_t flag);
 void suction_cup_control(uint8_t flag);
@@ -64,7 +62,6 @@ void outline_control(uint8_t flag);
 void camera_control(uint8_t flag);
 void rfid_ele_control(uint8_t flag);
 void all_switch_stop();
-void spindle_fan_close();
 void coolant_close();
 
 #endif
