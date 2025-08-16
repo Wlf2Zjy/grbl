@@ -8,7 +8,7 @@ void toolFlip_control_init()
 }
 
 //  0上V 1下P
-void set_flip1(uint8_t flag)
+void set_flip(uint8_t flag)
 {
     protocol_buffer_synchronize();
     limits_disable();
@@ -152,7 +152,7 @@ void set_flip1(uint8_t flag)
 }
 
 
-void set_flip(uint8_t flag){
+void set_flip1(uint8_t flag){
     uint8_t open_command[8] = {0xfe, 0xfe, 0x05, 0x01, 0x01, 0x08, 0x00, 0xfa};   // 2048
     uint8_t close_command[8] = {0xfe, 0xfe, 0x05, 0x01, 0x01, 0x0A, 0x28, 0xfa};  // 2600
     uint8_t read_command[6] = {0xfe, 0xfe, 0x03, 0x01, 0x02, 0xfa}; 
