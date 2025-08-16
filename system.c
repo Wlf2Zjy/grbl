@@ -114,9 +114,9 @@ void handle_stable_input(uint8_t pin)
   sys.drawerStatus = pin & (1 << DRAWER_DETECT_BIT);
   if (!(sys_rt_exec_alarm))
   {
-    uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7));
+    // uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7));
     // uint8_t stopStatus = (~pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
-    // uint8_t stopStatus = (~pin & 1 << 7);
+    uint8_t stopStatus = (~pin & 1 << 7);
     // print_uint8_base2_ndigit(stopStatus, 8);
     // printString("S\r\n");
     // 检查限位引脚状态
