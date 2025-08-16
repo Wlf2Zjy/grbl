@@ -31,7 +31,7 @@ void mc_line(float *target, plan_line_data_t *pl_data)
   if (bit_istrue(settings.flags, BITFLAG_SOFT_LIMIT_ENABLE))
   {
     // 注意：阻止 jog 状态。Jogging 是特殊情况，软限制独立处理。
-    if (sys.state != STATE_JOG)
+    if (sys.state != STATE_JOG && gc_state.modal.motion < MOTION_MODE_PROBE_TOWARD)
     {
       limits_soft_check(target);
     }

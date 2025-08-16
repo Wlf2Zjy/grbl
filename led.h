@@ -48,7 +48,6 @@ typedef enum {
 } LedColor;
 
 
-// 设置从 G-code 解析器接收到的有效移动命令，检查软限位，并执行移动。
 void led_init();
 void control_status_led();
 void control_tool_led();
