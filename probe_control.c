@@ -61,7 +61,7 @@ void set_probe(uint8_t flag)
         }
         else
         {
-            target[idx] = -120;
+            target[idx] = -100;
         }
         // 将轴锁应用于本循环中活动的步进端口引脚。
         axislock |= step_pin[idx];
