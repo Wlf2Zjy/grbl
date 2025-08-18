@@ -341,12 +341,15 @@ uint8_t system_execute_line(char *line)
     {
       switch (line[2])
       {
-      case 'S':
+        case 'A':
         sys.isRunGcode = true;
         // 开始运行gcode
         control_led(3);
         sys.startTime = getTime();
         spindle_fan_control(1);
+        printString("finish\r\n");
+        break;
+      case 'S':
         break;
       case 'E':
         // 运行gcode结束
