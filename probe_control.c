@@ -149,7 +149,7 @@ void set_probe(uint8_t flag)
     gc_sync_position();
     plan_sync_position();
     limits_init();
-    if(!flag){
-        gc_execute_line("G91G1C1F1000");
-    }
+    // if(!flag){
+    //     gc_execute_line("G91G1C1F1000");
+    // }
 }

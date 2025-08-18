@@ -210,6 +210,7 @@ void tool_length_zero()
   write_global_settings(); // 将更新后的刀长写入eeprom
   // report_probe_parameters();
   gc_execute_line("G90G53G0Z-5"); // 抬刀
+  protocol_buffer_synchronize();
 }
 
 // 设置刀补
@@ -241,4 +242,5 @@ void set_tool_length()
   // report_probe_parameters();
   // 抬刀
   gc_execute_line("G90G53G0Z-5");
+  protocol_buffer_synchronize();
 }

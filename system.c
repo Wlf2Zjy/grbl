@@ -87,7 +87,7 @@ extern volatile bool pin_state;
 ISR(CONTROL_INT_vect)
 {
   uint8_t pin = (CONTROL_PIN & CONTROL_MASK);
-  pin ^= CONTROL_MASK;
+  // pin ^= CONTROL_MASK;
   if (pin != last_pin_state)
   {
     last_pin_state = pin;
@@ -95,8 +95,8 @@ ISR(CONTROL_INT_vect)
     pin_state = true;
   }
   // 只有当消抖计数器为0时才处理稳定输入
-  // print_uint8_base2_ndigit(pin, 8);
-  // printString("A\r\n");
+  print_uint8_base2_ndigit(pin, 8);
+  printString("A\r\n");
   if (debounce_counter == 0 && sys.state != STATE_ALARM && pin_state) {
       pin_state = false;
       handle_stable_input(pin);
@@ -114,11 +114,11 @@ void handle_stable_input(uint8_t pin)
   sys.drawerStatus = pin & (1 << DRAWER_DETECT_BIT);
   if (!(sys_rt_exec_alarm))
   {
-    // uint8_t stopStatus = (pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7));
+    // uint8_t stopStatus = ((pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7)));  // 前三位屏蔽
     // uint8_t stopStatus = (~pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
     uint8_t stopStatus = (~pin & 1 << 7);
-    // print_uint8_base2_ndigit(stopStatus, 8);
-    // printString("S\r\n");
+    print_uint8_base2_ndigit(stopStatus, 8);
+    printString("S\r\n");
     // 检查限位引脚状态
     if (stopStatus)
     {
