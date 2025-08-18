@@ -347,7 +347,7 @@ uint8_t system_execute_line(char *line)
         control_led(3);
         sys.startTime = getTime();
         spindle_fan_control(1);
-        printString("finish\r\n");
+        printString("finish");
         break;
       case 'S':
         break;
