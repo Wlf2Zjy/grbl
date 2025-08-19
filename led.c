@@ -133,7 +133,7 @@ void control_led(uint8_t color)
 }
 
 // 设置所有5个刀位的LED颜色
-void set_tool_leds(LedColor color1, LedColor color2, LedColor color3, 
+void set_tool_leds1(LedColor color1, LedColor color2, LedColor color3, 
                 LedColor color4, LedColor color5) 
 {
   // 禁用LED控制器
@@ -190,4 +190,65 @@ void set_tool_leds(LedColor color1, LedColor color2, LedColor color3,
   
   sei(); // 恢复中断
   delay_us(60);  // WS2812B更新需要的时间
+}
+
+// 设置所有5个刀位的LED颜色
+void set_tool_leds(LedColor color1, LedColor color2, LedColor color3, 
+  LedColor color4, LedColor color5) 
+{
+  uint8_t led_command[21] = {0xfe, 0xfe, 0x12, 0x01, 0x04, 
+    0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 
+    0xfa};
+    // GRB
+    // 设置第1个灯
+    switch(color1) {
+      case LED_WHITE: led_command[5] = 0xff; led_command[6] = 0xff, led_command[7] = 0xff; break;
+      case LED_RED:   led_command[5] = 0x00; led_command[6] = 0xff, led_command[7] = 0x00; break;
+      case LED_GREEN: led_command[5] = 0xff; led_command[6] = 0x00, led_command[7] = 0x00; break;
+      case LED_BLUE:  led_command[5] = 0x00; led_command[6] = 0x00, led_command[7] = 0xff; break;
+      default:        led_command[5] = 0x00; led_command[6] = 0x00, led_command[7] = 0x00; break;
+    }
+
+    // 设置第2个灯
+    switch(color2) {
+      case LED_WHITE: led_command[8] = 0xff; led_command[9] = 0xff, led_command[10] = 0xff; break;
+      case LED_RED:   led_command[8] = 0x00; led_command[9] = 0xff, led_command[10] = 0x00; break;
+      case LED_GREEN: led_command[8] = 0xff; led_command[9] = 0x00, led_command[10] = 0x00; break;
+      case LED_BLUE:  led_command[8] = 0x00; led_command[9] = 0x00, led_command[10] = 0xff; break;
+      default:        led_command[8] = 0x00; led_command[9] = 0x00, led_command[10] = 0x00; break;
+    }
+
+    // 设置第3个灯
+    switch(color3) {
+      case LED_WHITE: led_command[11] = 0xff; led_command[12] = 0xff, led_command[13] = 0xff; break;
+      case LED_RED:   led_command[11] = 0x00; led_command[12] = 0xff, led_command[13] = 0x00; break;
+      case LED_GREEN: led_command[11] = 0xff; led_command[12] = 0x00, led_command[13] = 0x00; break;
+      case LED_BLUE:  led_command[11] = 0x00; led_command[12] = 0x00, led_command[13] = 0xff; break;
+      default:        led_command[11] = 0x00; led_command[12] = 0x00, led_command[13] = 0x00; break;
+    }
+
+    // 设置第4个灯
+    switch(color4) {
+      case LED_WHITE: led_command[14] = 0xff; led_command[15] = 0xff, led_command[16] = 0xff; break;
+      case LED_RED:   led_command[14] = 0x00; led_command[15] = 0xff, led_command[16] = 0x00; break;
+      case LED_GREEN: led_command[14] = 0xff; led_command[15] = 0x00, led_command[16] = 0x00; break;
+      case LED_BLUE:  led_command[14] = 0x00; led_command[15] = 0x00, led_command[16] = 0xff; break;
+      default:        led_command[14] = 0x00; led_command[15] = 0x00, led_command[16] = 0x00; break;
+    }
+
+    // 设置第5个灯
+    switch(color5) {
+      case LED_WHITE: led_command[17] = 0xff; led_command[18] = 0xff, led_command[19] = 0xff; break;
+      case LED_RED:   led_command[17] = 0x00; led_command[18] = 0xff, led_command[19] = 0x00; break;
+      case LED_GREEN: led_command[17] = 0xff; led_command[18] = 0x00, led_command[19] = 0x00; break;
+      case LED_BLUE:  led_command[17] = 0x00; led_command[18] = 0x00, led_command[19] = 0xff; break;
+      default:        led_command[17] = 0x00; led_command[18] = 0x00, led_command[19] = 0x00; break;
+    }
+    for(uint8_t i=0; i < sizeof(led_command); i++){
+      serial2_write(led_command[i]);
+    }
 }

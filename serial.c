@@ -442,6 +442,11 @@ void serial_reset_read_buffer()
   serial_rx_buffer_tail = serial_rx_buffer_head; // 重置读取缓冲区
 }
 
+void serial2_reset_read_buffer()
+{
+  serial2_rx_buffer_tail = serial2_rx_buffer_head; // 重置读取缓冲区
+}
+
 void clearSerial1BufferHard() {
   // 清除接收缓冲区（AVR 专用方法）
   UCSR1B &= ~(1 << RXEN1);  // 禁用接收

@@ -46,6 +46,7 @@ uint8_t serial2_read();
 
 // 重置并清空读取缓冲区中的数据。由急停和重置使用。
 void serial_reset_read_buffer();
+void serial2_reset_read_buffer();
 
 // 返回 RX 串口缓冲区中可用的字节数。
 uint8_t serial_get_rx_buffer_available();

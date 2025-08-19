@@ -53,7 +53,7 @@ void return_tool()
       toolLed[i] = LED_BLUE;
     }
   }
-  // set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]);
+  set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]);
 
   printPgmString(PSTR("beforeTool:"));
   printInteger(settings.tool);
@@ -103,7 +103,7 @@ void return_tool()
       rfid_write(settings.tool, minutes);
       set_rfid(1);
     }
-    // set_tool_leds(LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN);
+    set_tool_leds(LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN);
   }
 }
 
@@ -125,7 +125,7 @@ void get_tool(uint8_t tool_number)
       toolLed[i] = LED_BLUE;
     }
   }
-  // set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]);
+  set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]);
 
   // 抬刀
   gc_execute_line("G90G53G0Z-5");
@@ -138,7 +138,7 @@ void get_tool(uint8_t tool_number)
   gc_execute_line(command);
   // 下降到取刀位置
   float2string(settings.tool_z[tool_number - 1], z_char, 3);
-  sprintf(command, "G90G53G01Z%sF1500", z_char);
+  sprintf(command, "G90G53G01Z%sF1800", z_char);
   gc_execute_line(command);
   protocol_buffer_synchronize();
   delay_ms(500);
@@ -151,7 +151,7 @@ void get_tool(uint8_t tool_number)
   if(sys.isRunGcode){
     sys.startTime = getTime(); // 记录开始时间
   }
-  // set_tool_leds(LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN);
+  set_tool_leds(LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN);
 }
 
 void change_tool(uint8_t tool_number)

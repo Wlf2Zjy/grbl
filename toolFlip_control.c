@@ -160,6 +160,8 @@ void set_flip(uint8_t flag){
     uint8_t pos_high;
     uint8_t pos_low;
     uint16_t pos;
+    // 清除串口读取缓冲区
+    serial2_reset_read_buffer();
     if(flag){
         for(uint8_t i=0; i < sizeof(open_command); i++){
             serial2_write(open_command[i]);
