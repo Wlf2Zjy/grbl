@@ -49,8 +49,6 @@ typedef enum {
 
 
 void led_init();
-void control_status_led();
-void control_tool_led();
 void control_led(uint8_t color);
 void set_tool_leds(LedColor color1, LedColor color2, LedColor color3, 
   LedColor color4, LedColor color5);
