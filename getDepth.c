@@ -23,5 +23,5 @@ void get_L_Depth() {
 }
 
 void get_R_Depth() {
-  sys.lWaterStatus = R_WATER_PIN & (1 << R_WATER_BIT);
+  sys.rWaterStatus = R_WATER_PIN & (1 << R_WATER_BIT);
 }
