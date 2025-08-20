@@ -107,13 +107,6 @@ int main(void)
     // 打印欢迎消息。指示在上电或重置时发生了初始化。
     // report_init_message();  
 
-    // if(goHomeFlag){
-    //   goHomeFlag = false;
-    //   sys.state = STATE_HOMING; // 设置系统状态变量
-    //   report_realtime_status();
-    //   mc_homing_cycle(HOMING_CYCLE_ALL);
-    // }
-
     // 启动 Grbl 主循环。处理程序输入并执行它们。
     protocol_main_loop();
   }
