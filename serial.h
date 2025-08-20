@@ -31,22 +31,26 @@
 void serial_init();
 void serial1_init();
 void serial2_init();
+void serial3_init();
 
 // 将一个字节写入 TX 串口缓冲区。由主程序调用。
 void serial_write(uint8_t data);
 uint8_t serial_write_bytes(const uint8_t* data, uint8_t length);
 void serial2_write(uint8_t data);
 void serial1_write(uint8_t data);
+void serial3_write(uint8_t data);
 
 // 获取串口读取缓冲区中的第一个字节。由主程序调用。
 uint8_t serial_read();
 uint8_t serial1_read();
 uint8_t serial1_read_bytes(uint8_t* buffer, uint8_t length);
 uint8_t serial2_read();
+uint8_t serial3_read();
 
 // 重置并清空读取缓冲区中的数据。由急停和重置使用。
 void serial_reset_read_buffer();
 void serial2_reset_read_buffer();
+void serial3_reset_read_buffer();
 
 // 返回 RX 串口缓冲区中可用的字节数。
 uint8_t serial_get_rx_buffer_available();

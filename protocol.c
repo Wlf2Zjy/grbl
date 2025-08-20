@@ -28,6 +28,7 @@
 
 
 static char line[LINE_BUFFER_SIZE]; // 要执行的行。零结尾。
+static char line3[LINE_BUFFER_SIZE]; // 串口3的行缓冲。零结尾。
 
 static void protocol_exec_rt_suspend();
 /*
@@ -69,6 +70,8 @@ void protocol_main_loop()
   uint8_t line_flags = 0;
   uint8_t char_counter = 0;
   uint8_t c;
+  uint8_t line3_flags = 0; // 串口3的行标志
+  uint8_t char_counter3 = 0; // 串口3的字符计数器
   extern volatile bool readFlag0;
   extern volatile bool tempConversionDone0;
   extern bool conversionStarted0;
@@ -172,6 +175,60 @@ void protocol_main_loop()
 
       }
     }
+ // 从串口3读取并解析一行（手轮/$J= 指令）
+    while((c = serial3_read()) != SERIAL_NO_DATA) {
+      if ((c == '\n') || (c == '\r')) { // 到达行末
+
+        protocol_execute_realtime(); // 运行时命令检查点。
+        if (sys.abort) { return; } // 系统中止时返回调用函数
+
+        line3[char_counter3] = 0; // 结束符
+
+        if (line3_flags & LINE_FLAG_OVERFLOW) {   //处理已接收的完整行
+          report_status_message(STATUS_OVERFLOW);
+        } else if (line3[0] == 0) {  // 如果是空行，报告OK状态
+          report_status_message(STATUS_OK);
+        } else if (line3[0] == '$') {
+          report_status_message(system_execute_line(line3));
+        } else if (sys.state & (STATE_ALARM | STATE_JOG)) {  // 如果系统处于报警或JOG模式，报告锁定状态
+          report_status_message(STATUS_SYSTEM_GC_LOCK);
+        } else {
+          report_status_message(gc_execute_line(line3));  //执行G代码并报告结果
+        }
+
+        line3_flags = 0;  // 重置行处理标志和字符计数器
+        char_counter3 = 0;
+
+      } else {
+
+        if (line3_flags) {   // 如果当前处于特殊处理状态（如注释中）
+          if (c == ')') {    // 如果当前在括号注释中且遇到右括号，结束注释状态
+            if (line3_flags & LINE_FLAG_COMMENT_PARENTHESES) { line3_flags &= ~(LINE_FLAG_COMMENT_PARENTHESES); }
+          }
+        } else {
+          if (c == '+') { // 将'+'视为分隔符（等同空白）
+            // 丢弃
+          } else if (c <= ' ') {
+            // 丢弃空白和控制字符
+          } else if (c == '/') {
+            // 忽略删除块
+          } else if (c == '(') {  
+            line3_flags |= LINE_FLAG_COMMENT_PARENTHESES;
+          } else if (c == ';') {
+            line3_flags |= LINE_FLAG_COMMENT_SEMICOLON;
+          } else if (char_counter3 >= (LINE_BUFFER_SIZE-1)) {
+            line3_flags |= LINE_FLAG_OVERFLOW;  // 检测到行缓冲区溢出并设置标志。
+          } else if (c >= 'a' && c <= 'z') {    // 将小写字母转换为大写字母并添加到缓冲区
+            line3[char_counter3++] = c-'a'+'A';
+          } else {
+            line3[char_counter3++] = c;        // 其他字符直接添加到缓冲区
+          }
+        }
+
+      }
+    }
+
+
     // 如果串行读取缓冲区中没有更多字符可处理和执行，
     // 则表示 g-code 流已填满计划缓冲区或已完成。
     // 无论是哪种情况，如果启用了自动循环启动，将执行所有排队的移动。
