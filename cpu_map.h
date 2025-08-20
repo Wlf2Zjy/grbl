@@ -68,7 +68,9 @@
 #define LIMIT_INT PCIE0 // 引脚更改中断使能引脚
 #define LIMIT_INT_vect PCINT0_vect
 #define LIMIT_PCMSK PCMSK0                                                                                                                                            // 引脚更改中断寄存器
-#define LIMIT_MASK ((1 << X_LIMIT_BIT) | (1 << Y_LIMIT_BIT) | (1 << Z_LIMIT_BIT) | (1 << B_LIMIT_BIT) | (1 << C_LIMIT_BIT) | (1 << D_LIMIT_BIT) | (1) | (1 << 7)) // All limit bits
+// #define LIMIT_MASK ((1 << X_LIMIT_BIT) | (1 << Y_LIMIT_BIT) | (1 << Z_LIMIT_BIT) | (1 << B_LIMIT_BIT) | (1 << C_LIMIT_BIT) | (1 << D_LIMIT_BIT) | (1) | (1 << 7)) // All limit bits
+
+#define LIMIT_MASK ((1 << X_LIMIT_BIT) | (1 << Y_LIMIT_BIT) | (1 << Z_LIMIT_BIT) | (1 << B_LIMIT_BIT) | (1 << C_LIMIT_BIT) | (1 << D_LIMIT_BIT)) // All limit bits
 
 #define A_LIMIT_DDR DDRK
 #define A_LIMIT_PORT PORTK

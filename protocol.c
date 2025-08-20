@@ -241,17 +241,6 @@ void protocol_main_loop()
       // 检查是否满足休眠条件，并在超时时执行自动停放。
       sleep_check();    
     #endif
-    // uint8_t level = ReadFiltered();
-    // print_uint8_base10(level);
-    // printString("\n");
-    // float temp = ds18b20_read_temp_timer2();
-    // float temp = ds18b20_read_temp();
-    // if (temp != 0) {
-      // printFloat_CoordValue(temp);
-      // printFloat(temp, 4);
-    //   printString("\n");
-    // }
-    
   }
 
   return; /* 永远不会达到此点 */
@@ -314,8 +303,8 @@ void protocol_exec_rt_system()
     if ((rt_exec == EXEC_ALARM_HARD_LIMIT) || (rt_exec == EXEC_ALARM_SOFT_LIMIT)) {
       report_feedback_message(MESSAGE_CRITICAL_EVENT);
       system_clear_exec_state_flag(EXEC_RESET); // 禁用现有的重置
-      sys_rt_exec_state = EXEC_RESET;
-      mc_reset(); // 发出系统重置，确保主轴和冷却关闭。
+      // sys_rt_exec_state = EXEC_RESET;
+      // mc_reset(); // 发出系统重置，确保主轴和冷却关闭。
       do {
         // 阻止所有操作，除非重置或状态报告，直到用户发出重置或断电。
         // 硬限位通常在无人监控或未注意时发生，给予用户和 GUI 时间执行必要的操作。
