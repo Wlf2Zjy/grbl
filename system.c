@@ -372,6 +372,13 @@ uint8_t system_execute_line(char *line)
     // 开门
     set_flip(0);
     break;
+  case 'W':
+    // 开门
+    set_flip(1);
+    tool_length_zero();
+    // 关门
+    set_flip(0);
+    break;
   case 'F':
     if (line[4] == 0)
     {

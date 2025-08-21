@@ -160,4 +160,5 @@ void set_tool_leds(LedColor color1, LedColor color2, LedColor color3,
     for(uint8_t i=0; i < sizeof(led_command); i++){
       serial2_write(led_command[i]);
     }
+    delay_ms(100);
 }
