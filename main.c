@@ -110,6 +110,5 @@ int main(void)
     // 启动 Grbl 主循环。处理程序输入并执行它们。
     protocol_main_loop();
   }
-  
   return 0; /* 永远不会到达 */
 }
