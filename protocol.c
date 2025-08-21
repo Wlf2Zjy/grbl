@@ -181,19 +181,19 @@ void protocol_main_loop()
 
         protocol_execute_realtime(); // 运行时命令检查点。
         if (sys.abort) { return; } // 系统中止时返回调用函数
-
+        
         line3[char_counter3] = 0; // 结束符
 
-        if (line3_flags & LINE_FLAG_OVERFLOW) {   //处理已接收的完整行
-          report_status_message(STATUS_OVERFLOW);
-        } else if (line3[0] == 0) {  // 如果是空行，报告OK状态
-          report_status_message(STATUS_OK);
+        if (line3_flags & LINE_FLAG_OVERFLOW) {
+             //处理已接收的完整行
+        } else if (line3[0] == 0) { 
+           // 如果是空行，报告OK状态
         } else if (line3[0] == '$') {
-          report_status_message(system_execute_line(line3));
-        } else if (sys.state & (STATE_ALARM | STATE_JOG)) {  // 如果系统处于报警或JOG模式，报告锁定状态
-          report_status_message(STATUS_SYSTEM_GC_LOCK);
+          system_execute_line(line3);
+        } else if (sys.state & (STATE_ALARM | STATE_JOG)) { 
+           // 如果系统处于报警或JOG模式，报告锁定状态
         } else {
-          report_status_message(gc_execute_line(line3));  //执行G代码并报告结果
+          gc_execute_line(line3);  //执行G代码并报告结果
         }
 
         line3_flags = 0;  // 重置行处理标志和字符计数器
