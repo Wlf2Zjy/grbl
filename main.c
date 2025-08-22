@@ -27,6 +27,7 @@ int main(void)
   switch_init();
   timer5_init();
   getDepth_init();
+  laser_distance_init();  // 初始化激光测距
   serial_init();   // 设置串行波特率和中断
   serial1_init();
   serial2_init();

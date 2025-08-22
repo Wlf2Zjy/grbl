@@ -134,6 +134,20 @@
 #define SPINDLE_PWM_PORT PORTH
 #define SPINDLE_PWM_BIT 4 // MEGA2560 Digital Pin 7
 
+// 激光测距配置
+#define LASER_SENSOR_PIN 4        // 使用ADC4通道 (PF4)
+#define LASER_NUM_SAMPLES 10      // 设置采样次数
+#define LASER_DISPLAY_MIN 25.0    // 最小显示值 (mm)
+#define LASER_DISPLAY_MAX 200.0   // 最大显示值 (mm)
+#define LASER_ADC_MIN 0           // ADC最小值
+#define LASER_ADC_MAX 1023        // ADC最大值
+
+// 激光ADC寄存器地址定义
+#define ADMUX_REG   (*((volatile uint8_t *)0x7C))  // ADC多路复用选择寄存器
+#define ADCSRA_REG  (*((volatile uint8_t *)0x7A))  // ADC控制和状态寄存器A
+#define ADCL_REG    (*((volatile uint8_t *)0x78))  // ADC数据寄存器低字节
+#define ADCH_REG    (*((volatile uint8_t *)0x79))  // ADC数据寄存器高字节
+
 #endif
 
 /*
