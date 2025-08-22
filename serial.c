@@ -52,6 +52,17 @@ uint8_t serial2_tx_buffer[TX2_RING_BUFFER];
 uint8_t serial2_tx_buffer_head = 0;
 volatile uint8_t serial2_tx_buffer_tail = 0;
 
+#define RX3_RING_BUFFER (RX_BUFFER_SIZE+1) // 接收环形缓冲区的大小
+#define TX3_RING_BUFFER (TX_BUFFER_SIZE+1) // 发送环形缓冲区的大小
+
+uint8_t serial3_rx_buffer[RX3_RING_BUFFER];
+uint8_t serial3_rx_buffer_head = 0;
+volatile uint8_t serial3_rx_buffer_tail = 0;
+
+uint8_t serial3_tx_buffer[TX3_RING_BUFFER];
+uint8_t serial3_tx_buffer_head = 0;
+volatile uint8_t serial3_tx_buffer_tail = 0;
+
 
 // 返回 RX 串口缓冲区中可用的字节数。
 uint8_t serial_get_rx_buffer_available()
@@ -88,6 +99,14 @@ uint8_t serial_get_tx_buffer_count()
   uint8_t ttail = serial_tx_buffer_tail; // 复制以限制对 volatile 的多次调用
   if (serial_tx_buffer_head >= ttail) { return(serial_tx_buffer_head-ttail); }
   return (TX_RING_BUFFER - (ttail-serial_tx_buffer_head));
+}
+
+// 返回 RX 串口3缓冲区中可用的字节数。
+uint8_t serial3_get_rx_buffer_available()
+{
+  uint8_t rtail = serial3_rx_buffer_tail; // 复制以限制对 volatile 的多次调用
+  if (serial3_rx_buffer_head >= rtail) { return(RX_BUFFER_SIZE - (serial3_rx_buffer_head-rtail)); }
+  return((rtail-serial3_rx_buffer_head-1));
 }
 
 
@@ -136,6 +155,20 @@ void serial2_init()
   UBRR2L = UBRR2_value;
 
   UCSR2B |= (1<<RXEN2 | 1<<TXEN2 | 1<<RXCIE2);
+}
+
+void serial3_init()
+{
+    uint16_t UBRR3_value = ((F_CPU / (4L * 115200)) - 1)/2;
+    UCSR3A |= (1 << U2X3);  // 对于高波特率（如 115200），开启波特率倍增
+ 
+    UBRR3H = UBRR3_value >> 8; // 设置高字节
+    UBRR3L = UBRR3_value; // 设置低字节
+
+  // 启用接收、发送和接收完整字节的中断
+    UCSR3B |= (1<<RXEN3 | 1<<TXEN3 | 1<<RXCIE3);
+
+  // 默认为 8 位，无奇偶校验，1 个停止位
 }
 
 
@@ -215,6 +248,20 @@ void serial2_write(uint8_t data) {
   serial2_tx_buffer_head = next_head;
 
   UCSR2B |=  (1 << UDRIE2);
+}
+
+void serial3_write(uint8_t data) {
+  uint8_t next_head = serial3_tx_buffer_head + 1;
+  if (next_head == TX3_RING_BUFFER) { next_head = 0; }
+
+  while (next_head == serial3_tx_buffer_tail) {
+    if (sys_rt_exec_state & EXEC_RESET) { return; }
+  }
+
+  serial3_tx_buffer[serial3_tx_buffer_head] = data;
+  serial3_tx_buffer_head = next_head;
+
+  UCSR3B |=  (1 << UDRIE3);
 }
 
 
@@ -313,12 +360,25 @@ uint8_t serial2_read()
   }
 }
 
+uint8_t serial3_read()
+{
+  uint8_t tail = serial3_rx_buffer_tail;
+
+  if (serial3_rx_buffer_head == tail) {
+    return SERIAL_NO_DATA;
+  } else {
+    uint8_t data = serial3_rx_buffer[tail];
+    tail++;
+    if (tail == RX3_RING_BUFFER) { tail = 0; }
+    serial3_rx_buffer_tail = tail;
+    return data;
+  }
+}
+
 ISR(SERIAL_RX)
 {
   uint8_t data = UDR0; // 从接收数据寄存器读取数据
   uint8_t next_head;
-
-  // 从串行流中直接获取实时命令字符。这些字符
   // 不会传递到主缓冲区，而是设置系统状态标志位以便实时执行。
   switch (data) {
     case CMD_RESET:         mc_reset(); break; // 调用运动控制重置例程。
@@ -437,12 +497,42 @@ ISR(USART2_UDRE_vect)
   if (tail == serial2_tx_buffer_head) { UCSR2B &= ~(1 << UDRIE2); }
 }
 
+ISR(USART3_RX_vect)
+{
+  uint8_t data = UDR3;
+  uint8_t next_head = serial3_rx_buffer_head + 1;
+  if (next_head == RX3_RING_BUFFER) { next_head = 0; }
+
+  if (next_head != serial3_rx_buffer_tail) {
+    serial3_rx_buffer[serial3_rx_buffer_head] = data;
+    serial3_rx_buffer_head = next_head;
+  }
+}
+
+ISR(USART3_UDRE_vect)
+{
+  uint8_t tail = serial3_tx_buffer_tail;
+  UDR3 = serial3_tx_buffer[tail];
+  
+
+  tail++;
+  if (tail == TX3_RING_BUFFER) { tail = 0; }
+  serial3_tx_buffer_tail = tail;
+
+  if (tail == serial3_tx_buffer_head) { UCSR3B &= ~(1 << UDRIE3); }
+}
+
 void serial_reset_read_buffer()
 {
   serial_rx_buffer_tail = serial_rx_buffer_head; // 重置读取缓冲区
 }
 
 void serial2_reset_read_buffer()
+{
+  serial2_rx_buffer_tail = serial2_rx_buffer_head; // 重置读取缓冲区
+}
+
+void serial3_reset_read_buffer()
 {
   serial2_rx_buffer_tail = serial2_rx_buffer_head; // 重置读取缓冲区
 }
