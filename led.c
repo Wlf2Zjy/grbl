@@ -84,7 +84,7 @@ void control_led(uint8_t color)
   STATUS_LED_PORT |= (1 << STATUS_LED_ENABLE_BIT); // 使能
 
   cli(); // 临时关闭中断（发送期间必须）
-  for (uint8_t i = 0; i < 60; i++)
+  for (uint8_t i = 0; i < 160; i++)
   {
     if(color==1){
       sendStatusColor(255, 0, 0);  // 显示红色
