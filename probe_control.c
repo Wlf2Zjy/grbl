@@ -150,6 +150,6 @@ void set_probe(uint8_t flag)
     plan_sync_position();
     limits_init();
     if(!flag){
-        gc_execute_line("G91G1C1.5F1000");
+        gc_execute_line("G91G1C2.5F1000");
     }
 }
