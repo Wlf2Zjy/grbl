@@ -67,6 +67,7 @@
 #include "tool_change.h"
 #include "time.h"
 #include "led.h"
+#include "laser_distance.h"
 
 // ---------------------------------------------------------------------------------------
 // 编译时对定义值进行错误检查：

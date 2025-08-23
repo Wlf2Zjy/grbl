@@ -644,7 +644,8 @@ void report_realtime_status()
   report_util_axis_values(print_position);
   printPgmString(PSTR("|WPos:"));
   report_util_axis_values(offset_position);
-
+  printPgmString(PSTR("|LD:"));
+  printFloat(sys.laserDistance, 2);
   printPgmString(PSTR("|T:"));
   print_uint8_base10(settings.tool);
   printPgmString(PSTR("|F:"));

@@ -1,7 +1,7 @@
 // ==================== 激光测距功能实现 ====================
 #include "grbl.h"
 #include <math.h>
-#include "laser_distance.h"
+
 
 laser_distance_t laser_distance = {0};
 
@@ -122,10 +122,12 @@ void laser_distance_update(void)
 void laser_distance_report_status(void)
 {
     if (laser_distance.is_valid) {
+        sys.laserDistance = laser_distance.distance_mm;
         // 仅输出距离，单位mm
-        printFloat_CoordValue(laser_distance.distance_mm);
-        printString("\r\n");
+        // printFloat_CoordValue(laser_distance.distance_mm);
+        // printString("\r\n");
     } else {
-        printString("0\r\n");
+        // printString("0\r\n");
+        sys.laserDistance = 0;
     }
 }

@@ -5,6 +5,7 @@
     "rfid_control.h": "c",
     "probe_control.h": "c",
     "system.h": "c",
-    "config.h": "c"
+    "config.h": "c",
+    "laser_distance.h": "c"
   }
 }

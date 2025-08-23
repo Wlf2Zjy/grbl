@@ -295,8 +295,6 @@ ISR(TIMER5_COMPA_vect) {
         laser_distance_start_sampling();
     }
 
-
-    
 }
 
 unsigned long getTime()

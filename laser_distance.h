@@ -1,8 +1,6 @@
 #ifndef laser_distance_h
 #define laser_diatance_h
 
-#include "grbl.h"
-
 // 激光测距函数声明
 void laser_distance_init(void);
 int laser_distance_read_adc(void);
