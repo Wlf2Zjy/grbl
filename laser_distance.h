@@ -10,6 +10,7 @@ int laser_distance_get_adc_value(void);
 bool laser_distance_is_valid(void);
 void laser_distance_update(void);
 void laser_distance_report_status(void);
+void laserScaning(void);
 
 // 激光测距状态结构体
 typedef struct {

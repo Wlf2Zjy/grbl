@@ -379,6 +379,9 @@ uint8_t system_execute_line(char *line)
     // 关门
     set_flip(0);
     break;
+  case 'L':
+    laserScaning();
+    break;
   case 'F':
     if (line[4] == 0)
     {

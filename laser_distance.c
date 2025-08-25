@@ -131,3 +131,26 @@ void laser_distance_report_status(void)
         sys.laserDistance = 0;
     }
 }
+
+void laserScaning(){
+    protocol_buffer_synchronize();
+    gc_execute_line("G90G53G0Z-5");
+    protocol_buffer_synchronize();
+    for(int i = 0; i <= 40; i++) {
+        char command[50];
+        char x_char[50];
+        float x_pos = -5 * i;
+        float next_x_pos = -5 * (i + 1);
+        
+        float2string(x_pos, x_char, 3);
+        sprintf(command, "G90G53G0X%sY-200", x_char);
+        gc_execute_line(command);
+        sprintf(command, "G90G53G0X%sY-5", x_char);
+        gc_execute_line(command);
+
+        float2string(next_x_pos, x_char, 3);
+        sprintf(command, "G90G53G0X%sY-5", next_x_pos);
+        gc_execute_line(command);
+    }
+    protocol_buffer_synchronize();
+  }

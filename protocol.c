@@ -135,7 +135,6 @@ void protocol_main_loop()
         char_counter = 0;
 
       } else {
-
         if (line_flags) {
           // 丢弃所有（除 EOL 外）的注释字符和溢出字符。
           if (c == ')') {
@@ -172,7 +171,6 @@ void protocol_main_loop()
             line[char_counter++] = c;
           }
         }
-
       }
     }
  // 从串口3读取并解析一行（手轮/$J= 指令）
@@ -235,8 +233,7 @@ void protocol_main_loop()
     protocol_auto_cycle_start();
 
     protocol_execute_realtime();  // 运行时命令检查点。
-    if (sys.abort) { return; } // 放弃到 main() 程序循环以重置系统。
-              
+    if (sys.abort) { return; } // 放弃到 main() 程序循环以重置系统。 
     #ifdef SLEEP_ENABLE
       // 检查是否满足休眠条件，并在超时时执行自动停放。
       sleep_check();    
