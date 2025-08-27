@@ -143,6 +143,7 @@ typedef struct {
   bool probeStatus;  // 探针状态0下1上
   bool isHomed;  // 是否回零过
   float laserDistance;
+  bool ALimit;  // 是否回零过
 } system_t;
 extern system_t sys;
 

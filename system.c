@@ -27,7 +27,7 @@ void system_init()
   // CONTROL_PORT &= ~((1 << X_ALARM_BIT) | (1 << Y_ALARM_BIT) | (1 << Z_ALARM_BIT));
   //   CONTROL_PORT |= ((1 << CONTROL_SAFETY_DOOR_BIT) | (1 << STOP_ALARM_BIT));
   // #else
-  //   CONTROL_PORT |= CONTROL_MASK; // 启用内部上拉电阻。常规高操作。
+    // CONTROL_PORT |= (1<< A_LIMIT_BIT); // 启用内部上拉电阻。常规高操作。
   // #endif
   CONTROL_PCMSK |= CONTROL_MASK; // 启用引脚变化中断的特定引脚
   PCICR |= (1 << CONTROL_INT);   // 启用引脚变化中断
@@ -117,6 +117,7 @@ void handle_stable_input(uint8_t pin)
     // uint8_t stopStatus = ((pin & (1 << 4 | 1 << 5 | 1 << 6)) || (~pin & (1 << 7)));  // 前三位屏蔽
     // uint8_t stopStatus = (~pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
     uint8_t stopStatus = (~pin & 1 << 7);
+    // sys.ALimit = (pin & 1 << A_LIMIT_BIT);
     print_uint8_base2_ndigit(stopStatus, 8);
     printString("S\r\n");
     // 检查限位引脚状态
@@ -539,10 +540,10 @@ uint8_t system_execute_line(char *line)
       if (line[2] == 0)
       {
         // 回零
-        set_probe(1);
+        // set_probe(1);
         mc_homing_cycle(HOMING_CYCLE_ALL);
-        set_rfid(1);
-        set_flip(0);
+        // set_rfid(1);
+        // set_flip(0);
         sys.isHomed = 1;
 #ifdef HOMING_SINGLE_AXIS_COMMANDS
       }

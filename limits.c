@@ -32,6 +32,7 @@ void limits_init()
   LIMIT_DDR &= ~(LIMIT_MASK); // 设置为输入引脚
   A_LIMIT_DDR &= ~(1 << A_LIMIT_BIT);
   A_LIMIT_PORT |= (1 << A_LIMIT_BIT);  // 启用内部上拉电阻。正常高操作。
+  // A_LIMIT_PORT &= ~(A_LIMIT_BIT); // 正常低操作。需要外部下拉。
 
   #ifdef DISABLE_LIMIT_PIN_PULL_UP
     LIMIT_PORT &= ~(LIMIT_MASK); // 正常低操作。需要外部下拉。
@@ -127,7 +128,10 @@ uint8_t limits_get_state()
         //   // printString("紧\n");
         //   gc_execute_line("G91G0A5");
         // }
-        uint8_t limit_state = ~LIMIT_PIN & 0x7E;  //第一位和第八位是电动虎钳的中断、不进入急停
+        uint8_t limit_state = (LIMIT_PIN & LIMIT_MASK);
+        // uint8_t limit_state = ~LIMIT_PIN & LIMIT_MASK;  //第一位和第八位是电动虎钳的中断、不进入急停
+        if (bit_isfalse(settings.flags,BITFLAG_INVERT_LIMIT_PINS)) { limit_state ^= LIMIT_MASK; }
+
         if (limit_state) {
             mc_reset(); // 发起系统终止。
             print_uint8_base2_ndigit(limit_state, 8);
@@ -409,9 +413,12 @@ void a_go_home()
     st_prep_buffer(); // 准备并填充段缓冲区，来源于新计划的块。
     st_wake_up(); // 启动运动
     do {
-          protocol_execute_realtime();
+          // protocol_execute_realtime();
           // 检查限位状态。当它们发生变化时锁定循环轴。
           limit_state = A_LIMIT_PIN & (1 << A_LIMIT_BIT);
+          // limit_state = sys.ALimit;
+          // print_uint8_base2_ndigit(limit_state,8);
+          // printString("\r\n");
           if (axislock & step_pin[idx])
           {
             if (limit_state)
