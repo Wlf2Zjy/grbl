@@ -279,23 +279,23 @@ ISR(TIMER5_COMPA_vect) {
         seconds_count++;        
     }
     
-    if (!sys.isRunGcode){
-        // 激光测距采样 (每10ms执行一次采样)
-        static uint8_t laser_sample_counter = 0;
-        laser_sample_counter++;
-        if (laser_sample_counter >= 1) { // 每10ms执行一次
-            laser_sample_counter = 0;
-            laser_distance_do_single_sample();
-        }
+    // if (!sys.isRunGcode){
+    //     // 激光测距采样 (每10ms执行一次采样)
+    //     static uint8_t laser_sample_counter = 0;
+    //     laser_sample_counter++;
+    //     if (laser_sample_counter >= 1) { // 每10ms执行一次
+    //         laser_sample_counter = 0;
+    //         laser_distance_do_single_sample();
+    //     }
         
-        // 激光测距启动 (每100ms启动一次新的采样周期)
-        static uint8_t laser_start_counter = 0;
-        laser_start_counter++;
-        if (laser_start_counter >= 10) { // 10 * 10ms = 100ms
-            laser_start_counter = 0;
-            laser_distance_start_sampling();
-        }
-    }
+    //     // 激光测距启动 (每100ms启动一次新的采样周期)
+    //     static uint8_t laser_start_counter = 0;
+    //     laser_start_counter++;
+    //     if (laser_start_counter >= 10) { // 10 * 10ms = 100ms
+    //         laser_start_counter = 0;
+    //         laser_distance_start_sampling();
+    //     }
+    // }
 }
 
 unsigned long getTime()

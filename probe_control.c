@@ -151,5 +151,7 @@ void set_probe(uint8_t flag)
     limits_init();
     if(!flag){
         gc_execute_line("G91G1C2.5F1000");
+        delay_ms(100);
+        gc_execute_line("G91G1C1F1000");
     }
 }
