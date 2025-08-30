@@ -1036,10 +1036,12 @@ uint8_t gc_execute_line(char *line)
 
           // 先用 h_x2_div_d 计算 4*h^2，检查是否为负或 r 小于 d。
           float h_x2_div_d = 4.0 * gc_block.values.r * gc_block.values.r - x * x - y * y;
-
+          
+          // debug!!!
           if (h_x2_div_d < 0)
           {
-            FAIL(STATUS_GCODE_ARC_RADIUS_ERROR);
+            h_x2_div_d = -h_x2_div_d;
+            // FAIL(STATUS_GCODE_ARC_RADIUS_ERROR);
           } // [圆弧半径错误]
 
           // 完成 h_x2_div_d 的计算。

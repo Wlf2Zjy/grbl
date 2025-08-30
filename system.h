@@ -144,6 +144,7 @@ typedef struct {
   bool isHomed;  // 是否回零过
   float laserDistance;
   bool ALimit;  // 是否回零过
+  bool isOpenLaser;
 } system_t;
 extern system_t sys;
 

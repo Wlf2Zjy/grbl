@@ -136,11 +136,11 @@ void laserScaning(){
     protocol_buffer_synchronize();
     gc_execute_line("G90G53G0Z-50");
     protocol_buffer_synchronize();
-    for(int i = 0; i <= 10; i++) {
+    for(int i = 0; i <= 20; i++) {
         char command[50];
         char x_char[50];
-        float x_pos = -20 * i;
-        float next_x_pos = -20 * (i + 1);
+        float x_pos = -10 * i;
+        float next_x_pos = -10 * (i + 1);
         
         float2string(x_pos, x_char, 3);
         sprintf(command, "G90G53G0X%sY-200", x_char);

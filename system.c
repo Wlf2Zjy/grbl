@@ -374,14 +374,35 @@ uint8_t system_execute_line(char *line)
     set_flip(0);
     break;
   case 'W':
-    // 开门
-    set_flip(1);
-    tool_length_zero();
-    // 关门
-    set_flip(0);
+    if (line[2] == 0)
+    {
+      // 开门
+      set_flip(1);
+      tool_length_zero();
+      // 关门
+      set_flip(0);
+    }else if (line[3] == 0)
+    {
+      switch (line[2])
+      {
+        protocol_buffer_synchronize();
+        break;
+      }
+    }
     break;
   case 'L':
-    laserScaning();
+    if (line[2] == 0)
+    {
+      sys.isOpenLaser = true;
+      laserScaning();
+      sys.isOpenLaser = false;
+      sys.laserDistance = 0;
+    }else if (line[3] == 0)
+    {
+      uint8_t index = line[2] - '0';
+      sys.isOpenLaser = index;
+      sys.laserDistance = 0;
+    }
     break;
   case 'F':
     if (line[4] == 0)
