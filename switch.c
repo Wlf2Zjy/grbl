@@ -66,6 +66,28 @@ void spindle_fan_control(uint8_t flag)
 }
 
 
+// 1左开， 2右开， 0关
+void coolant_control(uint8_t flag)
+{
+    if (flag == 1)
+    {
+        l_water_control(1);
+        r_water_control(0);
+        spray_control(1);
+    }
+    else if(flag == 2)
+    {
+        r_water_control(1);
+        l_water_control(0);
+        spray_control(1);
+    }else{
+        r_water_control(0);
+        l_water_control(0);
+        spray_control(0);
+    }
+    sys.coolingStatus = flag;
+}
+
 void coolant_close()
 {
     l_water_control(0);

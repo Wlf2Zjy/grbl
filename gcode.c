@@ -351,21 +351,15 @@ uint8_t gc_execute_line(char *line)
         {
         case 7:
           gc_block.modal.coolant = COOLANT_MIST_ENABLE;
-          sys.coolingStatus = 1;
-          l_water_control(1);
-          spray_control(1);
+          coolant_control(1);
           break;
         case 8:
           gc_block.modal.coolant = COOLANT_FLOOD_ENABLE;
-          sys.coolingStatus = 2;
-          r_water_control(1);
-          spray_control(1);
+          coolant_control(2);
           break;
         case 9:
           gc_block.modal.coolant = COOLANT_DISABLE;
-          sys.coolingStatus = 0;
-          spray_control(0);
-          coolant_close();
+          coolant_control(0);
           break;
         }
         break;

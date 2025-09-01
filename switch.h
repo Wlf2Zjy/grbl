@@ -63,5 +63,6 @@ void camera_control(uint8_t flag);
 void rfid_ele_control(uint8_t flag);
 void all_switch_stop();
 void coolant_close();
+void coolant_control(uint8_t flag);
 
 #endif
