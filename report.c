@@ -47,6 +47,19 @@ static void report_util_axis_values(float *axis_value)
   }
 }
 
+static void report_util_axis_values3(float *axis_value)
+{
+  uint8_t idx;
+  for (idx = 0; idx < 4; idx++)
+  {
+    printFloat_CoordValue3(axis_value[idx]);
+    if (idx < (4 - 1))
+    {
+      serial3_write(',');
+    }
+  }
+}
+
 /*
 static void report_util_setting_string(uint8_t n) {
   serial_write(' ');
@@ -854,6 +867,51 @@ void report_realtime_status()
 #endif
 
   serial_write('>');
+  report_util_line_feed();
+}
+
+
+// 打印实时数据。此功能获取步进子程序的实时快照
+// 和 CNC 机器的实际位置。用户可以根据自己的特定需求更改以下函数，
+// 但所需的实时数据报告必须尽可能简短。这是必需的，因为它最小化了计算开销，
+// 使 Grbl 能够平稳运行，特别是在具有快速、短行段和高频报告（5-20Hz）
+// 的 G-code 程序期间。
+void report_realtime_status3()
+{
+  uint8_t idx;
+  int32_t current_position[N_AXIS]; // 复制系统位置变量的当前状态
+  memcpy(current_position, sys_position, sizeof(sys_position));
+  float print_position[N_AXIS];
+  float offset_position[N_AXIS];
+  system_convert_array_steps_to_mpos(print_position, current_position);
+  system_convert_array_steps_to_mpos(offset_position, current_position);
+
+  // 报告当前机器状态和子状态
+  serial3_write('<');
+  float wco[N_AXIS];
+  if (bit_isfalse(settings.status_report_mask, BITFLAG_RT_STATUS_POSITION_TYPE) ||
+      (sys.report_wco_counter == 0))
+  {
+    for (idx = 0; idx < N_AXIS; idx++)
+    {
+      // 将工件坐标偏移和刀具长度偏移应用于当前位置。
+      wco[idx] = gc_state.coord_system[idx] + gc_state.coord_offset[idx];
+      if (idx == TOOL_LENGTH_OFFSET_AXIS)
+      {
+        wco[idx] += gc_state.tool_length_offset;
+      }
+      if (bit_isfalse(settings.status_report_mask, BITFLAG_RT_STATUS_POSITION_TYPE))
+      {
+        offset_position[idx] -= wco[idx];
+      }
+    }
+  }
+
+  printPgmString(PSTR("MPos:"));
+  report_util_axis_values(print_position);
+  printPgmString(PSTR("|WPos:"));
+  report_util_axis_values(offset_position);
+  serial3_write('>');
   report_util_line_feed();
 }
 

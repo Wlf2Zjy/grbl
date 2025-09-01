@@ -107,7 +107,7 @@ void report_echo_line_received(char *line);
 
 // 打印实时状态报告
 void report_realtime_status();
-
+void report_realtime_status3();
 // 打印记录的探测位置
 void report_probe_parameters();
 

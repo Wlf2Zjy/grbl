@@ -394,7 +394,9 @@ uint8_t system_execute_line(char *line)
     if (line[2] == 0)
     {
       sys.isOpenLaser = true;
+      laser_distance_init();
       laserScaning();
+      probe_init();
       sys.isOpenLaser = false;
       sys.laserDistance = 0;
     }else if (line[3] == 0)
@@ -402,6 +404,11 @@ uint8_t system_execute_line(char *line)
       uint8_t index = line[2] - '0';
       sys.isOpenLaser = index;
       sys.laserDistance = 0;
+      if(index == 0){
+        probe_init();
+      }else{
+        laser_distance_init();
+      }
     }
     break;
   case 'F':

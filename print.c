@@ -30,6 +30,13 @@ void printPgmString(const char *s)
     serial_write(c);
 }
 
+// 打印存储在 PGM 内存中的字符串
+void printPgmString3(const char *s)
+{
+  char c;
+  while ((c = pgm_read_byte_near(s++)))
+    serial3_write(c);
+}
 
 // void printIntegerInBase(unsigned long n, unsigned long base)
 // {
@@ -159,6 +166,47 @@ void printFloat(float n, uint8_t decimal_places)
   }
 }
 
+// 通过立即转换为长整型将浮点数转换为字符串，该整数包含比浮点数更多的数字。
+// 小数位数由计数器跟踪，可以由用户设置。然后有效地将整数转换为字符串。
+// 注意：AVR 的 '%' 和 '/' 整数操作非常高效。位移加速
+// 技术实际上只是稍微慢一点。通过艰难的方式发现了这一点。
+void printFloat3(float n, uint8_t decimal_places)
+{
+  if (n < 0) {
+    serial3_write('-');
+    n = -n;
+  }
+
+  uint8_t decimals = decimal_places;
+  while (decimals >= 2) { // 快速转换预期为 E0 到 E-4 的值。
+    n *= 100;
+    decimals -= 2;
+  }
+  if (decimals) { n *= 10; }
+  n += 0.5; // 添加舍入因子。确保整个值的进位。
+
+  // 反向生成数字并存储在字符串中。
+  unsigned char buf[13];
+  uint8_t i = 0;
+  uint32_t a = (long)n;
+  while (a > 0) {
+    buf[i++] = (a % 10) + '0'; // 获取数字
+    a /= 10;
+  }
+  while (i < decimal_places) {
+     buf[i++] = '0'; // 填充小数点前的零（当 n < 1 时）
+  }
+  if (i == decimal_places) { // 如有需要，填充前导零。
+    buf[i++] = '0';
+  }
+
+  // 打印生成的字符串。
+  for (; i > 0; i--) {
+    if (i == decimal_places) { serial3_write('.'); } // 在正确位置插入小数点。
+    serial3_write(buf[i - 1]);
+  }
+}
+
 
 // 用于 Grbl 中特殊变量类型的浮点值打印处理程序，定义在 config.h 中。
 //  - CoordValue: 处理以英寸或毫米报告的所有位置或坐标值。
@@ -168,6 +216,14 @@ void printFloat_CoordValue(float n) {
     printFloat(n * INCH_PER_MM, N_DECIMAL_COORDVALUE_INCH);
   } else {
     printFloat(n, N_DECIMAL_COORDVALUE_MM);
+  }
+}
+
+void printFloat_CoordValue3(float n) {
+  if (bit_istrue(settings.flags, BITFLAG_REPORT_INCHES)) {
+    printFloat3(n * INCH_PER_MM, N_DECIMAL_COORDVALUE_INCH);
+  } else {
+    printFloat3(n, N_DECIMAL_COORDVALUE_MM);
   }
 }
 

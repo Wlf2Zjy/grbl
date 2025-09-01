@@ -421,7 +421,7 @@ void a_go_home()
           // printString("\r\n");
           if (axislock & step_pin[idx])
           {
-            if (limit_state)
+            if (!limit_state)
             {
                 axislock &= ~(step_pin[idx]);
             }

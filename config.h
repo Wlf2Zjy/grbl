@@ -50,7 +50,7 @@
 // #define CMD_STATUS_REPORT 0x81
 // #define CMD_CYCLE_START 0x82
 // #define CMD_FEED_HOLD 0x83
-#define CMD_SAFETY_DOOR 0x84
+// #define CMD_SAFETY_DOOR 0x84
 #define CMD_JOG_CANCEL 0x85
 #define CMD_DEBUG_REPORT 0x86   // 仅在启用DEBUG时，发送调试报告，格式为'{}'。
 #define CMD_FEED_OVR_RESET 0x90 // 将进给倍率恢复为100%。

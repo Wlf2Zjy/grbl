@@ -19,6 +19,7 @@
 void printString(const char *s);
 
 void printPgmString(const char *s);
+void printPgmString3(const char *s);
 
 void printInteger(long n);
 
@@ -36,6 +37,8 @@ void printFloat(float n, uint8_t decimal_places);
 //  - CoordValue: 处理以英寸或毫米报告的所有位置或坐标值。
 //  - RateValue: 处理以英寸或毫米报告的进给速率和当前速度。
 void printFloat_CoordValue(float n);
+void printFloat_CoordValue3(float n);
+
 void printFloat_RateValue(float n);
 
 // 调试工具，用于在调用点打印剩余内存（以字节为单位）。否则不使用。

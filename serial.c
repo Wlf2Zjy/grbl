@@ -388,7 +388,7 @@ ISR(SERIAL_RX)
     default :
       if (data > 0x7F) { // 实时控制字符仅为扩展 ASCII。
         switch(data) {
-          case CMD_SAFETY_DOOR:   system_set_exec_state_flag(EXEC_SAFETY_DOOR); break; // 设置为真
+          // case CMD_SAFETY_DOOR:   system_set_exec_state_flag(EXEC_SAFETY_DOOR); break; // 设置为真
           case CMD_JOG_CANCEL:   
             if (sys.state & STATE_JOG) { // 阻止其他状态调用运动取消。
               system_set_exec_state_flag(EXEC_MOTION_CANCEL); 
