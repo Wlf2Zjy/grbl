@@ -127,6 +127,8 @@ void settings_restore(uint8_t restore_flag)
     settings.probe_offset[X_AXIS] = 10;
     settings.probe_offset[Y_AXIS] = 20;
     settings.probe_offset[Z_AXIS] = 30;
+    settings.rfid_filp_value = -1.1;
+    settings.rfid_offset = 38;
     settings.tool = 1;
     settings.tool_length = 0;
     settings.tool_zpos = 0;
@@ -547,6 +549,12 @@ uint8_t settings_store_global_setting(uint8_t parameter, float value)
       break;
     case 35:
       settings.probe_offset[2] = value;
+      break;
+    case 36:
+      settings.rfid_filp_value = value;
+      break;
+    case 37:
+      settings.rfid_offset = value;
       break;
     default:
       return (STATUS_INVALID_STATEMENT);

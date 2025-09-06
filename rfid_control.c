@@ -61,7 +61,7 @@ void set_rfid(uint8_t flag)
         }
         else
         {
-            target[idx] = -1.25;
+            target[idx] = settings.rfid_filp_value;
         }
         // 将轴锁应用于本循环中活动的步进端口引脚。
         axislock |= step_pin[idx];
@@ -215,30 +215,14 @@ void rfid_write(uint8_t toolNumber, uint16_t time)
 void read_all_rfid(){
     char y_char[20], command[80];
     uint8_t return_data[8];
-    uint8_t offset = 40;
     gc_execute_line("G90G53G0Z-5");
-    gc_execute_line("G90G53G0Y-5");
-    set_flip(1);
     protocol_buffer_synchronize();
     set_rfid(0);
     for (uint8_t i = 0; i < TOOL_NUM-1; i++)
     {
-        memset(return_data, 0, 8);
-        // // 移动刀位置
-        // float2string(settings.tool_y[i] - 32, y_char, 3);
-        // sprintf(command, "G90G53G0Y%s", y_char);
-        // gc_execute_line(command);
-        // protocol_buffer_synchronize();
-        // rfid_read(return_data);
-        // memcpy(settings.tool_data[i], return_data, 16);
-        // printPgmString(PSTR("{'tool"));
-        // print_uint8_base10(i + 1);
-        // printPgmString(PSTR("':"));
-        // print_tool_info(settings.tool_data[i]);
-        // printPgmString(PSTR("}\r\n"));
-        
+        memset(return_data, 0, 8);     
         // 移动刀位置
-        float2string(settings.tool_y[i] - offset, y_char, 3);
+        float2string(settings.tool_y[i] - settings.rfid_offset, y_char, 3);
         sprintf(command, "G90G53G0Y%s", y_char);
         gc_execute_line(command);
         protocol_buffer_synchronize();
@@ -252,7 +236,7 @@ void read_all_rfid(){
         
         if (settings.tool_data[i][0] == 0){
                     // 移动刀位置
-            float2string(settings.tool_y[i] - offset + 1.5, y_char, 3);
+            float2string(settings.tool_y[i] - settings.rfid_offset + 1.5, y_char, 3);
             sprintf(command, "G90G53G0Y%s", y_char);
             gc_execute_line(command);
             protocol_buffer_synchronize();
@@ -266,7 +250,7 @@ void read_all_rfid(){
         }
         if (settings.tool_data[i][0] == 0){
             // 移动刀位置
-            float2string(settings.tool_y[i] - offset - 1.5, y_char, 3);
+            float2string(settings.tool_y[i] - settings.rfid_offset - 1.5, y_char, 3);
             sprintf(command, "G90G53G0Y%s", y_char);
             gc_execute_line(command);
             protocol_buffer_synchronize();
@@ -286,8 +270,6 @@ void read_all_rfid(){
         }
         set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]); 
     }
-    gc_execute_line("G90G53G0Y-5");
     set_rfid(1);
-    set_flip(0);
     write_global_settings();
 }
