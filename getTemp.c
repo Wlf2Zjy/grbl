@@ -247,15 +247,6 @@ ISR(TIMER5_COMPA_vect) {
             }
         }
     }
-
-    //读液位
-    if(waterCounter < 50){
-        waterCounter++;
-    }else{
-        waterCounter = 0;
-        get_L_Depth();
-        get_R_Depth();
-    }
     
     // 消抖
     if(pin_state){
@@ -268,32 +259,42 @@ ISR(TIMER5_COMPA_vect) {
             debounce_counter = time_ms;
         }
     }
-
-    // 计时
-    static uint8_t overflow_count = 0;
-    overflow_count++;
-    
-    // 计算 1 秒
-    if (overflow_count >= 100) {
-        overflow_count = 0;
-        seconds_count++;        
-    }
-    
+  
     if (sys.isOpenLaser){
         // 激光测距采样 (每10ms执行一次采样)
         static uint8_t laser_sample_counter = 0;
-        laser_sample_counter++;
-        if (laser_sample_counter >= 1) { // 每10ms执行一次
-            laser_sample_counter = 0;
-            laser_distance_do_single_sample();
-        }
-        
         // 激光测距启动 (每100ms启动一次新的采样周期)
         static uint8_t laser_start_counter = 0;
+
         laser_start_counter++;
         if (laser_start_counter >= 10) { // 10 * 10ms = 100ms
             laser_start_counter = 0;
             laser_distance_start_sampling();
+        }else{
+            laser_sample_counter++;
+            if (laser_sample_counter >= 1) { // 每10ms执行一次
+                laser_sample_counter = 0;
+                laser_distance_do_single_sample();
+            }
+        }
+    }else{
+        //读液位
+        if(waterCounter < 50){
+            waterCounter++;
+        }else{
+            waterCounter = 0;
+            get_L_Depth();
+            get_R_Depth();
+        }
+
+        // 计时
+        static uint8_t overflow_count = 0;
+        overflow_count++;
+        
+        // 计算 1 秒
+        if (overflow_count >= 100) {
+            overflow_count = 0;
+            seconds_count++;        
         }
     }
 }

@@ -151,6 +151,9 @@ void set_rfid(uint8_t flag)
     limits_init();
     protocol_buffer_synchronize();
     rfid_ele_control(0);
+    // if(flag){
+    //     gc_execute_line("G91G1B0.3F1000");
+    // }
 }
 
 
@@ -214,6 +217,7 @@ void read_all_rfid(){
     uint8_t return_data[8];
     uint8_t offset = 40;
     gc_execute_line("G90G53G0Z-5");
+    gc_execute_line("G90G53G0Y-5");
     set_flip(1);
     protocol_buffer_synchronize();
     set_rfid(0);
@@ -282,6 +286,7 @@ void read_all_rfid(){
         }
         set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]); 
     }
+    gc_execute_line("G90G53G0Y-5");
     set_rfid(1);
     set_flip(0);
     write_global_settings();

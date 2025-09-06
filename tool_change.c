@@ -92,6 +92,7 @@ void return_tool()
       char y_char[20], command[80];
       uint8_t return_data[8];
       gc_execute_line("G90G53G0Z-5");
+      gc_execute_line("G90G53G0Y-5");
       protocol_buffer_synchronize();
       set_rfid(0);
       memset(return_data, 0, 8);
@@ -101,6 +102,7 @@ void return_tool()
       gc_execute_line(command);
       protocol_buffer_synchronize();
       rfid_write(settings.tool, minutes);
+      gc_execute_line("G90G53G0Y-5");
       set_rfid(1);
     }
     set_tool_leds(LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN);
@@ -198,7 +200,7 @@ void tool_length_zero()
   float2string(settings.tool_z[TOOL_NUM - 1], z_char, 3);
   sprintf(command, "G90G53G0Z%s", z_char);
   gc_execute_line(command);
-  gc_execute_line("G21G91G38.2Z-100F200");
+  gc_execute_line("G21G91G38.2Z-30F200");
   gc_execute_line("G0Z1");
   gc_execute_line("G38.2Z-2F30");
 
@@ -229,7 +231,7 @@ void set_tool_length()
   float2string(settings.tool_z[TOOL_NUM - 1], z_char, 3);
   sprintf(command, "G90G53G0Z%s", z_char);
   gc_execute_line(command);
-  gc_execute_line("G21G91G38.2Z-100F200");
+  gc_execute_line("G21G91G38.2Z-30F200");
   gc_execute_line("G0Z1");
   gc_execute_line("G38.2Z-2F30");
   float print_position[N_AXIS];

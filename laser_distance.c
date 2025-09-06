@@ -74,11 +74,24 @@ bool laser_distance_is_valid(void)
 
 // 开始采样过程
 void laser_distance_start_sampling(void)
-{
-    laser_distance.sample_sum = 0;
-    laser_distance.sample_count = 0;
-    laser_distance.sampling_active = true;
-    laser_distance_report_status();
+{  
+    // 如果完成10次采样，计算平均值并更新数据
+    // if (laser_distance.sample_count >= LASER_NUM_SAMPLES) {
+        int sensorValue = laser_distance.sample_sum / LASER_NUM_SAMPLES;
+        
+        // 将ADC值转换为毫米值 (25.0-200.0mm)
+        float displayValue = LASER_DISPLAY_MIN + (sensorValue * (LASER_DISPLAY_MAX - LASER_DISPLAY_MIN) / LASER_ADC_MAX);
+        // 四舍五入保留一位小数
+        displayValue = round(displayValue * 10) / 10.0;
+        // 更新距离
+        laser_distance.distance_mm = displayValue;
+        laser_distance.is_valid = true;
+        laser_distance.sample_sum = 0;
+        laser_distance.sample_count = 0;
+        laser_distance.sampling_active = true;
+        laser_distance_report_status();
+    // }
+
 }
 // 执行单次采样
 void laser_distance_do_single_sample(void)
@@ -86,27 +99,13 @@ void laser_distance_do_single_sample(void)
     if (laser_distance.sampling_active) {
         // 读取ADC值并累加
         int adc_value = laser_distance_read_adc();
+        if(adc_value == 0 || adc_value > 1000){
+            laser_distance.distance_mm = 0;
+            laser_distance.is_valid = false;
+            return;
+        }
         laser_distance.sample_sum += adc_value;
         laser_distance.sample_count++;
-        
-        // 如果完成10次采样，计算平均值并更新数据
-        if (laser_distance.sample_count >= LASER_NUM_SAMPLES) {
-            int sensorValue = laser_distance.sample_sum / LASER_NUM_SAMPLES;
-            
-            // 将ADC值转换为毫米值 (25.0-200.0mm)
-            float displayValue = LASER_DISPLAY_MIN + (sensorValue * (LASER_DISPLAY_MAX - LASER_DISPLAY_MIN) / LASER_ADC_MAX);
-            
-            // 四舍五入保留一位小数
-            displayValue = round(displayValue * 10) / 10.0;
-            
-            // 更新距离
-            laser_distance.distance_mm = displayValue;
-            laser_distance.is_valid = true;
-            laser_distance.last_update_time = getTime();
-            
-            // 停止采样
-            laser_distance.sampling_active = false;
-        }
     }
 }
 // 更新激光测距数据（兼容性函数）
@@ -122,7 +121,7 @@ void laser_distance_update(void)
 void laser_distance_report_status(void)
 {
     if (laser_distance.is_valid) {
-        sys.laserDistance = laser_distance.distance_mm;
+        sys.laserDistance = laser_distance.distance_mm - 185;
         // 仅输出距离，单位mm
         // printFloat_CoordValue(laser_distance.distance_mm);
         // printString("\r\n");
@@ -134,7 +133,7 @@ void laser_distance_report_status(void)
 
 void laserScaning(){
     protocol_buffer_synchronize();
-    gc_execute_line("G90G53G0Z-50");
+    gc_execute_line("G90G53G0Z-30");
     protocol_buffer_synchronize();
     for(int i = 0; i <= 20; i++) {
         char command[50];
@@ -143,13 +142,15 @@ void laserScaning(){
         float next_x_pos = -10 * (i + 1);
         
         float2string(x_pos, x_char, 3);
-        sprintf(command, "G90G53G0X%sY-200", x_char);
+        sprintf(command, "G90G53G0X%sY-180", x_char);
         gc_execute_line(command);
-        sprintf(command, "G90G53G0X%sY-5", x_char);
+        sprintf(command, "G90G53G0X%sY0", x_char);
         gc_execute_line(command);
         float2string(next_x_pos, x_char, 3);
-        sprintf(command, "G90G53G0X%sY-5", next_x_pos);
+        sprintf(command, "G90G53G0X%sY0", next_x_pos);
         gc_execute_line(command);
     }
     protocol_buffer_synchronize();
   }
+
+  

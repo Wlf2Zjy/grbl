@@ -190,6 +190,7 @@ typedef struct
   uint8_t spindle;      // {M3,M4,M5}
 } gc_modal_t;
 
+
 typedef struct
 {
   float f;           // 进给速度
