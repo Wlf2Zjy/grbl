@@ -225,15 +225,35 @@ ISR(TIMER5_COMPA_vect) {
 
     // 风扇循环
     if (sys.isRunGcode){
-        if (blowFanCounter >= (uint32_t)100*60*15) {  // 确保一定会进入清零逻辑
+        // if (blowFanCounter >= (uint32_t)100*60*15) {  // 确保一定会进入清零逻辑
+        //     blowFanCounter = 0;
+        //     blow_fan_control(0);
+        // } else {
+        //     blowFanCounter++;
+        //     if (blowFanCounter == (uint32_t)100*60*14) {
+        //         blow_fan_control(1);
+        //     }
+        // }
+        if (blowFanCounter >= (uint32_t)100*60*10) {  // 确保一定会进入清零逻辑
             blowFanCounter = 0;
             blow_fan_control(0);
         } else {
             blowFanCounter++;
-            if (blowFanCounter == (uint32_t)100*60*14) {
+            if (blowFanCounter == (uint32_t)100*60*9) {
                 blow_fan_control(1);
+            }else if(blowFanCounter == (uint32_t)100*60*9 + 300){
+                blow_fan_control(0);
+            }else if(blowFanCounter == (uint32_t)100*60*9 + 300 + 1500){
+                blow_fan_control(1);
+            }else if(blowFanCounter == (uint32_t)100*60*9 + 300 + 1500 + 300 ){
+                blow_fan_control(0);
+            }else if(blowFanCounter == (uint32_t)100*60*9 + 300 + 1500 + 300 + 1500){
+                blow_fan_control(1);
+            }else if(blowFanCounter == (uint32_t)100*60*9 + 300 + 1500 + 300 + 1500 + 300){
+                blow_fan_control(0);
             }
         }
+
         if(sys.spindleFanStatus != 0){
             if (SpineFanCounter < (uint32_t)100*60*5) {
                 SpineFanCounter++;
