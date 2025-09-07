@@ -124,9 +124,9 @@ void settings_restore(uint8_t restore_flag)
     settings.max_travel[X_AXIS] = (-DEFAULT_X_MAX_TRAVEL);
     settings.max_travel[Y_AXIS] = (-DEFAULT_Y_MAX_TRAVEL);
     settings.max_travel[Z_AXIS] = (-DEFAULT_Z_MAX_TRAVEL);
-    settings.probe_offset[X_AXIS] = 10;
-    settings.probe_offset[Y_AXIS] = 20;
-    settings.probe_offset[Z_AXIS] = 30;
+    settings.probe_offset[X_AXIS] = -55;
+    settings.probe_offset[Y_AXIS] = 0;
+    settings.probe_offset[Z_AXIS] = -54;
     settings.rfid_filp_value = -1.1;
     settings.rfid_offset = 38;
     settings.tool = 1;
