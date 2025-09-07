@@ -154,7 +154,7 @@ void set_flip1(uint8_t flag)
 
 void set_flip(uint8_t flag){
     uint8_t open_command[8] = {0xfe, 0xfe, 0x05, 0x01, 0x01, 0x08, 0x00, 0xfa};   // 2048
-    uint8_t close_command[8] = {0xfe, 0xfe, 0x05, 0x01, 0x01, 0x0A, 0x28, 0xfa};  // 2600
+    uint8_t close_command[8] = {0xfe, 0xfe, 0x05, 0x01, 0x01, 0x09, 0xF6, 0xfa};  // 2550
     uint8_t read_command[6] = {0xfe, 0xfe, 0x03, 0x01, 0x02, 0xfa}; 
     uint8_t c;
     uint8_t pos_high;
@@ -223,13 +223,13 @@ void set_flip(uint8_t flag){
                 if(serial2_read() != 0xfa) continue;
                 pos = pos_high << 8 | pos_low;
             }
-            if(pos > 2600){
-                if((pos - 2600) < 50){
+            if(pos > 2550){
+                if((pos - 2550) < 50){
                     sys.toolDoorStatus = flag;
                     return 1;
                 }
             }else{
-                if((2600 - pos) < 50){
+                if((2550 - pos) < 50){
                     sys.toolDoorStatus = flag;
                     return 1;
                 }
