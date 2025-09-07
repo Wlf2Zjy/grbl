@@ -216,6 +216,7 @@ void read_all_rfid(){
     char y_char[20], command[80];
     uint8_t return_data[8];
     gc_execute_line("G90G53G0Z-5");
+    set_flip(0);
     protocol_buffer_synchronize();
     set_rfid(0);
     for (uint8_t i = 0; i < TOOL_NUM-1; i++)
