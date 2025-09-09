@@ -219,7 +219,11 @@ void read_all_rfid(){
     set_flip(0);
     protocol_buffer_synchronize();
     set_rfid(0);
-    set_tool_leds(LED_OFF, LED_OFF, LED_OFF, LED_OFF, LED_OFF); 
+    for (uint8_t i = 0; i < TOOL_NUM-1; i++)
+    {
+        toolLed[i] = LED_OFF;
+    }
+    set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]); 
     for (uint8_t i = 0; i < TOOL_NUM-1; i++)
     {
         memset(return_data, 0, 8);     
