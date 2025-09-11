@@ -500,12 +500,19 @@ ISR(USART2_UDRE_vect)
 ISR(USART3_RX_vect)
 {
   uint8_t data = UDR3;
-  uint8_t next_head = serial3_rx_buffer_head + 1;
-  if (next_head == RX3_RING_BUFFER) { next_head = 0; }
+  uint8_t next_head;
+  // 不会传递到主缓冲区，而是设置系统状态标志位以便实时执行。
+  switch (data) {
+    case CMD_RESET:         mc_reset(); break; // 调用运动控制重置例程。
+    default :
+        next_head = serial3_rx_buffer_head + 1;
+        if (next_head == RX3_RING_BUFFER) { next_head = 0; }
 
-  if (next_head != serial3_rx_buffer_tail) {
-    serial3_rx_buffer[serial3_rx_buffer_head] = data;
-    serial3_rx_buffer_head = next_head;
+        // 将数据写入缓冲区，除非已满。
+        if (next_head != serial3_rx_buffer_tail) {
+          serial3_rx_buffer[serial3_rx_buffer_head] = data;
+          serial3_rx_buffer_head = next_head;
+      }
   }
 }
 
@@ -513,8 +520,6 @@ ISR(USART3_UDRE_vect)
 {
   uint8_t tail = serial3_tx_buffer_tail;
   UDR3 = serial3_tx_buffer[tail];
-  
-
   tail++;
   if (tail == TX3_RING_BUFFER) { tail = 0; }
   serial3_tx_buffer_tail = tail;

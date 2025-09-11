@@ -26,6 +26,8 @@ void report_util_setting_prefix(uint8_t n)
   serial_write('=');
 }
 static void report_util_line_feed() { printPgmString(PSTR("\r\n")); }
+static void report_util_line_feed3() { printPgmString3(PSTR("\r\n")); }
+
 static void report_util_feedback_line_feed()
 {
   serial_write(']');
@@ -909,12 +911,12 @@ void report_realtime_status3()
     }
   }
 
-  printPgmString(PSTR("MPos:"));
-  report_util_axis_values(print_position);
-  printPgmString(PSTR("|WPos:"));
-  report_util_axis_values(offset_position);
+  printPgmString3(PSTR("MPos:"));
+  report_util_axis_values3(print_position);
+  printPgmString3(PSTR("|WPos:"));
+  report_util_axis_values3(offset_position);
   serial3_write('>');
-  report_util_line_feed();
+  report_util_line_feed3();
 }
 
 #ifdef DEBUG
