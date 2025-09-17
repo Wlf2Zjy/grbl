@@ -357,7 +357,11 @@ uint8_t system_execute_line(char *line)
         control_led(2);
         spindle_fan_control(0);
         blowAllSlag();
-        change_tool(0);
+        // 如果刀号一样跳过换刀
+        if (settings.tool != 0)
+        {
+          change_tool(0);
+        }
         sys.isRunGcode = false;
         report_realtime_status();
         // Gcode运行结束

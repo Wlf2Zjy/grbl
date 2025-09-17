@@ -417,8 +417,8 @@ void a_go_home()
           // 检查限位状态。当它们发生变化时锁定循环轴。
           limit_state = A_LIMIT_PIN & (1 << A_LIMIT_BIT);
           // limit_state = sys.ALimit;
-          // print_uint8_base2_ndigit(limit_state,8);
-          // printString("\r\n");
+          print_uint8_base2_ndigit(limit_state,8);
+          printString("\r\n");
           if (axislock & step_pin[idx])
           {
             if (!limit_state)
