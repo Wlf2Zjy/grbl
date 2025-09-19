@@ -822,14 +822,14 @@ uint8_t system_check_travel_limits(float *target)
       // 注意：最大移动限制存储为负值
       if (bit_istrue(settings.homing_dir_mask, bit(idx)))
       {
-        if (target[idx] < 0 || target[idx] > -settings.max_travel[idx])
+        if (target[idx] < settings.homing_pulloff*0.8 || target[idx] > -settings.max_travel[idx])
         {
           return (true);
         }
       }
       else
       {
-        if (target[idx] > 0 || target[idx] < settings.max_travel[idx])
+        if (target[idx] > settings.homing_pulloff*0.8 || target[idx] < settings.max_travel[idx])
         {
           return (true);
         }
