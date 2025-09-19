@@ -74,7 +74,9 @@ void return_tool()
     float2string(settings.tool_z[settings.tool - 1], z_char, 3);
     sprintf(command, "G90G53G01Z%sF1500", z_char);
     gc_execute_line(command);
+    protocol_buffer_synchronize();
     // 松刀
+    delay_ms(0.3);
     // 抬刀
     gc_execute_line("G90G53G0Z-5");
     protocol_buffer_synchronize();
@@ -132,7 +134,7 @@ void get_tool(uint8_t tool_number)
   // 抬刀
   gc_execute_line("G90G53G0Z-5");
   protocol_buffer_synchronize();
-  gc_execute_line("M3S3000");
+  gc_execute_line("M3S2900");
   // 移动取刀位置
   float2string(settings.tool_x[tool_number - 1], x_char, 3);
   float2string(settings.tool_y[tool_number - 1], y_char, 3);
