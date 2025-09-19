@@ -114,6 +114,7 @@ void set_probe(uint8_t flag)
             if (sys_rt_exec_alarm)
             {
                 mc_reset(); // 停止电机（如果正在运行）。
+                // printString("探针上下\r\n");
                 protocol_execute_realtime();
                 return;
             }

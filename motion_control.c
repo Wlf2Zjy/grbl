@@ -315,6 +315,7 @@ uint8_t mc_probe_cycle(float *target, plan_line_data_t *pl_data, uint8_t parser_
   { // 检查探测引脚状态。
     system_set_exec_alarm(EXEC_ALARM_PROBE_FAIL_INITIAL);
     mc_reset();   // 系统重置
+    // printString("探针\r\n");
     protocol_execute_realtime();
     probe_configure_invert_mask(false); // 返回之前重新初始化反转掩码。
     return (GC_PROBE_FAIL_INIT);        // 除了退出别无选择。

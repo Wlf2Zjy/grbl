@@ -114,6 +114,7 @@ void set_rfid(uint8_t flag)
             if (sys_rt_exec_alarm)
             {
                 mc_reset(); // 停止电机（如果正在运行）。
+                // printString("rfid\r\n");
                 protocol_execute_realtime();
                 return;
             }

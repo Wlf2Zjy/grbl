@@ -95,8 +95,8 @@ ISR(CONTROL_INT_vect)
     pin_state = true;
   }
   // 只有当消抖计数器为0时才处理稳定输入
-  print_uint8_base2_ndigit(pin, 8);
-  printString("A\r\n");
+  // print_uint8_base2_ndigit(pin, 8);
+  // printString("A\r\n");
   if (debounce_counter == 0 && sys.state != STATE_ALARM && pin_state) {
       pin_state = false;
       handle_stable_input(pin);
@@ -118,12 +118,13 @@ void handle_stable_input(uint8_t pin)
     // uint8_t stopStatus = (~pin & (1 << 4 | 1 << 5 | 1 << 6 | 1 << 7));
     uint8_t stopStatus = (~pin & 1 << 7);
     // sys.ALimit = (pin & 1 << A_LIMIT_BIT);
-    print_uint8_base2_ndigit(stopStatus, 8);
-    printString("S\r\n");
+    // print_uint8_base2_ndigit(stopStatus, 8);
+    // printString("S\r\n");
     // 检查限位引脚状态
     if (stopStatus)
     {
       mc_reset();
+      // printString("急停\r\n");
       system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT);
     }
   }
@@ -505,6 +506,7 @@ uint8_t system_execute_line(char *line)
       if (sys.state == STATE_CHECK_MODE)
       {
         mc_reset();
+        // printString("gcode检测\r\n");
         report_feedback_message(MESSAGE_DISABLED);
       }
       else
@@ -664,6 +666,7 @@ uint8_t system_execute_line(char *line)
       }
       report_feedback_message(MESSAGE_RESTORE_DEFAULTS);
       mc_reset(); // 强制重置以确保设置正确初始化。
+      // printString("不知道\r\n");
       break;
     case 'N': // 启动行 [IDLE/ALARM]
       if (line[++char_counter] == 0)

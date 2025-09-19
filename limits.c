@@ -133,6 +133,7 @@ uint8_t limits_get_state()
         if (bit_isfalse(settings.flags,BITFLAG_INVERT_LIMIT_PINS)) { limit_state ^= LIMIT_MASK; }
 
         if (limit_state) {
+          // printString("限位\r\n");
             mc_reset(); // 发起系统终止。
             print_uint8_base2_ndigit(limit_state, 8);
             system_set_exec_alarm(EXEC_ALARM_HARD_LIMIT); // 指示硬限位关键事件
@@ -270,6 +271,7 @@ void limits_go_home(uint8_t cycle_mask)
         if (approach && (rt_exec & EXEC_CYCLE_STOP)) { system_set_exec_alarm(EXEC_ALARM_HOMING_FAIL_APPROACH); }
         if (sys_rt_exec_alarm) {
           mc_reset(); // 停止电机（如果正在运行）。
+          // printString("回零\r\n");
           protocol_execute_realtime();
           return;
         } else {
@@ -417,8 +419,8 @@ void a_go_home()
           // 检查限位状态。当它们发生变化时锁定循环轴。
           limit_state = A_LIMIT_PIN & (1 << A_LIMIT_BIT);
           // limit_state = sys.ALimit;
-          print_uint8_base2_ndigit(limit_state,8);
-          printString("\r\n");
+          // print_uint8_base2_ndigit(limit_state,8);
+          // printString("\r\n");
           if (axislock & step_pin[idx])
           {
             if (!limit_state)
@@ -440,6 +442,7 @@ void a_go_home()
             if (rt_exec & EXEC_SAFETY_DOOR) { system_set_exec_alarm(EXEC_ALARM_HOMING_FAIL_DOOR); }            
             if (sys_rt_exec_alarm) {
               mc_reset(); // 停止电机（如果正在运行）。
+              // printString("A回零\r\n");
               protocol_execute_realtime();
               return;
             } else {
@@ -482,6 +485,7 @@ void limits_soft_check(float *target)
       } while ( sys.state != STATE_IDLE );
     }
     mc_reset(); // 发出系统重置，确保主轴和冷却关闭。
+    // printString("软限位\r\n");
     system_set_exec_alarm(EXEC_ALARM_SOFT_LIMIT); // 指示软限位的关键事件
     protocol_execute_realtime(); // 执行以进入关键事件循环和系统中止
     return;

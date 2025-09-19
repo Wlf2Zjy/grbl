@@ -112,7 +112,8 @@ void set_laser(uint8_t flag)
             }
             if (sys_rt_exec_alarm)
             {
-                mc_reset(); // 停止电机（如果正在运行）。
+                mc_reset(); // 停止电机（如果正在运行）
+                // printString("激光\r\n");
                 protocol_execute_realtime();
                 return;
             }

@@ -381,7 +381,9 @@ ISR(SERIAL_RX)
   uint8_t next_head;
   // 不会传递到主缓冲区，而是设置系统状态标志位以便实时执行。
   switch (data) {
-    case CMD_RESET:         mc_reset(); break; // 调用运动控制重置例程。
+    case CMD_RESET:         
+    // printString("串口\r\n");
+    mc_reset(); break; // 调用运动控制重置例程。
     case CMD_STATUS_REPORT: system_set_exec_state_flag(EXEC_STATUS_REPORT); break; // 设置为真
     case CMD_CYCLE_START:   system_set_exec_state_flag(EXEC_CYCLE_START); break; // 设置为真
     case CMD_FEED_HOLD:     system_set_exec_state_flag(EXEC_FEED_HOLD); break; // 设置为真
@@ -501,19 +503,31 @@ ISR(USART3_RX_vect)
 {
   uint8_t data = UDR3;
   uint8_t next_head;
-  // 不会传递到主缓冲区，而是设置系统状态标志位以便实时执行。
-  switch (data) {
-    case CMD_RESET:         mc_reset(); break; // 调用运动控制重置例程。
-    default :
-        next_head = serial3_rx_buffer_head + 1;
-        if (next_head == RX3_RING_BUFFER) { next_head = 0; }
 
-        // 将数据写入缓冲区，除非已满。
-        if (next_head != serial3_rx_buffer_tail) {
-          serial3_rx_buffer[serial3_rx_buffer_head] = data;
-          serial3_rx_buffer_head = next_head;
-      }
+  next_head = serial3_rx_buffer_head + 1;
+  if (next_head == RX3_RING_BUFFER) { next_head = 0; }
+
+  // 将数据写入缓冲区，除非已满。
+  if (next_head != serial3_rx_buffer_tail) {
+    serial3_rx_buffer[serial3_rx_buffer_head] = data;
+    serial3_rx_buffer_head = next_head;
+
   }
+  // 不会传递到主缓冲区，而是设置系统状态标志位以便实时执行。
+  // switch (data) {
+  //   case CMD_RESET:         
+  //   printString("手轮\r\n");
+  //   mc_reset(); break; // 调用运动控制重置例程。
+  //   default :
+  //       next_head = serial3_rx_buffer_head + 1;
+  //       if (next_head == RX3_RING_BUFFER) { next_head = 0; }
+
+  //       // 将数据写入缓冲区，除非已满。
+  //       if (next_head != serial3_rx_buffer_tail) {
+  //         serial3_rx_buffer[serial3_rx_buffer_head] = data;
+  //         serial3_rx_buffer_head = next_head;
+  //     }
+  // }
 }
 
 ISR(USART3_UDRE_vect)

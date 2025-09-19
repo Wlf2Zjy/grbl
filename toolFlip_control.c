@@ -114,6 +114,7 @@ void set_flip1(uint8_t flag)
             if (sys_rt_exec_alarm)
             {
                 mc_reset(); // 停止电机（如果正在运行）。
+                // printString("刀库翻转\r\n");
                 protocol_execute_realtime();
                 return;
             }
@@ -200,6 +201,7 @@ void set_flip(uint8_t flag){
         sys.state = STATE_ALARM; // 确保设置警报状态。
         report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
         mc_reset(); // 停止电机（如果正在运行）。
+        // printString("刀库翻转\r\n");
         protocol_execute_realtime();
         return 0;
     }else{
@@ -239,6 +241,7 @@ void set_flip(uint8_t flag){
         sys.state = STATE_ALARM; // 确保设置警报状态。
         report_alarm_message(ALARM_TOOL_MAGAZINE_ERROR);
         mc_reset(); // 停止电机（如果正在运行）。
+        // printString("刀库翻转\r\n");
         protocol_execute_realtime();
         return 0;
     }
