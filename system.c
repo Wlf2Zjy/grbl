@@ -196,6 +196,9 @@ void print_tool_info(uint8_t *data)
   case 5:
     printPgmString(PSTR("'thread',"));
     break;
+  case 6:
+    printPgmString(PSTR("'chamfer',"));
+    break;
   default:
     printPgmString(PSTR("null]"));
     return;
