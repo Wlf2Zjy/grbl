@@ -352,6 +352,8 @@ uint8_t system_execute_line(char *line)
         control_led(3);
         sys.startTime = getTime();
         spindle_fan_control(1);
+        sys.handwheel_mode = 0;
+        UCSR3B &= ~(1<<RXEN3 |1<<RXCIE3);  // 关闭串口3接收中断
         printString("finish");
         break;
       case 'S':
@@ -459,6 +461,14 @@ uint8_t system_execute_line(char *line)
         break;
       case 'M':
         spindle_fan_control(0);
+        break;
+      case 'O':
+        sys.handwheel_mode = index;
+        if(index){
+          UCSR3B |= (1<<RXEN3 |1<<RXCIE3);  // 打开串口3接收中断
+        }else{
+          UCSR3B &= ~(1<<RXEN3 |1<<RXCIE3);  // 关闭串口3接收中断
+        }
         break;
       default:
         return (STATUS_INVALID_STATEMENT);

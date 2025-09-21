@@ -124,28 +124,24 @@ void settings_restore(uint8_t restore_flag)
     settings.max_travel[X_AXIS] = (-DEFAULT_X_MAX_TRAVEL);
     settings.max_travel[Y_AXIS] = (-DEFAULT_Y_MAX_TRAVEL);
     settings.max_travel[Z_AXIS] = (-DEFAULT_Z_MAX_TRAVEL);
-    settings.probe_offset[X_AXIS] = -55;
-    settings.probe_offset[Y_AXIS] = 0;
-    settings.probe_offset[Z_AXIS] = -54;
-    settings.rfid_filp_value = -1.1;
-    settings.rfid_offset = 38;
-    settings.tool = 1;
-    settings.tool_length = 0;
-    settings.tool_zpos = 0;
+    settings.probe_offset[X_AXIS] = DEFAULT_PROBE_SPINDLE_X;
+    settings.probe_offset[Y_AXIS] = DEFAULT_PROBE_SPINDLE_Y;
+    settings.probe_offset[Z_AXIS] = DEFAULT_PROBE_SPINDLE_Z;
+    settings.rfid_filp_value = DEFAULT_RFID_MOVEMENT_DISTANCE;
+    settings.rfid_offset = DEFAULT_RFID_TOOL_YOFFSET;
+    settings.tool = DEFAULT_TOOL_NUMBER;
+    settings.tool_length = DEFAULT_TOOL_LENGTH;
+    settings.tool_zpos = DEFAULT_TOOL_ZPOS;
     for (uint8_t i = 0; i < TOOL_NUM; i++)
     {
-      settings.tool_x[i] = -5;
-      settings.tool_y[i] = -20 - i * 30;
-      settings.tool_z[i] = -50;
+      settings.tool_x[i] = -0.2;
+      settings.tool_y[i] = -34 - i * 35;
+      settings.tool_z[i] = -123;
     }
     for (uint8_t j = 0; j < TOOL_NUM-2; j++)
     {
       settings.tool_data[j][0] = 0x01;
       settings.tool_data[j][1] = 0x00;
-      // settings.tool_data[j][2] = 0x40;
-      // settings.tool_data[j][3] = 0xC0;
-      // settings.tool_data[j][4] = 0x00;
-      // settings.tool_data[j][5] = 0x00;
       settings.tool_data[j][2] = 0x00;
       settings.tool_data[j][3] = 0x00;
       settings.tool_data[j][4] = 0xC0;
@@ -163,10 +159,6 @@ void settings_restore(uint8_t restore_flag)
     }
     settings.tool_data[4][0] = 0x00;
     settings.tool_data[4][1] = 0x00;
-    // settings.tool_data[j][2] = 0x40;
-    // settings.tool_data[j][3] = 0xC0;
-    // settings.tool_data[j][4] = 0x00;
-    // settings.tool_data[j][5] = 0x00;
     settings.tool_data[4][2] = 0x00;
     settings.tool_data[4][3] = 0x00;
     settings.tool_data[4][4] = 0x00;

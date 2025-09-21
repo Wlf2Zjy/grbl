@@ -145,6 +145,7 @@ typedef struct {
   float laserDistance;
   bool ALimit;  // 是否回零过
   bool isOpenLaser;
+  bool handwheel_mode; // 是否开启手轮
 } system_t;
 extern system_t sys;
 

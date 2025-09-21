@@ -685,6 +685,8 @@ void report_realtime_status()
   printFloat_RateValue(sys.doorStatus);
   printPgmString(PSTR("|DR:"));
   printFloat_RateValue(sys.drawerStatus);
+  printPgmString(PSTR("|HW:"));
+  printFloat_RateValue(sys.handwheel_mode);
   printPgmString(PSTR("|C:"));
   printFloat_RateValue(sys.coolingStatus);
   printPgmString(PSTR("|L:"));

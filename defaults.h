@@ -57,6 +57,15 @@
 #define DEFAULT_HOMING_SEEK_RATE 600.0    // mm/min
 #define DEFAULT_HOMING_DEBOUNCE_DELAY 250 // msec (0-65k)
 #define DEFAULT_HOMING_PULLOFF 2.0        // mm
+#define DEFAULT_PROBE_SPINDLE_X -55        // mm
+#define DEFAULT_PROBE_SPINDLE_Y 0        // mm
+#define DEFAULT_PROBE_SPINDLE_Z -54        // mm
+#define DEFAULT_RFID_MOVEMENT_DISTANCE -1.1        // mm
+#define DEFAULT_RFID_TOOL_YOFFSET 38        // mm
+#define DEFAULT_TOOL_NUMBER 0
+#define DEFAULT_TOOL_LENGTH 0
+#define DEFAULT_TOOL_ZPOS 0
+
 #endif
 
 #ifdef DEFAULTS_SHERLINE_5400

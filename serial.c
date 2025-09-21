@@ -167,6 +167,7 @@ void serial3_init()
 
   // 启用接收、发送和接收完整字节的中断
     UCSR3B |= (1<<RXEN3 | 1<<TXEN3 | 1<<RXCIE3);
+    UCSR3B &= ~(1<<RXEN3 |1<<RXCIE3);  // 关闭串口接收中断
 
   // 默认为 8 位，无奇偶校验，1 个停止位
 }
