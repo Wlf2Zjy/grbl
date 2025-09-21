@@ -35,7 +35,7 @@ int main(void)
   serial_init();   // 设置串行波特率和中断
   serial1_init();
   serial2_init();
-  serial3_init();  //串口3接手轮
+  // serial3_init();  //串口3接手轮
   settings_init(); // 从 EEPROM 加载 Grbl 设置
   stepper_init();  // 配置步进电机引脚和中断定时器
   system_init();   // 配置引脚引脚和引脚变更中断

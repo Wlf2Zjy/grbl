@@ -187,12 +187,12 @@ void set_flip(uint8_t flag){
                 pos = (pos_high << 8) | pos_low;
             }
             if(pos > 2048){
-                if((pos - 2048) < 50){
+                if((pos - 2048) < 100){
                     sys.toolDoorStatus = flag;
                     return 1;
                 }
             }else{
-                if((2048 - pos) < 50){
+                if((2048 - pos) < 100){
                     sys.toolDoorStatus = flag;
                     return 1;
                 }
@@ -227,12 +227,12 @@ void set_flip(uint8_t flag){
                 pos = pos_high << 8 | pos_low;
             }
             if(pos > 2550){
-                if((pos - 2550) < 50){
+                if((pos - 2550) < 100){
                     sys.toolDoorStatus = flag;
                     return 1;
                 }
             }else{
-                if((2550 - pos) < 50){
+                if((2550 - pos) < 100){
                     sys.toolDoorStatus = flag;
                     return 1;
                 }

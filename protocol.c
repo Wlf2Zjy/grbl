@@ -233,11 +233,11 @@ void protocol_main_loop()
     // 则表示 g-code 流已填满计划缓冲区或已完成。
     // 无论是哪种情况，如果启用了自动循环启动，将执行所有排队的移动。
     protocol_auto_cycle_start();
-    nowTime = getTime();
-    if(nowTime != lastTime){
-      report_realtime_status3();
-      lastTime = nowTime;
-    }
+    // nowTime = getTime();
+    // if(nowTime != lastTime){
+    //   report_realtime_status3();
+    //   lastTime = nowTime;
+    // }
 
     protocol_execute_realtime();  // 运行时命令检查点。
     if (sys.abort) { return; } // 放弃到 main() 程序循环以重置系统。 
