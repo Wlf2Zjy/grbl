@@ -229,11 +229,17 @@ void set_flip(uint8_t flag){
             if(pos > 2550){
                 if((pos - 2550) < 100){
                     sys.toolDoorStatus = flag;
+                    for(uint8_t i=0; i < sizeof(close_command); i++){
+                        serial2_write(close_command[i]);
+                    }
                     return 1;
                 }
             }else{
                 if((2550 - pos) < 100){
                     sys.toolDoorStatus = flag;
+                    for(uint8_t i=0; i < sizeof(close_command); i++){
+                        serial2_write(close_command[i]);
+                    }
                     return 1;
                 }
             }
