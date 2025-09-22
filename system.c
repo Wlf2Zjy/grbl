@@ -205,9 +205,9 @@ void print_tool_info(uint8_t *data)
   }
   print_uint8_base10(angle);
   printPgmString(PSTR(","));
-  printFloat(diameter, 2);
+  printFloat(diameter, 3);
   printPgmString(PSTR(","));
-  printFloat(pitch, 2);
+  printFloat(pitch, 3);
   printPgmString(PSTR(","));
   print_uint8_base10(bladeNum);
   printPgmString(PSTR(","));
