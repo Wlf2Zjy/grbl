@@ -213,9 +213,193 @@ void rfid_write(uint8_t toolNumber, uint16_t time)
     }
 }
 
+// aa 02 12 55 停止循环
+// aa 02 10 55 开始循环
+typedef struct {
+    float diameter; // 半径/直径 (4字节)
+    uint8_t toolType;    // 刀类
+    uint8_t tool_data[16];
+    uint16_t count;      // 出现次数
+} ToolStat;
+
+#define MAX_TOOLS 5   // 最多存储 50 种刀具
+ToolStat toolStats[MAX_TOOLS];
+uint8_t toolCount = 0;
+uint8_t data_len = 0;
+uint8_t data_count = 0;
+uint8_t read_rfid_data[20];
+uint8_t read_rfid_status = 0;
+// 0 读帧头 1 读长度 2 读数据 3 读帧尾
+
+
+void add_tool(float diameter, uint8_t toolType, uint8_t* tool_data) {
+    // 查找是否已存在
+    for (uint8_t i = 0; i < toolCount; i++) {
+        if (toolStats[i].diameter == diameter &&
+            toolStats[i].toolType == toolType) {
+            toolStats[i].count++;
+            return;
+        }
+    }
+
+    // 新增
+    if (toolCount < MAX_TOOLS) {
+        toolStats[toolCount].diameter = diameter;
+        toolStats[toolCount].toolType = toolType;
+        toolStats[toolCount].count = 1;
+        memcpy(toolStats[toolCount].tool_data, tool_data, 16);
+        toolCount++;
+    }
+}
+
+ToolStat* get_max_tool() {
+    if (toolCount == 0) return 0;
+
+    ToolStat* maxTool = &toolStats[0];
+    for (uint8_t i = 1; i < toolCount; i++) {
+        if (toolStats[i].count > maxTool->count) {
+            maxTool = &toolStats[i];
+        }
+    }
+    return maxTool;
+}
+
+void rfid_read_loop(uint8_t* return_data) {
+    toolCount = 0;
+    memset(toolStats, 0, sizeof(toolStats));
+    clearSerial1BufferHard();
+
+    uint8_t loop_read_start[4] = {0xAA, 0x02, 0x10, 0x55};
+    for(uint8_t i=0; i < sizeof(loop_read_start); i++){
+        serial1_write(loop_read_start[i]);
+    }
+    for(uint16_t j=0; j < 500; j++){
+        delay_ms(4);
+        if(serial1_read() != 0xAA) continue;
+
+        uint8_t data_len = serial1_read();
+        uint8_t read_data[data_len];
+        serial1_read_bytes(read_data, data_len);
+
+        if(read_data[data_len-1] == 0x55 && data_len == 0x15){
+            uint8_t toolType = read_data[4];
+            float diameter;
+            uint8_t tool_data[16];
+            memcpy(&tool_data, &read_data[4], 16);
+            memcpy(&diameter, &read_data[6], 4);
+
+            add_tool(diameter, toolType, tool_data);
+        }
+        
+    }
+
+    uint8_t loop_read_stop[4] = {0xAA, 0x02, 0x12, 0x55};
+    for(uint8_t i=0; i < sizeof(loop_read_stop); i++){
+        serial1_write(loop_read_stop[i]);
+    }
+
+    // 输出统计结果
+    ToolStat* maxTool = get_max_tool();
+    if (maxTool) {
+        if(maxTool->count > 10){
+            memcpy(return_data, maxTool->tool_data, 16);
+        }
+    }
+}
+
+
+void rfid_read_loop3(uint8_t* return_data) {
+    toolCount = 0;
+    data_len = 0;
+    data_count = 0;
+    read_rfid_status = 0;
+    memset(toolStats, 0, sizeof(toolStats));
+    memset(read_rfid_data, 0, sizeof(read_rfid_data));
+    clearSerial1BufferHard();
+
+    uint8_t loop_read_start[4] = {0xAA, 0x02, 0x10, 0x55};
+    for(uint8_t i=0; i < sizeof(loop_read_start); i++){
+        serial1_write(loop_read_start[i]);
+    }
+
+    delay_ms(20);
+    for(uint16_t j=0; j < 5000; j++){
+        delay_ms(1);
+        uint8_t data = serial1_read();
+        // serial_write(data);
+        if(data == 0xFF){
+            if (j >0){
+                j--;
+            }
+        }
+        continue;
+        // 0 读帧头 1 读长度 2 读数据 3 读帧尾
+        switch (read_rfid_status)
+        {
+            case 0:
+                if(data == 0xAA){
+                    read_rfid_status == 1;
+                }
+                break;
+            case 1:
+                data_len = data;
+                read_rfid_status = 2;
+                break;
+            case 2:
+                read_rfid_data[data_count] = data;
+                serial_write(data);
+                data_count++;
+                if(data_len - 1 == data_count){
+                    read_rfid_status = 3;
+                }
+                break;
+            case 3:
+                if(data == 0x55){
+                    read_rfid_status = 3;
+                    uint8_t toolType = read_rfid_data[4];
+                    float diameter;
+                    uint8_t tool_data[16];
+                    memcpy(&tool_data, &read_rfid_data[4], 16);
+                    memcpy(&diameter, &read_rfid_data[6], 4);
+        
+                    add_tool(diameter, toolType, tool_data);
+                }
+                data_len = 0;
+                data_count = 0;
+                read_rfid_status = 0;
+                memset(read_rfid_data, 0, sizeof(read_rfid_data));
+                break;
+            default:
+                break;
+        }
+        
+    }
+
+    uint8_t loop_read_stop[4] = {0xAA, 0x02, 0x12, 0x55};
+    for(uint8_t i=0; i < sizeof(loop_read_stop); i++){
+        serial1_write(loop_read_stop[i]);
+    }
+
+    // 输出统计结果
+    ToolStat* maxTool = get_max_tool();
+    if (maxTool) {
+        if(maxTool->count > 10){
+            memcpy(return_data, maxTool->tool_data, 16);
+        }
+        print_uint8_base10(maxTool->toolType);
+        printString("\r\n");
+        printFloat(maxTool->diameter,3);
+        printString("\r\n");
+        print_uint32_base10(maxTool->count);
+        printString("\r\n");
+    }
+}
+
+
+
 void read_all_rfid(){
     char y_char[20], command[80];
-    uint8_t return_data[8];
+    uint8_t return_data[16];
     gc_execute_line("G90G53G0Z-5");
     set_flip(0);
     protocol_buffer_synchronize();
@@ -227,19 +411,22 @@ void read_all_rfid(){
     set_tool_leds(toolLed[0], toolLed[1], toolLed[2], toolLed[3], toolLed[4]); 
     for (uint8_t i = 0; i < TOOL_NUM-1; i++)
     {
-        memset(return_data, 0, 8);     
+        memset(return_data, 0, 16);     
         // 移动刀位置
         float2string(settings.tool_y[i] - settings.rfid_offset, y_char, 3);
         sprintf(command, "G90G53G0Y%s", y_char);
         gc_execute_line(command);
         protocol_buffer_synchronize();
-        rfid_read(return_data);
+        rfid_read_loop(return_data);
         memcpy(settings.tool_data[i], return_data, 16);
-        printPgmString(PSTR("{'tool"));
-        print_uint8_base10(i + 1);
-        printPgmString(PSTR("':"));
-        print_tool_info(settings.tool_data[i]);
-        printPgmString(PSTR("}\r\n"));
+        if (settings.tool_data[i][0] != 0){
+            printPgmString(PSTR("{'tool"));
+            print_uint8_base10(i + 1);
+            printPgmString(PSTR("':"));
+            print_tool_info(settings.tool_data[i]);
+            printPgmString(PSTR("}\r\n"));
+        }
+
         
         if (settings.tool_data[i][0] == 0){
                     // 移动刀位置
@@ -247,13 +434,15 @@ void read_all_rfid(){
             sprintf(command, "G90G53G0Y%s", y_char);
             gc_execute_line(command);
             protocol_buffer_synchronize();
-            rfid_read(return_data);
+            rfid_read_loop(return_data);
             memcpy(settings.tool_data[i], return_data, 16);
-            printPgmString(PSTR("{'tool"));
-            print_uint8_base10(i + 1);
-            printPgmString(PSTR("':"));
-            print_tool_info(settings.tool_data[i]);
-            printPgmString(PSTR("}\r\n"));
+            if (settings.tool_data[i][0] != 0){
+                printPgmString(PSTR("{'tool"));
+                print_uint8_base10(i + 1);
+                printPgmString(PSTR("':"));
+                print_tool_info(settings.tool_data[i]);
+                printPgmString(PSTR("}\r\n"));
+            }
         }
         if (settings.tool_data[i][0] == 0){
             // 移动刀位置
@@ -261,7 +450,7 @@ void read_all_rfid(){
             sprintf(command, "G90G53G0Y%s", y_char);
             gc_execute_line(command);
             protocol_buffer_synchronize();
-            rfid_read(return_data);
+            rfid_read_loop(return_data);
             memcpy(settings.tool_data[i], return_data, 16);
             printPgmString(PSTR("{'tool"));
             print_uint8_base10(i + 1);
