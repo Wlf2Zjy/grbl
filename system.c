@@ -323,9 +323,18 @@ uint8_t system_execute_line(char *line)
     report_probe_offset();
     break;
   case 'S':
-    if (line[4] == 0)
+    if (line[3] == 0){
+      switch (line[2])
+      {
+      case 'R':
+        set_rfid(index); // $SR
+        break;
+      default:
+        break;  
+      }
+    }else if (line[4] == 0)
     {
-      serial_write_bytes(line, 4);
+      // serial_write_bytes(line, 4);
       uint8_t index = line[3] - '0';
       switch (line[2])
       {
