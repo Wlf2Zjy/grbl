@@ -304,8 +304,13 @@ uint8_t system_execute_line(char *line)
       switch (line[2])
       {
       case 'R':
-        rfid_read(return_data);
+        rfid_read_loop(return_data, true);
         memcpy(settings.tool_data[tool_index - 1], return_data, 16);
+        printString("{'tool");
+        print_uint8_base10(tool_index);
+        printString("':");
+        print_tool_info(settings.tool_data[tool_index - 1]);
+        printString("}\r\n");
         write_global_settings();
         break;
       case 'G':

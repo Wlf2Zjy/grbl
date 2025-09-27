@@ -14,5 +14,5 @@ void rfid_write(uint8_t toolNumber, uint16_t time);
 void read_all_rfid();
 void read_rfid_power();
 void change_rfid_power(uint8_t value);
-
+void rfid_read_loop(uint8_t* return_data, bool clear_tool);
 #endif
