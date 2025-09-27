@@ -417,7 +417,8 @@ void read_all_rfid(){
         sprintf(command, "G90G53G0Y%s", y_char);
         gc_execute_line(command);
         protocol_buffer_synchronize();
-        rfid_read_loop(return_data);
+        rfid_read(return_data);
+        // rfid_read_loop(return_data);
         memcpy(settings.tool_data[i], return_data, 16);
         if (settings.tool_data[i][0] != 0){
             printPgmString(PSTR("{'tool"));
@@ -434,7 +435,8 @@ void read_all_rfid(){
             sprintf(command, "G90G53G0Y%s", y_char);
             gc_execute_line(command);
             protocol_buffer_synchronize();
-            rfid_read_loop(return_data);
+            rfid_read(return_data);
+            // rfid_read_loop(return_data);
             memcpy(settings.tool_data[i], return_data, 16);
             if (settings.tool_data[i][0] != 0){
                 printPgmString(PSTR("{'tool"));
@@ -450,7 +452,8 @@ void read_all_rfid(){
             sprintf(command, "G90G53G0Y%s", y_char);
             gc_execute_line(command);
             protocol_buffer_synchronize();
-            rfid_read_loop(return_data);
+            rfid_read(return_data);
+            // rfid_read_loop(return_data);
             memcpy(settings.tool_data[i], return_data, 16);
             printPgmString(PSTR("{'tool"));
             print_uint8_base10(i + 1);
