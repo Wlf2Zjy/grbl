@@ -12,5 +12,7 @@ void set_rfid(uint8_t flag);
 void rfid_read(uint8_t* return_data);
 void rfid_write(uint8_t toolNumber, uint16_t time);
 void read_all_rfid();
+void read_rfid_power();
+void change_rfid_power(uint8_t value);
 
 #endif

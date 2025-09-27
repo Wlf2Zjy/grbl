@@ -273,9 +273,17 @@ void rfid_read_loop(uint8_t* return_data) {
     for(uint8_t i=0; i < sizeof(loop_read_start); i++){
         serial1_write(loop_read_start[i]);
     }
-    for(uint16_t j=0; j < 500; j++){
-        delay_ms(4);
-        if(serial1_read() != 0xAA) continue;
+    delay_ms(20);
+    for(uint16_t j=0; j < 100; j++){
+        delay_ms(5); // 没数据，加延时
+        uint8_t c = serial1_read();
+        if(c != 0xAA){
+            if(c != SERIAL_NO_DATA){
+                j--;  // 有数据但不对，补读取次数
+            }
+            continue;
+        }
+        
 
         uint8_t data_len = serial1_read();
         uint8_t read_data[data_len];
@@ -304,6 +312,13 @@ void rfid_read_loop(uint8_t* return_data) {
         if(maxTool->count > 10){
             memcpy(return_data, maxTool->tool_data, 16);
         }
+        // print_uint8_base10(maxTool->toolType);
+        // printString("\r\n");
+        // printFloat(maxTool->diameter,3);
+        // printString("\r\n");
+        // print_uint32_base10(maxTool->count);
+        // printString("\r\n");
+    
     }
 }
 
@@ -386,12 +401,12 @@ void rfid_read_loop3(uint8_t* return_data) {
         if(maxTool->count > 10){
             memcpy(return_data, maxTool->tool_data, 16);
         }
-        print_uint8_base10(maxTool->toolType);
-        printString("\r\n");
-        printFloat(maxTool->diameter,3);
-        printString("\r\n");
-        print_uint32_base10(maxTool->count);
-        printString("\r\n");
+        // print_uint8_base10(maxTool->toolType);
+        // printString("\r\n");
+        // printFloat(maxTool->diameter,3);
+        // printString("\r\n");
+        // print_uint32_base10(maxTool->count);
+        // printString("\r\n");
     }
 }
 
@@ -471,4 +486,36 @@ void read_all_rfid(){
     }
     set_rfid(1);
     write_global_settings();
+}
+
+
+void read_rfid_power()
+{
+    uint8_t read_command[4] = {0xaa, 0x02, 0x01, 0x55};
+    clearSerial1BufferHard();
+    for(uint8_t j=0; j < 15; j++){
+        for(uint8_t i=0; i < sizeof(read_command); i++){
+            serial1_write(read_command[i]);
+        }
+        delay_ms(100);
+        if(serial1_read() != 0xAA) continue;
+        uint8_t data_len = serial1_read();
+        uint8_t read_data[data_len];
+        serial1_read_bytes(read_data, data_len);
+        if(read_data[data_len-1] == 0x55){
+            printPgmString(PSTR("[rfid_power:"));
+            print_uint8_base10(read_data[2]);
+            printPgmString(PSTR("]\r\n"));
+            return;
+        }
+    }
+}
+
+void change_rfid_power(uint8_t value)
+{
+    uint8_t read_command[6] = {0xaa, 0x04, 0x02, 0x01, 0x1a, 0x55};
+    read_command[4] = value;
+    for(uint8_t i=0; i < sizeof(read_command); i++){
+        serial1_write(read_command[i]);
+    }
 }
