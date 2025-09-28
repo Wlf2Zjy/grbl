@@ -304,8 +304,13 @@ uint8_t system_execute_line(char *line)
       switch (line[2])
       {
       case 'R':
-        rfid_read(return_data);
+        rfid_read_loop(return_data, true);
         memcpy(settings.tool_data[tool_index - 1], return_data, 16);
+        printString("{'tool");
+        print_uint8_base10(tool_index);
+        printString("':");
+        print_tool_info(settings.tool_data[tool_index - 1]);
+        printString("}\r\n");
         write_global_settings();
         break;
       case 'G':
@@ -323,21 +328,40 @@ uint8_t system_execute_line(char *line)
     report_probe_offset();
     break;
   case 'S':
-    if (line[4] == 0)
+    if (line[3] == 0){
+      switch (line[2])
+      {
+      case 'A':
+        read_rfid_power(); // $SA 读RFID频率
+        break;
+      default:
+        break;  
+      }
+    }else if (line[4] == 0)
     {
       // serial_write_bytes(line, 4);
       uint8_t index = line[3] - '0';
       switch (line[2])
       {
-      case 'R':
-        set_rfid(index); // $SR
-        break;
-      case 'P':
-        set_probe(index); // $SP
-        break;
-      case 'T':
-        set_flip(index); // $SP
-        break;
+        case 'R':
+          set_rfid(index); // $SR
+          break;
+        case 'P':
+          set_probe(index); // $SP
+          break;
+        case 'T':
+          set_flip(index); // $SP
+          break;
+      }
+    }else if (line[5] == 0)
+    {
+      uint8_t ten = line[3] - '0';
+      uint8_t units = line[4] - '0';
+      switch (line[2])
+      {
+        case 'A':
+          change_rfid_power(ten*10 + units); // $SA10
+          break;
       }
     }
     break;
