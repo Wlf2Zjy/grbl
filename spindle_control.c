@@ -50,13 +50,31 @@ void float2Bytes(uint8_t bytes_temp[4],float float_variable){
 void control485(uint8_t *sendData){
     uint8_t bytes[2];
     uint16_t value = crc_chk_value(sendData, 6);
+    uint8_t c;
     memcpy(bytes, &value, sizeof(value));
-    for(uint8_t i=0; i < 6; i++){
-      serial2_write(sendData[i]);
+
+    for(uint8_t j=0; j < 5; j++){
+      for(uint8_t i=0; i < 6; i++){
+        serial2_write(sendData[i]);
+      }
+      serial2_write(bytes[0]);
+      serial2_write(bytes[1]);
+      delay_ms(100);
+      while((c = serial2_read()) != SERIAL_NO_DATA) {
+        if(c != sendData[0]) continue;
+        if(serial2_read() != sendData[1]) continue;
+        if(serial2_read() != sendData[2]) continue;
+        if(serial2_read() != sendData[3]) continue;
+        if(serial2_read() != sendData[4]) continue;
+        if(serial2_read() != sendData[5]) continue;
+        if(serial2_read() != bytes[0]) continue;
+        if(serial2_read() != bytes[1]) continue;
+        return 1;
     }
-    serial2_write(bytes[0]);
-    serial2_write(bytes[1]);
-    delay_ms(50);
+  }
+
+
+
 }
 
 void spindle_init()

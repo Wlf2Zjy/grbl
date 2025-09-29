@@ -189,11 +189,13 @@ void set_flip(uint8_t flag){
             if(pos > 2048){
                 if((pos - 2048) < 100){
                     sys.toolDoorStatus = flag;
+                    delay_ms(200);
                     return 1;
                 }
             }else{
                 if((2048 - pos) < 100){
                     sys.toolDoorStatus = flag;
+                    delay_ms(200);
                     return 1;
                 }
             }
@@ -232,6 +234,7 @@ void set_flip(uint8_t flag){
                     for(uint8_t i=0; i < sizeof(close_command); i++){
                         serial2_write(close_command[i]);
                     }
+                    delay_ms(200);
                     return 1;
                 }
             }else{
@@ -240,6 +243,7 @@ void set_flip(uint8_t flag){
                     for(uint8_t i=0; i < sizeof(close_command); i++){
                         serial2_write(close_command[i]);
                     }
+                    delay_ms(200);
                     return 1;
                 }
             }
