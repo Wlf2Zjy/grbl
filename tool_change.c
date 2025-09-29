@@ -206,7 +206,7 @@ void tool_length_zero()
   gc_execute_line("G21G91G38.2Z-30F200");
   gc_execute_line("G0Z1");
   gc_execute_line("G38.2Z-2F30");
-
+  if (sys.state == STATE_ALARM) return;
   float print_position[N_AXIS];
   system_convert_array_steps_to_mpos(print_position, sys_position);
   settings.tool_zpos = print_position[2];
@@ -237,6 +237,7 @@ void set_tool_length()
   gc_execute_line("G21G91G38.2Z-30F200");
   gc_execute_line("G0Z1");
   gc_execute_line("G38.2Z-2F30");
+  if (sys.state == STATE_ALARM) return;
   float print_position[N_AXIS];
   system_convert_array_steps_to_mpos(print_position, sys_position);
   // 现在z轴位置- 之前刀z轴位置 + 之前刀长

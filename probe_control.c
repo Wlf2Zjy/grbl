@@ -10,6 +10,7 @@ void probe_control_init()
 //  1上 0下
 void set_probe(uint8_t flag)
 {
+    if (sys.state == STATE_ALARM) return;
     protocol_buffer_synchronize();
     limits_disable();
     uint8_t cycle_mask = 1 << C_AXIS;

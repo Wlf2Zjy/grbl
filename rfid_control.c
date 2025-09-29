@@ -10,6 +10,7 @@ void rfid_control_init()
 //  0上U 1下D
 void set_rfid(uint8_t flag)
 {
+    if (sys.state == STATE_ALARM) return;
     protocol_buffer_synchronize();
     rfid_ele_control(1);
     limits_disable();
