@@ -41,6 +41,7 @@ int main(void)
   system_init();   // 配置引脚引脚和引脚变更中断
   // time2Init();
   // memset(sys_position, 0, sizeof(sys_position)); // 清除机器位置。
+  delay_ms(3000);
   sei(); // 启用中断
 
 // 初始化系统状态。
@@ -64,7 +65,6 @@ int main(void)
     sys.state = STATE_ALARM;
   }
 #endif
-
   // uint8_t goHomeFlag = true;
   // Grbl 在上电或系统中止时的初始化循环。对于后者，所有进程
   // 将返回到此循环以进行干净的重新初始化。
@@ -104,7 +104,7 @@ int main(void)
     DDRE |= (1 << 4); // 将其配置为输出引脚。
     PORTE |= (1<<4);  // 设置引脚为高，继电器默认闭合
     led_init();
-
+    rfid_ele_control(1);
     set_tool_leds(LED_WHITE, LED_WHITE, LED_WHITE, LED_WHITE, LED_WHITE);
     control_led(1);
     // 将清除的 G-code 和规划器位置同步到当前系统位置。
