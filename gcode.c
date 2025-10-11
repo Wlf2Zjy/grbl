@@ -252,7 +252,7 @@ uint8_t gc_execute_line(char *line)
         axis_command = AXIS_COMMAND_TOOL_LENGTH_OFFSET;
         if (int_value == 49)
         { // G49
-          gc_block.modal.tool_length = TOOL_LENGTH_OFFSET_CANCEL;
+          // gc_block.modal.tool_length = TOOL_LENGTH_OFFSET_CANCEL;
         }
         else if (mantissa == 10)
         { // G43.1
@@ -670,16 +670,16 @@ uint8_t gc_execute_line(char *line)
 
   // [刀具长度补偿]：G43 不支持，但 G43.1 和 G49 支持。
   // [G43.1 错误]：同行出现运动指令
-  if (axis_command == AXIS_COMMAND_TOOL_LENGTH_OFFSET)
-  { // 表示在代码块中调用
-    if (gc_block.modal.tool_length == TOOL_LENGTH_OFFSET_ENABLE_DYNAMIC)
-    {
-      if (axis_words ^ (1 << TOOL_LENGTH_OFFSET_AXIS))
-      {
-        FAIL(STATUS_GCODE_G43_DYNAMIC_AXIS_ERROR);
-      }
-    }
-  }
+  // if (axis_command == AXIS_COMMAND_TOOL_LENGTH_OFFSET)
+  // { // 表示在代码块中调用
+  //   if (gc_block.modal.tool_length == TOOL_LENGTH_OFFSET_ENABLE_DYNAMIC)
+  //   {
+  //     if (axis_words ^ (1 << TOOL_LENGTH_OFFSET_AXIS))
+  //     {
+  //       FAIL(STATUS_GCODE_G43_DYNAMIC_AXIS_ERROR);
+  //     }
+  //   }
+  // }
 
   // [坐标系统选择]：如刀具半径补偿激活则报错
   // TODO：EEPROM 读取坐标数据时或需同步缓冲区以防活跃周期中造成的崩溃
@@ -1318,21 +1318,21 @@ uint8_t gc_execute_line(char *line)
   // [14. 刀具长度补偿 ]: G43.1 和 G49 支持。G43 不支持。
   // 注意：如果支持 G43，其操作在执行上与 G43.1 并无不同。
   // 错误检查步骤将简单地将偏移值加载到区块 XYZ 值数组的正确轴中。
-  if (axis_command == AXIS_COMMAND_TOOL_LENGTH_OFFSET)
-  { // 表示更改。
-    gc_state.modal.tool_length = gc_block.modal.tool_length;
-    if (gc_state.modal.tool_length == TOOL_LENGTH_OFFSET_CANCEL)
-    { // G49
-      gc_block.values.xyz[TOOL_LENGTH_OFFSET_AXIS] = 0.0;
-    } // else G43.1
-    if (gc_state.tool_length_offset != gc_block.values.xyz[TOOL_LENGTH_OFFSET_AXIS])
-    {
-      gc_state.tool_length_offset = gc_block.values.xyz[TOOL_LENGTH_OFFSET_AXIS];
-      settings.tool_length = gc_state.tool_length_offset;
-      write_global_settings(); // 将更新后的刀长写入eeprom
-      system_flag_wco_change();
-    }
-  }
+  // if (axis_command == AXIS_COMMAND_TOOL_LENGTH_OFFSET)
+  // { // 表示更改。
+  //   gc_state.modal.tool_length = gc_block.modal.tool_length;
+  //   if (gc_state.modal.tool_length == TOOL_LENGTH_OFFSET_CANCEL)
+  //   { // G49
+  //     gc_block.values.xyz[TOOL_LENGTH_OFFSET_AXIS] = 0.0;
+  //   } // else G43.1
+  //   if (gc_state.tool_length_offset != gc_block.values.xyz[TOOL_LENGTH_OFFSET_AXIS])
+  //   {
+  //     gc_state.tool_length_offset = gc_block.values.xyz[TOOL_LENGTH_OFFSET_AXIS];
+  //     settings.tool_length = gc_state.tool_length_offset;
+  //     write_global_settings(); // 将更新后的刀长写入eeprom
+  //     system_flag_wco_change();
+  //   }
+  // }
 
   // [15. 坐标系选择 ]:
   if (gc_state.modal.coord_select != gc_block.modal.coord_select)
