@@ -37,7 +37,7 @@
 #define DEFAULT_Z_MAX_TRAVEL 400.0               // mm
 #define DEFAULT_SPINDLE_RPM_MAX 255.0          // rpm
 #define DEFAULT_SPINDLE_RPM_MIN 0.0              // rpm
-#define DEFAULT_STEP_PULSE_MICROSECONDS 10
+#define DEFAULT_STEP_PULSE_MICROSECONDS 40
 #define DEFAULT_STEPPING_INVERT_MASK 0
 #define DEFAULT_DIRECTION_INVERT_MASK 2
 #define DEFAULT_STEPPER_IDLE_LOCK_TIME 25 // msec (0-254, 255 keeps steppers enabled)
@@ -452,9 +452,9 @@
 #endif
 
 #ifdef DEFAULTS_ABC_AXIS
-#define DEFAULT_A_STEPS_PER_MM 180
-#define DEFAULT_A_MAX_RATE 3500.0                // mm/min
-#define DEFAULT_A_ACCELERATION (400.0 * 60 * 60) // 10*60*60 mm/min^2 = 10 mm/sec^2
+#define DEFAULT_A_STEPS_PER_MM 360
+#define DEFAULT_A_MAX_RATE 4000.0                // mm/min
+#define DEFAULT_A_ACCELERATION (200.0 * 60 * 60) // 10*60*60 mm/min^2 = 10 mm/sec^2
 #define DEFAULT_A_MAX_TRAVEL 200.0              // mm
 
 #define DEFAULT_B_STEPS_PER_MM 320.0
