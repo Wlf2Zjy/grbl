@@ -92,6 +92,10 @@
 #define CMD_CLOSE_OUTLINE 0xB5
 #define CMD_OPEN_RFID_ELE 0xB6
 #define CMD_CLOSE_RFID_ELE 0xB7
+#define CMD_OPEN_L_COOLANT 0xB8
+#define CMD_OPEN_R_COOLANT 0xB9
+#define CMD_CLOSE_COOLANT 0xBA
+
 
 // 如果启用了归位，归位初始化锁会在开机时将Grbl置于报警状态。这迫使用户在执行其他任何操作之前进行归位循环（或覆盖锁）。
 // 这主要是一个安全特性，用于提醒用户进行归位，因为Grbl的位置信息是未知的。

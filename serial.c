@@ -437,6 +437,9 @@ ISR(SERIAL_RX)
           case CMD_CLOSE_OUTLINE: outline_control(0); break;
           case CMD_OPEN_RFID_ELE: rfid_ele_control(1); break;
           case CMD_CLOSE_RFID_ELE: rfid_ele_control(0); break;
+          case CMD_OPEN_L_COOLANT: coolant_control(1); break;
+          case CMD_OPEN_R_COOLANT: coolant_control(2); break;
+          case CMD_CLOSE_COOLANT: coolant_control(0); break;
         }
         // 丢弃任何未找到的扩展 ASCII 字符，不将其传递到串口缓冲区。
       } else { // 将字符写入缓冲区
