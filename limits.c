@@ -344,6 +344,7 @@ void limits_go_home(uint8_t cycle_mask)
 // A轴回零
 void a_go_home()
 {
+  limits_disable(); // 禁用硬限制引脚更改寄存器以便在循环期间使用
   protocol_buffer_synchronize();
   uint8_t cycle_mask = 1 << A_AXIS;
   uint8_t idx = 3;
@@ -463,6 +464,21 @@ void a_go_home()
     sys_position[idx] = 0;
 
     sys.step_control = STEP_CONTROL_NORMAL_OP; // 将步进控制返回到正常操作。
+    protocol_execute_realtime(); // 检查重置并设置系统中止。
+    if (sys.abort)
+    {
+      return;
+    } // 未完成。由 mc_alarm 设置的警报状态。
+  
+    // 归零循环完成！设置系统以正常运行。
+    // -------------------------------------------------------------------------------------
+  
+    // 同步 G-code 解析器和规划器位置到归零位置。
+    gc_sync_position();
+    plan_sync_position();
+  
+    // 如果启用了硬限制功能，在归零循环后重新启用硬限制引脚更改寄存器。
+    limits_init();
 }
 
 
