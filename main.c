@@ -41,7 +41,7 @@ int main(void)
   system_init();   // 配置引脚引脚和引脚变更中断
   // time2Init();
   // memset(sys_position, 0, sizeof(sys_position)); // 清除机器位置。
-  delay_ms(3000);
+  // delay_ms(3000);
   sei(); // 启用中断
 
 // 初始化系统状态。
@@ -73,8 +73,8 @@ int main(void)
     // 重置系统变量。
     uint8_t prior_state = sys.state;
     memset(&sys, 0, sizeof(system_t)); // 清除系统结构变量。
-    // sys.state = prior_state;
-    sys.state = STATE_ALARM;
+    sys.state = prior_state;
+    // sys.state = STATE_ALARM;
     sys.f_override = DEFAULT_FEED_OVERRIDE;                 // 设置为 100%
     sys.r_override = DEFAULT_RAPID_OVERRIDE;                // 设置为 100%
     sys.spindle_speed_ovr = DEFAULT_SPINDLE_SPEED_OVERRIDE; // 设置为 100%

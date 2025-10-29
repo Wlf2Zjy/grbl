@@ -376,6 +376,7 @@ uint8_t mc_probe_cycle(float *target, plan_line_data_t *pl_data, uint8_t parser_
   } // 成功的探测循环。
   else
   {
+    mc_reset();
     return (GC_PROBE_FAIL_END);
   } // 在运动范围内未能触发探测。无论是否有错误。
 }
