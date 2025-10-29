@@ -343,7 +343,7 @@ void report_version()
 {
   // 以机器位置的方式报告。
   printPgmString(PSTR("[version:"));
-  printPgmString(PSTR("control-1.0.0-alpha5"));
+  printPgmString(PSTR("control-1.0.0-alpha6"));
   report_util_feedback_line_feed();
 }
 
