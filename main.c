@@ -71,7 +71,7 @@ int main(void)
   for (;;)
   {
     // 重置系统变量。
-    bool oldIsHomed = sys.isHomed
+    bool oldIsHomed = sys.isHomed;
     uint8_t prior_state = sys.state;
     memset(&sys, 0, sizeof(system_t)); // 清除系统结构变量。
     sys.state = prior_state;
