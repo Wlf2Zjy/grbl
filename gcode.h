@@ -226,6 +226,7 @@ typedef struct
   float tool_length_offset;   // 跟踪启用时的工具长度偏移值。
   uint8_t drill_r;        // 跟踪钻孔指令R值
   uint8_t drill_back;        // 跟踪钻孔退刀
+  float drill_z;        // 跟踪钻孔深度
 } parser_state_t;
 extern parser_state_t gc_state;
 

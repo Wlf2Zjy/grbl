@@ -193,8 +193,6 @@ uint8_t gc_execute_line(char *line)
         // * G43.1 也是一个轴命令，但未显式定义为此。
         if (axis_command)
         {
-          print_uint8_base10(axis_command);
-          printString("\r\n");
           FAIL(STATUS_GCODE_AXIS_COMMAND_CONFLICT);
         } // [轴字/命令冲突]
         axis_command = AXIS_COMMAND_MOTION_MODE;
@@ -496,6 +494,7 @@ uint8_t gc_execute_line(char *line)
         word_bit = WORD_Z;
         gc_block.values.xyz[Z_AXIS] = value;
         axis_words |= (1 << Z_AXIS);
+        gc_state.drill_z = value;
         break;
       default:
         FAIL(STATUS_GCODE_UNSUPPORTED_COMMAND);
@@ -1438,27 +1437,30 @@ uint8_t gc_execute_line(char *line)
       }
       else if (gc_state.modal.motion == MOTION_MODE_DRILLING_CYCLE)
       { 
-        // 开始位置
-        printFloat_CoordValue(gc_block.values.xyz[0]);
-        printString(",");
-        printFloat_CoordValue(gc_block.values.xyz[1]);
-        printString(",");
-        printFloat_CoordValue(gc_block.values.xyz[2]);
-        printString(",");
-        print_uint8_base10(gc_state.drill_back);
-        printString(",");
-        print_uint8_base10(gc_state.drill_r);
-        printString("\r\n");
-        // 先快速移动到点上方
-        pl_data->condition |= PL_COND_FLAG_RAPID_MOTION; // 设置快速运动条件标志。
-        float drill_xyz[3] = {gc_block.values.xyz[0], gc_block.values.xyz[1], 0};
+        float startZ = gc_state.position[2];
+        float drill_xyz[7];
+        memcpy(drill_xyz, gc_block.values.xyz, sizeof(gc_block.values.xyz));
+        pl_data->feed_rate = 2000; // 快速移动速度
+        // 快速移动到点xy上方
+        drill_xyz[2] = startZ;
         mc_line(drill_xyz, pl_data);
-        pl_data->condition |= PL_COND_FLAG_INVERSE_TIME;
+        // 快速移动到点xyz上方
+        drill_xyz[2] = gc_state.coord_system[2] + gc_state.drill_r;
+        mc_line(drill_xyz, pl_data);
+        // 钻孔
         pl_data->feed_rate = gc_state.feed_rate; // 记录供计划使用的数据。
-        print_uint8_base10(gc_state.feed_rate);
-        printString("\r\n");
-        drill_xyz[2] = -100;
+        drill_xyz[2] = gc_state.drill_z + gc_state.coord_system[2];
         mc_line(drill_xyz, pl_data);
+        // 回退
+        pl_data->feed_rate = 2000; // 快速移动速度
+        if(gc_state.drill_back == 98){
+          drill_xyz[2] = startZ;
+          mc_line(drill_xyz, pl_data);
+        }else{
+          drill_xyz[2] = gc_state.coord_system[2] + gc_state.drill_r;
+          mc_line(drill_xyz, pl_data);
+        }
+        memcpy(gc_block.values.xyz, drill_xyz, sizeof(gc_block.values.xyz));
       }
       else if (gc_state.modal.motion == MOTION_MODE_DRILLING_HOLE_CYCLE)
       { 
