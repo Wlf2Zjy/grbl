@@ -27,7 +27,7 @@
 // 并且类似于其他制造商（Haas、Fanuc、Mazak 等）的 G 代码解析器。
 // 注意：模态组的定义值必须从零开始并按顺序排列。
 #define MODAL_GROUP_G0 0   // [G4, G10, G28, G28.1, G30, G30.1, G53, G92, G92.1] 非模态
-#define MODAL_GROUP_G1 1   // [G0, G1, G2, G3, G38.2, G38.3, G38.4, G38.5, G80] 运动
+#define MODAL_GROUP_G1 1   // [G0, G1, G2, G3, G38.2, G38.3, G38.4, G38.5, G80, G81, G82, G83] 运动
 #define MODAL_GROUP_G2 2   // [G17, G18, G19] 平面选择
 #define MODAL_GROUP_G3 3   // [G90, G91] 距离模式
 #define MODAL_GROUP_G4 4   // [G91.1] 弧 IJK 距离模式
@@ -74,6 +74,10 @@
 #define MOTION_MODE_PROBE_AWAY 142            // G38.4（不可更改值）
 #define MOTION_MODE_PROBE_AWAY_NO_ERROR 143   // G38.5（不可更改值）
 #define MOTION_MODE_NONE 80                   // G80（不可更改值）
+#define MOTION_MODE_DRILLING_CYCLE 81         // G81（不可更改值）
+#define MOTION_MODE_DRILLING_HOLE_CYCLE 82         // G81（不可更改值）
+#define MOTION_MODE_Deep_HOLE_DRILLING_CYCLE 83         // G81（不可更改值）
+
 
 // 模态组 G2：平面选择
 #define PLANE_SELECT_XY 0 // G17（默认：必须为零）
@@ -175,7 +179,7 @@
 // 注意：当该结构体清零时，上述定义设置系统默认值。
 typedef struct
 {
-  uint8_t motion;    // {G0,G1,G2,G3,G38.2,G80}
+  uint8_t motion;    // {G0,G1,G2,G3,G38.2,G80,G81,G82,G83}
   uint8_t feed_rate; // {G93,G94}
   uint8_t units;     // {G20,G21}
   uint8_t distance;  // {G90,G91}
@@ -185,6 +189,7 @@ typedef struct
   uint8_t tool_length;  // {G43.1,G49}
   uint8_t coord_select; // {G54,G55,G56,G57,G58,G59}
   // uint8_t control;      // {G61} 注意：不跟踪，仅支持默认值
+  uint8_t drill_back;      // 钻孔完成后返回{G98, G99} G99: 指定循环完成后退回至 R点（安全高效）。如果用 G98 则退回至 初始平面。
   uint8_t program_flow; // {M0,M1,M2,M30}
   uint8_t coolant;      // {M7,M8,M9}
   uint8_t spindle;      // {M3,M4,M5}

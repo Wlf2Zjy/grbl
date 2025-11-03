@@ -145,6 +145,12 @@ uint8_t gc_execute_line(char *line)
       // 确定 'G' 命令及其模式组。
       switch (int_value)
       {
+      case 98:
+        // G98 则退回至 初始平面。
+        gc_block.modal.drill_back = 98;
+      case 99:
+        // G99: 指定循环完成后退回至 R点（安全高效）
+        gc_block.modal.drill_back = 99;
       case 10:
       case 28:
       case 30:
@@ -179,6 +185,9 @@ uint8_t gc_execute_line(char *line)
       case 2:
       case 3:
       case 38:
+      case 81:
+      case 82:
+      case 83:
         // 检查在同一块中调用 G10/28/30/92 时是否调用了 G0/1/2/3/38。
         // * G43.1 也是一个轴命令，但未显式定义为此。
         if (axis_command)
@@ -1401,7 +1410,6 @@ uint8_t gc_execute_line(char *line)
       if (gc_state.modal.motion == MOTION_MODE_LINEAR)
       {
         mc_line(gc_block.values.xyz, pl_data);
-        // printFloat_CoordValue(gc_block.values.xyz[0]);
       }
       else if (gc_state.modal.motion == MOTION_MODE_SEEK)
       {
@@ -1412,6 +1420,27 @@ uint8_t gc_execute_line(char *line)
       {
         mc_arc(gc_block.values.xyz, pl_data, gc_state.position, gc_block.values.ijk, gc_block.values.r,
                axis_0, axis_1, axis_linear, bit_istrue(gc_parser_flags, GC_PARSER_ARC_IS_CLOCKWISE));
+      }
+      else if (gc_state.modal.motion == MOTION_MODE_DRILLING_CYCLE)
+      { 
+        printFloat_CoordValue(gc_block.values.xyz[0]);
+        printString(",");
+        printFloat_CoordValue(gc_block.values.xyz[1]);
+        printString(",");
+        printFloat_CoordValue(gc_block.values.xyz[2]);
+        printString(",");
+        print_uint8_base10(gc_block.modal.drill_back);
+        printString(",");
+        print_uint8_base10(gc_block.values.r);
+        printString("\r\n");
+      }
+      else if (gc_state.modal.motion == MOTION_MODE_DRILLING_HOLE_CYCLE)
+      { 
+
+      }
+      else if (gc_state.modal.motion == MOTION_MODE_Deep_HOLE_DRILLING_CYCLE)
+      { 
+
       }
       else
       {
