@@ -71,6 +71,7 @@ int main(void)
   for (;;)
   {
     // 重置系统变量。
+    bool oldIsHomed = sys.isHomed
     uint8_t prior_state = sys.state;
     memset(&sys, 0, sizeof(system_t)); // 清除系统结构变量。
     sys.state = prior_state;
@@ -111,8 +112,9 @@ int main(void)
     }else if (sys.state == STATE_IDLE)
     {
       control_led(2);
+      sys.isHomed = true;
     }
-    
+
     // 将清除的 G-code 和规划器位置同步到当前系统位置。
     plan_sync_position();
     gc_sync_position();
