@@ -106,7 +106,13 @@ int main(void)
     led_init();
     rfid_ele_control(1);
     set_tool_leds(LED_WHITE, LED_WHITE, LED_WHITE, LED_WHITE, LED_WHITE);
-    control_led(1);
+    if(sys.state == STATE_ALARM){
+      control_led(1);
+    }else if (sys.state == STATE_IDLE)
+    {
+      control_led(2);
+    }
+    
     // 将清除的 G-code 和规划器位置同步到当前系统位置。
     plan_sync_position();
     gc_sync_position();
