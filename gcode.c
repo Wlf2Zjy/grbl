@@ -145,12 +145,6 @@ uint8_t gc_execute_line(char *line)
       // 确定 'G' 命令及其模式组。
       switch (int_value)
       {
-      case 98:
-        // G98 则退回至 初始平面。
-        gc_block.modal.drill_back = 98;
-      case 99:
-        // G99: 指定循环完成后退回至 R点（安全高效）
-        gc_block.modal.drill_back = 99;
       case 10:
       case 28:
       case 30:
@@ -180,6 +174,13 @@ uint8_t gc_execute_line(char *line)
           mantissa = 0; // 设置为零以指示有效的非整数 G 命令。
         }
         break;
+      case 98:
+      case 99:
+        // G98 则退回至 初始平面。
+        // G99: 指定循环完成后退回至 R点（安全高效）
+        gc_block.modal.drill_back = int_value;
+        gc_state.drill_back = int_value;
+        break;
       case 0:
       case 1:
       case 2:
@@ -192,6 +193,8 @@ uint8_t gc_execute_line(char *line)
         // * G43.1 也是一个轴命令，但未显式定义为此。
         if (axis_command)
         {
+          print_uint8_base10(axis_command);
+          printString("\r\n");
           FAIL(STATUS_GCODE_AXIS_COMMAND_CONFLICT);
         } // [轴字/命令冲突]
         axis_command = AXIS_COMMAND_MOTION_MODE;
@@ -1126,6 +1129,18 @@ uint8_t gc_execute_line(char *line)
           }
         }
         break;
+      case MOTION_MODE_DRILLING_CYCLE:
+        //安全高度
+        if (value_words & bit(WORD_R))
+        { 
+          bit_false(value_words, bit(WORD_R));
+          gc_state.drill_r = gc_block.values.r;
+        };
+        break;  
+      case MOTION_MODE_DRILLING_HOLE_CYCLE:
+        break; 
+      case MOTION_MODE_Deep_HOLE_DRILLING_CYCLE:
+        break; 
       case MOTION_MODE_PROBE_TOWARD_NO_ERROR:
       case MOTION_MODE_PROBE_AWAY_NO_ERROR:
         gc_parser_flags |= GC_PARSER_PROBE_IS_NO_ERROR; // 故意无 break。
@@ -1423,16 +1438,27 @@ uint8_t gc_execute_line(char *line)
       }
       else if (gc_state.modal.motion == MOTION_MODE_DRILLING_CYCLE)
       { 
+        // 开始位置
         printFloat_CoordValue(gc_block.values.xyz[0]);
         printString(",");
         printFloat_CoordValue(gc_block.values.xyz[1]);
         printString(",");
         printFloat_CoordValue(gc_block.values.xyz[2]);
         printString(",");
-        print_uint8_base10(gc_block.modal.drill_back);
+        print_uint8_base10(gc_state.drill_back);
         printString(",");
-        print_uint8_base10(gc_block.values.r);
+        print_uint8_base10(gc_state.drill_r);
         printString("\r\n");
+        // 先快速移动到点上方
+        pl_data->condition |= PL_COND_FLAG_RAPID_MOTION; // 设置快速运动条件标志。
+        float drill_xyz[3] = {gc_block.values.xyz[0], gc_block.values.xyz[1], 0};
+        mc_line(drill_xyz, pl_data);
+        pl_data->condition |= PL_COND_FLAG_INVERSE_TIME;
+        pl_data->feed_rate = gc_state.feed_rate; // 记录供计划使用的数据。
+        print_uint8_base10(gc_state.feed_rate);
+        printString("\r\n");
+        drill_xyz[2] = -100;
+        mc_line(drill_xyz, pl_data);
       }
       else if (gc_state.modal.motion == MOTION_MODE_DRILLING_HOLE_CYCLE)
       { 
