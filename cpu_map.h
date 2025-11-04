@@ -69,8 +69,8 @@
 #define LIMIT_INT_vect PCINT0_vect
 #define LIMIT_PCMSK PCMSK0                                                                                                                                            // 引脚更改中断寄存器
 // #define LIMIT_MASK ((1 << X_LIMIT_BIT) | (1 << Y_LIMIT_BIT) | (1 << Z_LIMIT_BIT) | (1 << B_LIMIT_BIT) | (1 << C_LIMIT_BIT) | (1 << D_LIMIT_BIT) | (1) | (1 << 7)) // All limit bits
-#define LIMIT_MASK 0
-// #define LIMIT_MASK ((1 << X_LIMIT_BIT) | (1 << Y_LIMIT_BIT) | (1 << Z_LIMIT_BIT) | (1 << B_LIMIT_BIT) | (1 << C_LIMIT_BIT) | (1 << D_LIMIT_BIT)) // All limit bits
+// #define LIMIT_MASK 0
+#define LIMIT_MASK ((1 << X_LIMIT_BIT) | (1 << Y_LIMIT_BIT) | (1 << Z_LIMIT_BIT) | (1 << B_LIMIT_BIT) | (1 << C_LIMIT_BIT) | (1 << D_LIMIT_BIT)) // All limit bits
 
 #define A_LIMIT_DDR DDRK
 #define A_LIMIT_PORT PORTK
@@ -96,8 +96,8 @@
 // #define CONTROL_MASK ((1 << DRAWER_DETECT_BIT) | (1 << CONTROL_SAFETY_DOOR_BIT) | (1 << STOP_ALARM_BIT))
 // #define CONTROL_MASK  ((1 << CONTROL_SAFETY_DOOR_BIT) | (1 << DRAWER_DETECT_BIT) | (1 << X_ALARM_BIT) | (1 << Y_ALARM_BIT) | (1 << Z_ALARM_BIT) | (1 << STOP_ALARM_BIT))
 // #define CONTROL_MASK  ((1 << CONTROL_SAFETY_DOOR_BIT) | (1 << DRAWER_DETECT_BIT) | (1 << STOP_ALARM_BIT) | (1 << A_LIMIT_BIT))
-// #define CONTROL_MASK  ((1 << CONTROL_SAFETY_DOOR_BIT) | (1 << DRAWER_DETECT_BIT) | (1 << STOP_ALARM_BIT))
-#define CONTROL_MASK  0
+#define CONTROL_MASK  ((1 << CONTROL_SAFETY_DOOR_BIT) | (1 << DRAWER_DETECT_BIT) | (1 << STOP_ALARM_BIT))
+// #define CONTROL_MASK  0
 // 定义探针开关输入引脚。
 #define PROBE_DDR DDRL
 #define PROBE_PIN PINL

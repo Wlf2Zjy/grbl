@@ -97,6 +97,7 @@ uint8_t gc_execute_line(char *line)
     以检测命令字模式组冲突、任何重复字以及 F、N、P、T 和 S 的数值字的负值。 */
 
   uint8_t word_bit; // 用于分配跟踪变量的位值
+  bool have_q = false;
   uint8_t char_counter;
   char letter;
   float value;
@@ -457,6 +458,10 @@ uint8_t gc_execute_line(char *line)
         word_bit = WORD_P;
         gc_block.values.p = value;
         break;
+      case 'Q':
+        have_q = true;
+        gc_block.values.q = value;
+        break;
       // 注意：对于某些命令，P 值必须为整数，但这些命令均不支持。
       // case 'Q': // 不支持
       case 'R':
@@ -501,13 +506,13 @@ uint8_t gc_execute_line(char *line)
       }
 
       // 注意：如果非命令字母有效，则始终会分配变量 'word_bit'。
-      if (bit_istrue(value_words, bit(word_bit)))
+      if (bit_istrue(value_words, bit(word_bit)) && !have_q)
       {
         FAIL(STATUS_GCODE_WORD_REPEATED);
       } // [字母重复]
       // 检查字母 F、N、P、T 和 S 的负值无效
       // 注意：为提高代码效率，负值检查在此进行。
-      if (bit(word_bit) & (bit(WORD_F) | bit(WORD_N) | bit(WORD_P) | bit(WORD_T) | bit(WORD_S)))
+      if ((bit(word_bit) & (bit(WORD_F) | bit(WORD_N) | bit(WORD_P) | bit(WORD_T) | bit(WORD_S))) || have_q)
       {
         if (value < 0.0)
         {
@@ -917,6 +922,10 @@ uint8_t gc_execute_line(char *line)
   // [20. 运动模式]：
   if (gc_block.modal.motion == MOTION_MODE_NONE)
   {
+    gc_state.drill_back = 0;
+    gc_state.drill_r = 0;
+    gc_state.drill_q = 0;
+    gc_state.drill_p = 0;
     // [G80 错误]：在 G80 激活时，编程了轴字。
     // 注意：即使是使用轴字的非模态命令或 TLO 也会引发此严格错误。
     if (axis_words)
@@ -1135,10 +1144,45 @@ uint8_t gc_execute_line(char *line)
           bit_false(value_words, bit(WORD_R));
           gc_state.drill_r = gc_block.values.r;
         };
+        if (gc_state.drill_r == 0.0)
+        {
+          FAIL(STATUS_GCODE_VALUE_WORD_MISSING);
+        }
         break;  
       case MOTION_MODE_DRILLING_HOLE_CYCLE:
+        //安全高度
+        if (value_words & bit(WORD_R))
+        { 
+          bit_false(value_words, bit(WORD_R));
+          gc_state.drill_r = gc_block.values.r;
+        };
+        //跟踪G82到底板延时
+        if (value_words & bit(WORD_P))
+        { 
+          bit_false(value_words, bit(WORD_P));
+          gc_state.drill_p = gc_block.values.p;
+        };
+        if (gc_state.drill_r == 0.0 || gc_state.drill_p == 0.0)
+        {
+          FAIL(STATUS_GCODE_VALUE_WORD_MISSING);
+        }
         break; 
       case MOTION_MODE_Deep_HOLE_DRILLING_CYCLE:
+        //安全高度
+        if (value_words & bit(WORD_R))
+        { 
+          bit_false(value_words, bit(WORD_R));
+          gc_state.drill_r = gc_block.values.r;
+        };
+        //跟踪G82到底板延时
+        if (have_q)
+        { 
+          gc_state.drill_q = gc_block.values.q;
+        };
+        if (gc_state.drill_r == 0.0 || gc_state.drill_q == 0.0)
+        {
+          FAIL(STATUS_GCODE_VALUE_WORD_MISSING);
+        }
         break; 
       case MOTION_MODE_PROBE_TOWARD_NO_ERROR:
       case MOTION_MODE_PROBE_AWAY_NO_ERROR:
@@ -1440,7 +1484,7 @@ uint8_t gc_execute_line(char *line)
         float startZ = gc_state.position[2];
         float drill_xyz[7];
         memcpy(drill_xyz, gc_block.values.xyz, sizeof(gc_block.values.xyz));
-        pl_data->feed_rate = 2000; // 快速移动速度
+        pl_data->feed_rate = settings.max_rate[2]; // 快速移动速度
         // 快速移动到点xy上方
         drill_xyz[2] = startZ;
         mc_line(drill_xyz, pl_data);
@@ -1452,7 +1496,7 @@ uint8_t gc_execute_line(char *line)
         drill_xyz[2] = gc_state.drill_z + gc_state.coord_system[2];
         mc_line(drill_xyz, pl_data);
         // 回退
-        pl_data->feed_rate = 2000; // 快速移动速度
+        pl_data->feed_rate = settings.max_rate[2]; // 快速移动速度
         if(gc_state.drill_back == 98){
           drill_xyz[2] = startZ;
           mc_line(drill_xyz, pl_data);
@@ -1464,11 +1508,118 @@ uint8_t gc_execute_line(char *line)
       }
       else if (gc_state.modal.motion == MOTION_MODE_DRILLING_HOLE_CYCLE)
       { 
-
+        float startZ = gc_state.position[2];
+        float drill_xyz[7];
+        memcpy(drill_xyz, gc_block.values.xyz, sizeof(gc_block.values.xyz));
+        pl_data->feed_rate = settings.max_rate[2]; // 快速移动速度
+        // 快速移动到点xy上方
+        drill_xyz[2] = startZ;
+        mc_line(drill_xyz, pl_data);
+        // 快速移动到点xyz上方
+        drill_xyz[2] = gc_state.coord_system[2] + gc_state.drill_r;
+        mc_line(drill_xyz, pl_data);
+        // 钻孔
+        pl_data->feed_rate = gc_state.feed_rate; // 记录供计划使用的数据。
+        drill_xyz[2] = gc_state.drill_z + gc_state.coord_system[2];
+        mc_line(drill_xyz, pl_data);
+        mc_dwell(gc_state.drill_p);
+        // 回退
+        pl_data->feed_rate = settings.max_rate[2]; // 快速移动速度
+        if(gc_state.drill_back == 98){
+          drill_xyz[2] = startZ;
+          mc_line(drill_xyz, pl_data);
+        }else{
+          drill_xyz[2] = gc_state.coord_system[2] + gc_state.drill_r;
+          mc_line(drill_xyz, pl_data);
+        }
+        memcpy(gc_block.values.xyz, drill_xyz, sizeof(gc_block.values.xyz));
       }
       else if (gc_state.modal.motion == MOTION_MODE_Deep_HOLE_DRILLING_CYCLE)
       { 
+        float startZ = gc_state.position[2];
+        float drill_xyz[7];
+        memcpy(drill_xyz, gc_block.values.xyz, sizeof(gc_block.values.xyz));
 
+        // 计算相关坐标值
+        float current_depth = gc_state.coord_system[2] + gc_state.drill_r; // 起始深度(R点)
+        float target_depth = gc_state.drill_z + gc_state.coord_system[2];  // 目标深度(Z点)
+        float q_value = gc_state.drill_q;                                  // 啄钻深度(Q值)
+        const float clearance = 1; // 微小间隙值，例如0.5mm
+
+        pl_data->feed_rate = settings.max_rate[2]; // 快速移动速度
+
+        // 快速移动到点xy上方
+        drill_xyz[2] = startZ;
+        mc_line(drill_xyz, pl_data);
+
+        // 快速移动到R点
+        drill_xyz[2] = current_depth;
+        mc_line(drill_xyz, pl_data);
+
+        // G83啄钻循环
+        float last_cut_depth = current_depth; // 记录上次切削的深度
+        bool first_peck = true; // 首次啄钻标志
+
+        pl_data->feed_rate = gc_state.feed_rate; // 切削进给速度
+
+        while (current_depth > target_depth) {
+            // 计算本次啄钻深度
+            float next_depth = current_depth - q_value;
+            
+            // 确保不会钻过目标深度
+            if (next_depth < target_depth) {
+                next_depth = target_depth;
+            }
+            
+            if (!first_peck) {
+                // 非首次啄钻：快速下降到离上次孔底的微小间隙处
+                pl_data->feed_rate = settings.max_rate[2]; // 快速移动
+                float approach_depth = last_cut_depth + clearance;
+                drill_xyz[2] = approach_depth;
+                mc_line(drill_xyz, pl_data);
+                
+                // 切换到切削进给
+                pl_data->feed_rate = gc_state.feed_rate;
+            }
+            
+            // 以切削速度钻到下一个深度
+            drill_xyz[2] = next_depth;
+            mc_line(drill_xyz, pl_data);
+            
+            // 记录本次切削深度
+            last_cut_depth = next_depth;
+            
+            // 快速退回到R点排屑
+            pl_data->feed_rate = settings.max_rate[2];
+            drill_xyz[2] = gc_state.coord_system[2] + gc_state.drill_r;
+            mc_line(drill_xyz, pl_data);
+            
+            // 更新当前深度
+            current_depth = next_depth;
+            
+            // 如果已经到达目标深度，退出循环
+            if (current_depth <= target_depth) {
+                break;
+            }
+            
+            // 准备下一次啄钻
+            pl_data->feed_rate = gc_state.feed_rate;
+            first_peck = false;
+        }
+
+        // 最终退刀
+        pl_data->feed_rate = settings.max_rate[2]; // 快速移动速度
+        if (gc_state.drill_back == 98) {
+            // G98: 退回初始平面
+            drill_xyz[2] = startZ;
+            mc_line(drill_xyz, pl_data);
+        } else {
+            // G99: 退回R点
+            drill_xyz[2] = gc_state.coord_system[2] + gc_state.drill_r;
+            mc_line(drill_xyz, pl_data);
+        }
+
+        memcpy(gc_block.values.xyz, drill_xyz, sizeof(gc_block.values.xyz));
       }
       else
       {

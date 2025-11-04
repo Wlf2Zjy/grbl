@@ -72,6 +72,7 @@ uint8_t read_float(char *line, uint8_t *char_counter, float *float_ptr);
 
 // 非阻塞延迟函数，用于一般操作和挂起功能。
 void delay_sec(float seconds, uint8_t mode);
+void delay_ms_no_blocking(float seconds, uint8_t mode);
 
 // 延迟定义的毫秒数。编译器兼容性修复，_delay_ms()。
 void delay_ms(uint16_t ms);

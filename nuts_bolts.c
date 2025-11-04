@@ -164,6 +164,23 @@ void delay_sec(float seconds, uint8_t mode)
 	}
 }
 
+// 非阻塞延迟函数，用于一般操作和挂起功能。
+void delay_ms_no_blocking(float seconds, uint8_t mode)
+{
+ 	uint16_t i = ceil(1000/DWELL_TIME_STEP*seconds/1000);
+	while (i-- > 0) {
+		if (sys.abort) { return; }
+		if (mode == DELAY_MODE_DWELL) {
+			protocol_execute_realtime();
+		} else { // DELAY_MODE_SYS_SUSPEND
+		  // 仅执行 rt_system() 以避免嵌套挂起循环。
+		  protocol_exec_rt_system();
+		  if (sys.suspend & SUSPEND_RESTART_RETRACT) { return; } // 如果安全门重新打开则退出。
+		}
+		_delay_ms(DWELL_TIME_STEP); // 延迟 DWELL_TIME_STEP 增量
+	}
+}
+
 // 延迟定义的毫秒数。编译器兼容性修复，_delay_ms()，
 // 仅接受常量以便将来的编译器版本。
 void delay_ms(uint16_t ms)

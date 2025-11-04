@@ -148,6 +148,7 @@
 #define WORD_B 14
 #define WORD_C 15
 #define WORD_D 16
+#define WORD_Q 17
 
 // 定义 G 代码解析器位置更新标志
 #define GC_UPDATE_POS_TARGET 0 // 必须为 0
@@ -203,7 +204,7 @@ typedef struct
   uint8_t l;         // G10 或循环参数
   int32_t n;         // 行号
   float p;           // G10 或延时参数
-  // float q;      // G82 挖槽钻孔
+  float q;      // G82 挖槽钻孔
   float r;           // 弧半径
   float s;           // 主轴转速
   uint8_t t;         // 工具选择
@@ -224,9 +225,11 @@ typedef struct
   float coord_system[N_AXIS]; // 当前工作坐标系 (G54+)。存储相对于绝对机床位置的偏移量（以 mm 为单位），在调用时从 EEPROM 加载。
   float coord_offset[N_AXIS]; // 保留 G92 坐标偏移（工作坐标）相对于机床零点的偏移量（以 mm 为单位），非持久性。在复位和启动时清除。
   float tool_length_offset;   // 跟踪启用时的工具长度偏移值。
-  uint8_t drill_r;        // 跟踪钻孔指令R值
-  uint8_t drill_back;        // 跟踪钻孔退刀
+  uint8_t drill_back;        // 跟踪钻孔完成后回退位置
+  float drill_r;        // 跟踪钻孔指令R值
+  float drill_q;        // 跟踪钻孔退刀
   float drill_z;        // 跟踪钻孔深度
+  float drill_p;        // 跟踪G82到底板延时
 } parser_state_t;
 extern parser_state_t gc_state;
 

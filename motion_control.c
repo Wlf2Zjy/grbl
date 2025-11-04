@@ -217,7 +217,7 @@ void mc_dwell(float seconds)
     return;
   }
   protocol_buffer_synchronize();
-  delay_sec(seconds, DELAY_MODE_DWELL);
+  delay_ms_no_blocking(seconds, DELAY_MODE_DWELL);
 }
 
 // 执行归零循环以定位和设置机器零点。只有 '$H' 执行此命令。
