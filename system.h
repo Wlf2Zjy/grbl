@@ -45,6 +45,7 @@
 #define EXEC_ALARM_HOMING_FAIL_PULLOFF  8
 #define EXEC_ALARM_HOMING_FAIL_APPROACH 9
 #define EXEC_TOOL_MAGAZINE_ERROR 10
+#define EXEC_CHANGE_TOOL_ERROR 11
 
 // 覆盖位图。实时位标志控制进给、快速、主轴和冷却液覆盖。
 // 主轴/冷却液和进给/快速被分为两个控制标志变量。
@@ -146,6 +147,7 @@ typedef struct {
   bool ALimit;  // 是否回零过
   bool isOpenLaser;
   bool handwheel_mode; // 是否开启手轮
+  bool probe_flag; // 是否记录对刀数据
 } system_t;
 extern system_t sys;
 

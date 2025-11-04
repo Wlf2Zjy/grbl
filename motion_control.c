@@ -306,6 +306,11 @@ uint8_t mc_probe_cycle(float *target, plan_line_data_t *pl_data, uint8_t parser_
   // 初始化探测控制变量
   uint8_t is_probe_away = bit_istrue(parser_flags, GC_PARSER_PROBE_IS_AWAY);
   uint8_t is_no_error = bit_istrue(parser_flags, GC_PARSER_PROBE_IS_NO_ERROR);
+  if(is_no_error){
+    sys.probe_flag = false;
+  }else{
+    sys.probe_flag = true;
+  }
   sys.probe_succeeded = false; // 在开始循环之前重新初始化探测历史。
   probe_configure_invert_mask(is_probe_away);
 
@@ -345,7 +350,7 @@ uint8_t mc_probe_cycle(float *target, plan_line_data_t *pl_data, uint8_t parser_
   {
     if (is_no_error)
     {
-      memcpy(sys_probe_position, sys_position, sizeof(sys_position));
+      // memcpy(sys_probe_position, sys_position, sizeof(sys_position));
     }
     else
     {
@@ -367,7 +372,10 @@ uint8_t mc_probe_cycle(float *target, plan_line_data_t *pl_data, uint8_t parser_
 
 #ifdef MESSAGE_PROBE_COORDINATES
                         // 所有完成！输出探测位置作为消息。
-  report_probe_parameters();
+  if (!is_no_error)
+  {
+    report_probe_parameters();
+  }
 #endif
 
   if (sys.probe_succeeded)
@@ -376,8 +384,12 @@ uint8_t mc_probe_cycle(float *target, plan_line_data_t *pl_data, uint8_t parser_
   } // 成功的探测循环。
   else
   {
-    mc_reset();
-    return (GC_PROBE_FAIL_END);
+    if (is_no_error){
+      return (GC_PROBE_FOUND);
+    }else{
+      mc_reset();
+      return (GC_PROBE_FAIL_END);
+    }
   } // 在运动范围内未能触发探测。无论是否有错误。
 }
 

@@ -6,6 +6,26 @@ void set_tool_length();
 void tool_length_zero();
 
 
+bool test_tool_status(){
+  // 先去对刀仪检测
+  // 抬刀
+  gc_execute_line("G90G53G0Z-5");
+  // 移动到对刀的xy位置
+  float2string(settings.tool_x[TOOL_NUM - 1], x_char, 3);
+  float2string(settings.tool_y[TOOL_NUM - 1], y_char, 3);
+  sprintf(command, "G90G53G0X%sY%s", x_char, y_char);
+  gc_execute_line(command);
+  // 下降到对刀z位置
+  float2string(settings.tool_z[TOOL_NUM - 1], z_char, 3);
+  sprintf(command, "G90G53G0Z%s", z_char);
+  gc_execute_line(command);
+  gc_execute_line("G21G91G38.3Z-30F500");
+  // 抬刀
+  gc_execute_line("G90G53G0Z-5");
+  protocol_buffer_synchronize();
+  return sys.probe_succeeded;
+}
+
 void tool_control_init()
 {
   // 换刀检测
@@ -47,6 +67,7 @@ void blowAllSlag(){
 
 void return_tool()
 {
+  if (settings.tool == 0) return;
   for (uint8_t i = 0; i < TOOL_NUM - 1; i++)
   {
     if (i == settings.tool - 1)
@@ -63,52 +84,50 @@ void return_tool()
   gc_execute_line("G90G53G0Z-5");
   gc_execute_line("M4S2300");
   protocol_buffer_synchronize();
-  if (settings.tool != 0)
-  {
-    // 移动到要还刀的xy位置
-    float2string(settings.tool_x[settings.tool - 1], x_char, 3);
-    float2string(settings.tool_y[settings.tool - 1], y_char, 3);
-    sprintf(command, "G90G53G0X%sY%s", x_char, y_char);
-    gc_execute_line(command);
-    // 下降到还刀位置
-    float2string(settings.tool_z[settings.tool - 1], z_char, 3);
-    sprintf(command, "G90G53G01Z%sF1500", z_char);
-    gc_execute_line(command);
-    protocol_buffer_synchronize();
-    // 松刀
-    delay_ms(0.3);
-    // 抬刀
+  // 移动到要还刀的xy位置
+  float2string(settings.tool_x[settings.tool - 1], x_char, 3);
+  float2string(settings.tool_y[settings.tool - 1], y_char, 3);
+  sprintf(command, "G90G53G0X%sY%s", x_char, y_char);
+  gc_execute_line(command);
+  // 下降到还刀位置
+  float2string(settings.tool_z[settings.tool - 1], z_char, 3);
+  sprintf(command, "G90G53G01Z%sF1500", z_char);
+  gc_execute_line(command);
+  protocol_buffer_synchronize();
+  // 松刀
+  delay_ms(0.3);
+  // 抬刀
+  gc_execute_line("G90G53G0Z-5");
+  protocol_buffer_synchronize();
+  gc_execute_line("M5");
+  // 向下压刀
+  // gc_execute_line("G91G0X-6");
+  // gc_execute_line("G91G1Z-78F2000");
+  // gc_execute_line("G90G53G0Z-5");
+
+  if(sys.isRunGcode){
+    // RFID运动到刀旁边
+    unsigned long nowTime = getTime(); // 记录开始时间
+    unsigned long useTime = nowTime - sys.startTime;
+    uint16_t minutes = useTime / 60;
+
+    char y_char[20], command[80];
+    uint8_t return_data[8];
     gc_execute_line("G90G53G0Z-5");
+    set_flip(0);
     protocol_buffer_synchronize();
-    gc_execute_line("M5");
-    // 向下压刀
-    // gc_execute_line("G91G0X-6");
-    // gc_execute_line("G91G1Z-78F2000");
-    // gc_execute_line("G90G53G0Z-5");
-
-    if(sys.isRunGcode){
-      // RFID运动到刀旁边
-      unsigned long nowTime = getTime(); // 记录开始时间
-      unsigned long useTime = nowTime - sys.startTime;
-      uint16_t minutes = useTime / 60;
-
-      char y_char[20], command[80];
-      uint8_t return_data[8];
-      gc_execute_line("G90G53G0Z-5");
-      set_flip(0);
-      protocol_buffer_synchronize();
-      set_rfid(0);
-      memset(return_data, 0, 8);
-      // 移动刀位置
-      float2string(settings.tool_y[settings.tool - 1] - settings.rfid_offset, y_char, 3);
-      sprintf(command, "G90G53G0Y%s", y_char);
-      gc_execute_line(command);
-      protocol_buffer_synchronize();
-      rfid_write(settings.tool, minutes);
-      set_rfid(1);
-    }
-    set_tool_leds(LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN);
+    set_rfid(0);
+    memset(return_data, 0, 8);
+    // 移动刀位置
+    float2string(settings.tool_y[settings.tool - 1] - settings.rfid_offset, y_char, 3);
+    sprintf(command, "G90G53G0Y%s", y_char);
+    gc_execute_line(command);
+    protocol_buffer_synchronize();
+    rfid_write(settings.tool, minutes);
+    set_rfid(1);
   }
+  set_tool_leds(LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN);
+  
 }
 
 void getToolStatus(){
@@ -166,10 +185,34 @@ void change_tool(uint8_t tool_number)
   if (tool_number == 0)
   {
     return_tool();
+    // 测试当前主轴上还有没有刀
+    if(test_tool_status()){
+      return_tool();
+      if(test_tool_status()){
+        sys.state = STATE_ALARM; // 确保设置警报状态。
+        report_alarm_message(ALARM_CHANGE_TOOL_ERROR);
+        mc_reset(); // 停止电机（如果正在运行）。
+        protocol_execute_realtime();
+        return;
+      }
+    }
+
   }
   else
   {
     return_tool();
+    // 测试当前主轴上还有没有刀
+    if(test_tool_status()){
+      return_tool();
+      if(test_tool_status()){
+        sys.state = STATE_ALARM; // 确保设置警报状态。
+        report_alarm_message(ALARM_CHANGE_TOOL_ERROR);
+        mc_reset(); // 停止电机（如果正在运行）。
+        protocol_execute_realtime();
+        return;
+      }
+    }
+
     set_flip(1);
     get_tool(tool_number);
     set_tool_length();
@@ -221,6 +264,7 @@ void tool_length_zero()
 // 设置刀补
 void set_tool_length()
 {
+  if (sys.state == STATE_ALARM) return;
   printPgmString(PSTR("Start tool setting"));
   printPgmString(PSTR("\r\n"));
   // 抬刀
