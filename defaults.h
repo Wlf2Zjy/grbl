@@ -37,7 +37,7 @@
 #define DEFAULT_Z_MAX_TRAVEL 400.0               // mm
 #define DEFAULT_SPINDLE_RPM_MAX 255.0          // rpm
 #define DEFAULT_SPINDLE_RPM_MIN 0.0              // rpm
-#define DEFAULT_STEP_PULSE_MICROSECONDS 40
+#define DEFAULT_STEP_PULSE_MICROSECONDS 10
 #define DEFAULT_STEPPING_INVERT_MASK 0
 #define DEFAULT_DIRECTION_INVERT_MASK 2
 #define DEFAULT_STEPPER_IDLE_LOCK_TIME 25 // msec (0-254, 255 keeps steppers enabled)
