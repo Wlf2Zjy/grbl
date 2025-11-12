@@ -10,6 +10,8 @@ bool test_tool_status(){
   // 先去对刀仪检测
   // 抬刀
   gc_execute_line("G90G53G0Z-5");
+  //开门
+  set_flip(1);
   // 移动到对刀的xy位置
   float2string(settings.tool_x[TOOL_NUM - 1], x_char, 3);
   float2string(settings.tool_y[TOOL_NUM - 1], y_char, 3);
@@ -104,6 +106,27 @@ void return_tool()
   // gc_execute_line("G91G0X-6");
   // gc_execute_line("G91G1Z-78F2000");
   // gc_execute_line("G90G53G0Z-5");
+  if(sys.isRunGcode){
+    // RFID运动到刀旁边
+    unsigned long nowTime = getTime(); // 记录开始时间
+    unsigned long useTime = nowTime - sys.startTime;
+    uint16_t minutes = useTime / 60;
+
+    char y_char[20], command[80];
+    uint8_t return_data[8];
+    gc_execute_line("G90G53G0Z-5");
+    set_flip(0);
+    protocol_buffer_synchronize();
+    set_rfid(0);
+    memset(return_data, 0, 8);
+    // 移动刀位置
+    float2string(settings.tool_y[settings.tool - 1] - settings.rfid_offset, y_char, 3);
+    sprintf(command, "G90G53G0Y%s", y_char);
+    gc_execute_line(command);
+    protocol_buffer_synchronize();
+    rfid_write(settings.tool, minutes);
+    set_rfid(1);
+  }
   set_tool_leds(LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN, LED_GREEN);
   
 }
@@ -174,27 +197,27 @@ void change_tool(uint8_t tool_number)
         return;
       }
     }
-    if(sys.isRunGcode){
-      // RFID运动到刀旁边
-      unsigned long nowTime = getTime(); // 记录开始时间
-      unsigned long useTime = nowTime - sys.startTime;
-      uint16_t minutes = useTime / 60;
+    // if(sys.isRunGcode){
+    //   // RFID运动到刀旁边
+    //   unsigned long nowTime = getTime(); // 记录开始时间
+    //   unsigned long useTime = nowTime - sys.startTime;
+    //   uint16_t minutes = useTime / 60;
   
-      char y_char[20], command[80];
-      uint8_t return_data[8];
-      gc_execute_line("G90G53G0Z-5");
-      set_flip(0);
-      protocol_buffer_synchronize();
-      set_rfid(0);
-      memset(return_data, 0, 8);
-      // 移动刀位置
-      float2string(settings.tool_y[settings.tool - 1] - settings.rfid_offset, y_char, 3);
-      sprintf(command, "G90G53G0Y%s", y_char);
-      gc_execute_line(command);
-      protocol_buffer_synchronize();
-      rfid_write(settings.tool, minutes);
-      set_rfid(1);
-    }
+    //   char y_char[20], command[80];
+    //   uint8_t return_data[8];
+    //   gc_execute_line("G90G53G0Z-5");
+    //   set_flip(0);
+    //   protocol_buffer_synchronize();
+    //   set_rfid(0);
+    //   memset(return_data, 0, 8);
+    //   // 移动刀位置
+    //   float2string(settings.tool_y[settings.tool - 1] - settings.rfid_offset, y_char, 3);
+    //   sprintf(command, "G90G53G0Y%s", y_char);
+    //   gc_execute_line(command);
+    //   protocol_buffer_synchronize();
+    //   rfid_write(settings.tool, minutes);
+    //   set_rfid(1);
+    // }
   }
   else
   {
@@ -210,27 +233,27 @@ void change_tool(uint8_t tool_number)
         return;
       }
     }
-    if(sys.isRunGcode){
-      // RFID运动到刀旁边
-      unsigned long nowTime = getTime(); // 记录开始时间
-      unsigned long useTime = nowTime - sys.startTime;
-      uint16_t minutes = useTime / 60;
+    // if(sys.isRunGcode){
+    //   // RFID运动到刀旁边
+    //   unsigned long nowTime = getTime(); // 记录开始时间
+    //   unsigned long useTime = nowTime - sys.startTime;
+    //   uint16_t minutes = useTime / 60;
   
-      char y_char[20], command[80];
-      uint8_t return_data[8];
-      gc_execute_line("G90G53G0Z-5");
-      set_flip(0);
-      protocol_buffer_synchronize();
-      set_rfid(0);
-      memset(return_data, 0, 8);
-      // 移动刀位置
-      float2string(settings.tool_y[settings.tool - 1] - settings.rfid_offset, y_char, 3);
-      sprintf(command, "G90G53G0Y%s", y_char);
-      gc_execute_line(command);
-      protocol_buffer_synchronize();
-      rfid_write(settings.tool, minutes);
-      set_rfid(1);
-    }
+    //   char y_char[20], command[80];
+    //   uint8_t return_data[8];
+    //   gc_execute_line("G90G53G0Z-5");
+    //   set_flip(0);
+    //   protocol_buffer_synchronize();
+    //   set_rfid(0);
+    //   memset(return_data, 0, 8);
+    //   // 移动刀位置
+    //   float2string(settings.tool_y[settings.tool - 1] - settings.rfid_offset, y_char, 3);
+    //   sprintf(command, "G90G53G0Y%s", y_char);
+    //   gc_execute_line(command);
+    //   protocol_buffer_synchronize();
+    //   rfid_write(settings.tool, minutes);
+    //   set_rfid(1);
+    // }
     set_flip(1);
     get_tool(tool_number);
     set_tool_length();
