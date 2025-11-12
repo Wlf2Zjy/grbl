@@ -74,8 +74,8 @@ int main(void)
     bool oldIsHomed = sys.isHomed;
     uint8_t prior_state = sys.state;
     memset(&sys, 0, sizeof(system_t)); // 清除系统结构变量。
-    sys.state = prior_state;
-    // sys.state = STATE_ALARM;
+    // sys.state = prior_state;
+    sys.state = STATE_ALARM;
     sys.f_override = DEFAULT_FEED_OVERRIDE;                 // 设置为 100%
     sys.r_override = DEFAULT_RAPID_OVERRIDE;                // 设置为 100%
     sys.spindle_speed_ovr = DEFAULT_SPINDLE_SPEED_OVERRIDE; // 设置为 100%
